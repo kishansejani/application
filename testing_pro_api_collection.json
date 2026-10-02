@@ -1,0 +1,489 @@
+{
+	"info": {
+		"_postman_id": "testing-pro-grocery-api-v2",
+		"name": "Testing Pro - Bilingual Grocery REST API Collection (with Settings, Roles, Forgot Password)",
+		"description": "Complete REST API collection for the Bilingual (English & Gujarati) Grocery Platform with OTP Auth, Forgot Password flow, Roles & Permissions, Categories, Products, Delivery Slot (2 Hours vs Next Day), Cart, Wishlist, Leaflet Map Addresses, Orders, and Settings.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://127.0.0.1:8000/api",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "locale",
+			"value": "gu",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Authentication & Password Reset",
+			"item": [
+				{
+					"name": "Send OTP (Mobile Login)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Accept-Language", "value": "{{locale}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone\": \"9876543210\"\n}",
+							"options": {"raw": {"language": "json"}}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/otp/send",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "otp", "send"]
+						}
+					}
+				},
+				{
+					"name": "Verify OTP & Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.token) {",
+									"    pm.collectionVariables.set('auth_token', jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Accept-Language", "value": "{{locale}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone\": \"9876543210\",\n    \"otp\": \"1234\"\n}",
+							"options": {"raw": {"language": "json"}}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/otp/verify",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "otp", "verify"]
+						}
+					}
+				},
+				{
+					"name": "Forgot Password - Send OTP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email_or_phone\": \"admin@grocery.com\"\n}",
+							"options": {"raw": {"language": "json"}}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/forgot-password/send-otp",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "forgot-password", "send-otp"]
+						}
+					}
+				},
+				{
+					"name": "Forgot Password - Reset with OTP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email_or_phone\": \"admin@grocery.com\",\n    \"otp\": \"1234\",\n    \"password\": \"newpassword123\"\n}",
+							"options": {"raw": {"language": "json"}}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/forgot-password/reset",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "forgot-password", "reset"]
+						}
+					}
+				},
+				{
+					"name": "Get Authenticated User Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Accept-Language", "value": "{{locale}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/profile",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "profile"]
+						}
+					}
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Accept-Language", "value": "{{locale}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Ramesh Patel\",\n    \"email\": \"ramesh.patel@example.com\"\n}",
+							"options": {"raw": {"language": "json"}}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/profile",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "profile"]
+						}
+					}
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/logout",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "logout"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Home, Settings & Public Data",
+			"item": [
+				{
+					"name": "Home Screen Aggregated Data",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Accept-Language", "value": "{{locale}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/home",
+							"host": ["{{base_url}}"],
+							"path": ["home"]
+						}
+					}
+				},
+				{
+					"name": "Get Theme & System Settings",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"}
+						],
+						"url": {
+							"raw": "{{base_url}}/settings",
+							"host": ["{{base_url}}"],
+							"path": ["settings"]
+						}
+					}
+				},
+				{
+					"name": "Get Delivery Slot Status (12 PM Rule)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Accept-Language", "value": "{{locale}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/delivery-slot",
+							"host": ["{{base_url}}"],
+							"path": ["delivery-slot"]
+						}
+					}
+				},
+				{
+					"name": "Get Active Offers / Coupons",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Accept-Language", "value": "{{locale}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/offers",
+							"host": ["{{base_url}}"],
+							"path": ["offers"]
+						}
+					}
+				},
+				{
+					"name": "Validate Coupon Code",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Accept-Language", "value": "{{locale}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"code\": \"FRESH20\",\n    \"subtotal\": 650.00\n}",
+							"options": {"raw": {"language": "json"}}
+						},
+						"url": {
+							"raw": "{{base_url}}/checkout/coupon/apply",
+							"host": ["{{base_url}}"],
+							"path": ["checkout", "coupon", "apply"]
+						}
+					}
+				},
+				{
+					"name": "Get Static Page by Slug",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Accept-Language", "value": "{{locale}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/pages/about-us",
+							"host": ["{{base_url}}"],
+							"path": ["pages", "about-us"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Categories & Catalog",
+			"item": [
+				{
+					"name": "List All Categories",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Accept-Language", "value": "{{locale}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/categories",
+							"host": ["{{base_url}}"],
+							"path": ["categories"]
+						}
+					}
+				},
+				{
+					"name": "Browse Products (Filters, Search, Sorting)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Accept-Language", "value": "{{locale}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/products?category_id=1&sort=price_low_to_high",
+							"host": ["{{base_url}}"],
+							"path": ["products"],
+							"query": [
+								{"key": "category_id", "value": "1"},
+								{"key": "sort", "value": "price_low_to_high"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Single Product Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Accept-Language", "value": "{{locale}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/products/1",
+							"host": ["{{base_url}}"],
+							"path": ["products", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "4. Cart & Wishlist",
+			"item": [
+				{
+					"name": "Get User Cart",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Accept-Language", "value": "{{locale}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/cart",
+							"host": ["{{base_url}}"],
+							"path": ["cart"]
+						}
+					}
+				},
+				{
+					"name": "Add to Cart",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Accept-Language", "value": "{{locale}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"product_id\": 1,\n    \"quantity\": 2\n}",
+							"options": {"raw": {"language": "json"}}
+						},
+						"url": {
+							"raw": "{{base_url}}/cart/add",
+							"host": ["{{base_url}}"],
+							"path": ["cart", "add"]
+						}
+					}
+				},
+				{
+					"name": "Get Wishlist Items",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Accept-Language", "value": "{{locale}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/wishlist",
+							"host": ["{{base_url}}"],
+							"path": ["wishlist"]
+						}
+					}
+				},
+				{
+					"name": "Toggle Wishlist Item",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"product_id\": 2\n}",
+							"options": {"raw": {"language": "json"}}
+						},
+						"url": {
+							"raw": "{{base_url}}/wishlist/toggle",
+							"host": ["{{base_url}}"],
+							"path": ["wishlist", "toggle"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Addresses (Map GPS & Manual)",
+			"item": [
+				{
+					"name": "List User Saved Addresses",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/addresses",
+							"host": ["{{base_url}}"],
+							"path": ["addresses"]
+						}
+					}
+				},
+				{
+					"name": "Create Address (Map Lat/Lng + Manual)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Ramesh Patel\",\n    \"phone\": \"9876543210\",\n    \"type\": \"home\",\n    \"address_line_1\": \"Flat 402, Shivam Heights\",\n    \"address_line_2\": \"Near Iscon Temple, SG Highway\",\n    \"city\": \"Ahmedabad\",\n    \"state\": \"Gujarat\",\n    \"pincode\": \"380015\",\n    \"latitude\": 23.0225,\n    \"longitude\": 72.5714,\n    \"is_default\": true\n}",
+							"options": {"raw": {"language": "json"}}
+						},
+						"url": {
+							"raw": "{{base_url}}/addresses",
+							"host": ["{{base_url}}"],
+							"path": ["addresses"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "6. Orders & Checkout (2-Hour Rule)",
+			"item": [
+				{
+					"name": "Place Order (Auto 2-Hour vs Next-Day Slot)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Accept-Language", "value": "{{locale}}"}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"address_id\": 1,\n    \"payment_method\": \"cod\",\n    \"coupon_code\": \"FRESH20\",\n    \"delivery_note\": \"Please ring bell twice.\"\n}",
+							"options": {"raw": {"language": "json"}}
+						},
+						"url": {
+							"raw": "{{base_url}}/checkout/place-order",
+							"host": ["{{base_url}}"],
+							"path": ["checkout", "place-order"]
+						}
+					}
+				},
+				{
+					"name": "List Customer Order History",
+					"request": {
+						"method": "GET",
+						"header": [
+							{"key": "Accept", "value": "application/json"},
+							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
+							{"key": "Accept-Language", "value": "{{locale}}"}
+						],
+						"url": {
+							"raw": "{{base_url}}/orders",
+							"host": ["{{base_url}}"],
+							"path": ["orders"]
+						}
+					}
+				}
+			]
+		}
+	]
+}

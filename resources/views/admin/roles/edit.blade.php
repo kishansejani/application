@@ -1,0 +1,69 @@
+@extends('admin.layouts.admin')
+
+@section('title', 'Edit Role - ' . $role->display_name)
+
+@section('content')
+<div class="max-w-4xl mx-auto space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Edit Role: {{ $role->display_name }}</h1>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Update display title, description and permissions matrix.</p>
+        </div>
+        <a href="{{ route('admin.roles.index') }}" class="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold rounded-xl text-sm">
+            Back to Roles
+        </a>
+    </div>
+
+    <form action="{{ route('admin.roles.update', $role) }}" method="POST" class="space-y-6">
+        @csrf
+        @method('PUT')
+
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Role Key</label>
+                    <input type="text" value="{{ $role->name }}" disabled
+                           class="w-full px-4 py-2.5 bg-slate-100 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-600 rounded-xl text-sm text-slate-500 cursor-not-allowed">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Display Title *</label>
+                    <input type="text" name="display_name" value="{{ old('display_name', $role->display_name) }}" required
+                           class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Description</label>
+                    <input type="text" name="description" value="{{ old('description', $role->description) }}"
+                           class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm">
+                </div>
+            </div>
+        </div>
+
+        <!-- Permissions Matrix Grouped by Module -->
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm space-y-6">
+            <h2 class="text-base font-bold text-slate-900 dark:text-white">Module Permissions Matrix</h2>
+
+            @foreach($permissions as $group => $groupPerms)
+            <div class="border border-slate-100 dark:border-slate-700 rounded-xl p-4">
+                <h3 class="text-xs font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3">{{ ucfirst($group) }} Module</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    @foreach($groupPerms as $perm)
+                    <label class="flex items-center gap-2 p-2.5 bg-slate-50 dark:bg-slate-900 rounded-xl cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800/80 transition">
+                        <input type="checkbox" name="permissions[]" value="{{ $perm->id }}"
+                               {{ in_array($perm->id, $rolePermissions) ? 'checked' : '' }}
+                               class="rounded text-black focus:ring-black">
+                        <span class="text-xs font-semibold text-slate-800 dark:text-slate-200">{{ $perm->display_name }}</span>
+                    </label>
+                    @endforeach
+                </div>
+            </div>
+            @endforeach
+        </div>
+
+        <div class="flex justify-end gap-3">
+            <button type="submit" class="px-6 py-2.5 bg-black hover:bg-slate-900 text-white dark:bg-white dark:text-black font-semibold rounded-xl text-sm shadow-md transition active:scale-95">
+                Update Role Permissions
+            </button>
+        </div>
+    </form>
+</div>
+@endsection
