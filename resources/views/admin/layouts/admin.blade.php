@@ -69,12 +69,249 @@
             color: #000000 !important;
             font-weight: 700 !important;
         }
-        .dataTables_wrapper select, .dataTables_wrapper input {
-            border: 1px solid #cbd5e1;
-            border-radius: 0.5rem;
-            padding: 0.4rem 0.75rem;
-            font-size: 0.875rem;
+        
+        /* Collapsible Mini Sidebar Styles */
+        #adminSidebar {
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+        #adminSidebar.collapsed {
+            width: 5rem !important; /* 80px */
+        }
+        #adminSidebar.collapsed .sidebar-text,
+        #adminSidebar.collapsed .sidebar-heading,
+        #adminSidebar.collapsed .sidebar-badge,
+        #adminSidebar.collapsed .sidebar-brand-text,
+        #adminSidebar.collapsed .sidebar-chevron {
+            display: none !important;
+        }
+        #adminSidebar.collapsed .sidebar-item {
+            justify-content: center !important;
+            padding-left: 0.75rem !important;
+            padding-right: 0.75rem !important;
+        }
+        #adminSidebar.collapsed .sidebar-brand-wrapper {
+            justify-content: center !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+
+        /* Tooltip styling for collapsed sidebar */
+        #adminSidebar.collapsed .sidebar-item {
+            position: relative;
+        }
+
+        /* Modern DataTables Styling */
+        .dataTables_wrapper {
+            width: 100% !important;
+        }
+        .dataTables_wrapper .dt-header {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+        @media (min-width: 640px) {
+            .dataTables_wrapper .dt-header {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+        }
+        .dataTables_wrapper .dataTables_length label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: #64748b;
+        }
+        .dark .dataTables_wrapper .dataTables_length label {
+            color: #94a3b8;
+        }
+        .dataTables_wrapper .dataTables_length select {
+            border: 1px solid #e2e8f0;
+            background-color: #ffffff;
+            color: #0f172a;
+            border-radius: 0.75rem;
+            padding: 0.45rem 2rem 0.45rem 0.85rem;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        .dark .dataTables_wrapper .dataTables_length select {
+            border-color: #334155;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+        .dataTables_wrapper .dataTables_length select:focus {
+            border-color: #0f172a;
+            box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.1);
+        }
+        .dataTables_wrapper .dataTables_filter {
+            margin: 0;
+            position: relative;
+        }
+        .dataTables_wrapper .dataTables_filter label {
+            display: flex;
+            align-items: center;
+            position: relative;
+            margin: 0;
+            font-size: 0;
+        }
+        .dataTables_wrapper .dataTables_filter input {
+            border: 1px solid #e2e8f0;
+            background-color: #ffffff;
+            color: #0f172a;
+            border-radius: 0.875rem;
+            padding: 0.55rem 1rem 0.55rem 2.5rem;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            width: 16rem;
+            outline: none;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+        }
+        .dark .dataTables_wrapper .dataTables_filter input {
+            border-color: #334155;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+        .dataTables_wrapper .dataTables_filter input:focus {
+            border-color: #0f172a;
+            box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1);
+            width: 18rem;
+        }
+        .dark .dataTables_wrapper .dataTables_filter input:focus {
+            border-color: #94a3b8;
+            box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.15);
+        }
+        .dataTables_wrapper .dataTables_filter::before {
+            content: "\f002";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            left: 0.9rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 0.8125rem;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .dataTables_wrapper table.dataTable {
+            border-collapse: separate !important;
+            border-spacing: 0 !important;
+            margin-top: 0.5rem !important;
+            margin-bottom: 0.5rem !important;
+            width: 100% !important;
+        }
+        .dataTables_wrapper table.dataTable thead th {
+            background-color: #f8fafc;
+            color: #64748b;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.875rem 1rem;
+            border-top: 1px solid #f1f5f9;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .dark .dataTables_wrapper table.dataTable thead th {
+            background-color: #0f172a;
+            color: #94a3b8;
+            border-color: #1e293b;
+        }
+        .dataTables_wrapper table.dataTable tbody td {
+            padding: 0.875rem 1rem;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .dark .dataTables_wrapper table.dataTable tbody td {
+            border-bottom: 1px solid #1e293b;
+        }
+        .dataTables_wrapper .dt-footer {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1.25rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #f1f5f9;
+        }
+        .dark .dataTables_wrapper .dt-footer {
+            border-color: #1e293b;
+        }
+        @media (min-width: 640px) {
+            .dataTables_wrapper .dt-footer {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+        }
+        .dataTables_wrapper .dataTables_info {
+            font-size: 0.8125rem;
+            font-weight: 500;
+            color: #64748b;
+            padding: 0;
+            margin: 0;
+        }
+        .dark .dataTables_wrapper .dataTables_info {
+            color: #94a3b8;
+        }
+        .dataTables_wrapper .dataTables_paginate {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0;
+            margin: 0;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            min-width: 2.25rem !important;
+            height: 2.25rem !important;
+            padding: 0 0.625rem !important;
+            border-radius: 0.75rem !important;
+            font-size: 0.8125rem !important;
+            font-weight: 600 !important;
+            border: 1px solid transparent !important;
+            background: transparent !important;
+            color: #64748b !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+        }
+        .dark .dataTables_wrapper .dataTables_paginate .paginate_button {
+            color: #94a3b8 !important;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover:not(.disabled) {
+            background-color: #f1f5f9 !important;
+            color: #0f172a !important;
+            border-color: #e2e8f0 !important;
+        }
+        .dark .dataTables_wrapper .dataTables_paginate .paginate_button:hover:not(.disabled) {
+            background-color: #1e293b !important;
+            color: #ffffff !important;
+            border-color: #334155 !important;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background-color: #0f172a !important;
+            color: #ffffff !important;
+            border-color: #0f172a !important;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+        .dark .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            border-color: #ffffff !important;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+            opacity: 0.35 !important;
+            cursor: not-allowed !important;
+        }
+
         .dropzone-container {
             border: 2px dashed #cbd5e1;
             transition: all 0.2s ease-in-out;
@@ -89,27 +326,28 @@
 <body class="h-full bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 antialiased flex flex-col transition-colors duration-200">
 
     <div class="min-h-screen flex flex-col">
-        <!-- Top Navbar (Matching Screenshot Header) -->
+        <!-- Top Navbar -->
         <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30 shadow-sm">
             <div class="px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
                 <!-- Left: Sidebar Toggle & Search Bar (Ctrl+/) -->
-                <div class="flex items-center gap-4 flex-1">
-                    <button id="sidebarToggle" class="lg:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700">
-                        <i class="fa-solid fa-bars text-lg"></i>
+                <div class="flex items-center gap-3 sm:gap-4 flex-1">
+                    <!-- Desktop & Mobile Sidebar Collapse Toggle Button -->
+                    <button id="sidebarCollapseToggle" type="button" class="p-2.5 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition flex items-center justify-center" title="Toggle Sidebar Width">
+                        <i class="fa-solid fa-bars-staggered text-base"></i>
                     </button>
                     
-                    <!-- Search Input matching screenshot -->
+                    <!-- Search Input -->
                     <div class="relative w-full max-w-md hidden sm:block">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                             <i class="fa-solid fa-magnifying-glass text-sm"></i>
                         </span>
-                        <input type="text" id="adminQuickSearch" placeholder="Search (Ctrl+/)"
+                        <input type="text" id="adminQuickSearch" placeholder="Search anything (Ctrl+/)..."
                                class="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-300">
                     </div>
                 </div>
 
                 <!-- Right Controls: Theme Mode (Light/Dark/System), Language, Storefront & Profile -->
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2.5 sm:gap-3">
                     <!-- Theme Mode Dropdown (Light / Dark / System Match PC) -->
                     <div class="relative" id="themeDropdownContainer">
                         <button id="themeModeBtn" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition">
@@ -144,8 +382,8 @@
                         <span>Storefront</span>
                     </a>
 
-                    <!-- Admin Profile Dropdown (Matching Profile with green online ring from screenshot) -->
-                    <div class="relative pl-2">
+                    <!-- Admin Profile -->
+                    <div class="relative pl-1 sm:pl-2">
                         <div class="flex items-center gap-2 cursor-pointer" id="userMenuBtn">
                             <div class="relative">
                                 <div class="w-9 h-9 rounded-full bg-slate-900 dark:bg-slate-100 text-white dark:text-black flex items-center justify-center font-bold text-sm shadow">
@@ -165,128 +403,128 @@
 
         <!-- Main Wrapper with Sidebar & Content -->
         <div class="flex-1 flex overflow-hidden">
-            <!-- Sidebar Navigation (Matching Screenshot Left Bar) -->
-            <aside id="adminSidebar" class="w-64 sidebar-custom-bg text-slate-300 flex-shrink-0 flex flex-col justify-between hidden lg:flex transition-all duration-300 z-20">
-                <div class="p-4 space-y-1 overflow-y-auto max-h-[calc(100vh-4rem)]">
-                    <!-- Brand Header in Sidebar (Matching Screenshot Decent Infoways Brand) -->
-                    <div class="flex items-center justify-between px-3 py-3 mb-2 border-b border-slate-800">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-white font-black text-base">
+            <!-- Sidebar Navigation (Collapsible to Icon-Only Mode) -->
+            <aside id="adminSidebar" class="w-64 sidebar-custom-bg text-slate-300 flex-shrink-0 flex flex-col justify-between hidden lg:flex z-20">
+                <div class="p-3 space-y-1 overflow-y-auto max-h-[calc(100vh-4rem)]">
+                    <!-- Brand Header in Sidebar -->
+                    <div class="sidebar-brand-wrapper flex items-center justify-between px-3 py-3 mb-2 border-b border-white/10">
+                        <div class="flex items-center gap-2.5 overflow-hidden">
+                            <div class="w-9 h-9 flex-shrink-0 rounded-xl bg-white/10 flex items-center justify-center text-white font-black text-base shadow-sm">
                                 <i class="fa-solid fa-layer-group"></i>
                             </div>
-                            <div>
-                                <span class="font-extrabold text-sm tracking-tight text-white block">{{ $sysSettings['footer_creator_name'] ?? 'Decent Infoways' }}</span>
+                            <div class="sidebar-brand-text truncate">
+                                <span class="font-extrabold text-sm tracking-tight text-white block truncate">{{ $sysSettings['footer_creator_name'] ?? 'Decent Infoways' }}</span>
+                                <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Admin Panel</span>
                             </div>
                         </div>
-                        <i class="fa-regular fa-circle-dot text-slate-500 text-xs"></i>
                     </div>
 
-                    <p class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-2 mb-1">Core Navigation</p>
+                    <p class="sidebar-heading px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-3 mb-1">Core</p>
 
                     <!-- Dashboard -->
-                    <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all {{ request()->routeIs('admin.dashboard') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}">
-                        <i class="fa-solid fa-chart-pie w-5 text-center"></i>
-                        <span>Dashboard</span>
+                    <a href="{{ route('admin.dashboard') }}" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all {{ request()->routeIs('admin.dashboard') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}" title="Dashboard">
+                        <i class="fa-solid fa-chart-pie text-sm w-5 text-center flex-shrink-0"></i>
+                        <span class="sidebar-text">Dashboard</span>
                     </a>
 
                     <!-- Orders -->
-                    <a href="{{ route('admin.orders.index') }}" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold transition-all {{ request()->routeIs('admin.orders.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}">
+                    <a href="{{ route('admin.orders.index') }}" class="sidebar-item flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all {{ request()->routeIs('admin.orders.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}" title="Orders">
                         <div class="flex items-center gap-3">
-                            <i class="fa-solid fa-truck-fast w-5 text-center"></i>
-                            <span>Manage Orders</span>
+                            <i class="fa-solid fa-truck-fast text-sm w-5 text-center flex-shrink-0"></i>
+                            <span class="sidebar-text">Orders</span>
                         </div>
                         @php $pendingCnt = \App\Models\Order::where('order_status', 'pending')->count(); @endphp
                         @if($pendingCnt > 0)
-                            <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-amber-400 text-black">{{ $pendingCnt }}</span>
+                            <span class="sidebar-badge px-2 py-0.5 text-[10px] font-bold rounded-full bg-amber-400 text-black">{{ $pendingCnt }}</span>
                         @endif
                     </a>
 
-                    <p class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 pt-4 pb-1">Catalog & Inventory</p>
+                    <p class="sidebar-heading px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 pt-3 pb-1">Catalog & Stock</p>
 
-                    <!-- Sliders -->
-                    <a href="{{ route('admin.sliders.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('admin.sliders.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}">
-                        <i class="fa-solid fa-images w-5 text-center"></i>
-                        <span>Manage Sliders</span>
+                    <!-- Sliders (Clean Name as requested) -->
+                    <a href="{{ route('admin.sliders.index') }}" class="sidebar-item flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all {{ request()->routeIs('admin.sliders.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}" title="Sliders">
+                        <i class="fa-solid fa-images text-sm w-5 text-center flex-shrink-0"></i>
+                        <span class="sidebar-text">Sliders</span>
                     </a>
 
                     <!-- Categories -->
-                    <a href="{{ route('admin.categories.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('admin.categories.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}">
-                        <i class="fa-solid fa-layer-group w-5 text-center"></i>
-                        <span>Manage Categories</span>
+                    <a href="{{ route('admin.categories.index') }}" class="sidebar-item flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all {{ request()->routeIs('admin.categories.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}" title="Categories">
+                        <i class="fa-solid fa-layer-group text-sm w-5 text-center flex-shrink-0"></i>
+                        <span class="sidebar-text">Categories</span>
                     </a>
 
                     <!-- Sub Categories -->
-                    <a href="{{ route('admin.subcategories.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('admin.subcategories.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}">
-                        <i class="fa-solid fa-sitemap w-5 text-center"></i>
-                        <span>Sub Categories</span>
+                    <a href="{{ route('admin.subcategories.index') }}" class="sidebar-item flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all {{ request()->routeIs('admin.subcategories.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}" title="Sub Categories">
+                        <i class="fa-solid fa-sitemap text-sm w-5 text-center flex-shrink-0"></i>
+                        <span class="sidebar-text">Sub Categories</span>
                     </a>
 
                     <!-- Products -->
-                    <a href="{{ route('admin.products.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('admin.products.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}">
-                        <i class="fa-solid fa-boxes-stacked w-5 text-center"></i>
-                        <span>Manage Products</span>
+                    <a href="{{ route('admin.products.index') }}" class="sidebar-item flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all {{ request()->routeIs('admin.products.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}" title="Products">
+                        <i class="fa-solid fa-boxes-stacked text-sm w-5 text-center flex-shrink-0"></i>
+                        <span class="sidebar-text">Products</span>
                     </a>
 
-                    <!-- Manage Stock -->
-                    <a href="{{ route('admin.stock.index') }}" class="flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('admin.stock.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}">
+                    <!-- Stock -->
+                    <a href="{{ route('admin.stock.index') }}" class="sidebar-item flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all {{ request()->routeIs('admin.stock.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}" title="Stock & Inventory">
                         <div class="flex items-center gap-3">
-                            <i class="fa-solid fa-warehouse w-5 text-center"></i>
-                            <span>Manage Stock</span>
+                            <i class="fa-solid fa-warehouse text-sm w-5 text-center flex-shrink-0"></i>
+                            <span class="sidebar-text">Stock</span>
                         </div>
                         @php $lowStockCount = \App\Models\Product::where('stock_quantity', '<=', 5)->count(); @endphp
                         @if($lowStockCount > 0)
-                            <span class="px-1.5 py-0.5 text-[10px] font-bold rounded bg-rose-500 text-white">Low</span>
+                            <span class="sidebar-badge px-1.5 py-0.5 text-[10px] font-bold rounded bg-rose-500 text-white">Low</span>
                         @endif
                     </a>
 
                     <!-- Offers & Pages -->
-                    <p class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 pt-4 pb-1">Marketing & Content</p>
+                    <p class="sidebar-heading px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 pt-3 pb-1">Marketing & Content</p>
 
-                    <a href="{{ route('admin.offers.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('admin.offers.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}">
-                        <i class="fa-solid fa-tag w-5 text-center"></i>
-                        <span>Manage Offers</span>
+                    <a href="{{ route('admin.offers.index') }}" class="sidebar-item flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all {{ request()->routeIs('admin.offers.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}" title="Offers">
+                        <i class="fa-solid fa-tag text-sm w-5 text-center flex-shrink-0"></i>
+                        <span class="sidebar-text">Offers</span>
                     </a>
 
-                    <a href="{{ route('admin.pages.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('admin.pages.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}">
-                        <i class="fa-solid fa-file-contract w-5 text-center"></i>
-                        <span>Manage Pages</span>
+                    <a href="{{ route('admin.pages.index') }}" class="sidebar-item flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all {{ request()->routeIs('admin.pages.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}" title="Pages">
+                        <i class="fa-solid fa-file-contract text-sm w-5 text-center flex-shrink-0"></i>
+                        <span class="sidebar-text">Pages</span>
                     </a>
 
-                    <!-- ROLE & USER MANAGEMENT (Matching User's Screenshot Menu Group) -->
-                    <p class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 pt-4 pb-1">Role & User Management</p>
+                    <!-- Role & User Management -->
+                    <p class="sidebar-heading px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 pt-3 pb-1">Administration</p>
 
-                    <a href="{{ route('admin.roles.index') }}" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('admin.roles.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}">
+                    <a href="{{ route('admin.roles.index') }}" class="sidebar-item flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all {{ request()->routeIs('admin.roles.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}" title="Roles & Permissions">
                         <div class="flex items-center gap-3">
-                            <i class="fa-solid fa-shield-halved w-5 text-center"></i>
-                            <span>Roles & Permissions</span>
+                            <i class="fa-solid fa-shield-halved text-sm w-5 text-center flex-shrink-0"></i>
+                            <span class="sidebar-text">Roles & Permissions</span>
                         </div>
-                        <i class="fa-solid fa-chevron-right text-[10px] opacity-60"></i>
+                        <i class="sidebar-chevron fa-solid fa-chevron-right text-[10px] opacity-60"></i>
                     </a>
 
-                    <a href="{{ route('admin.users.index') }}" class="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('admin.users.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}">
+                    <a href="{{ route('admin.users.index') }}" class="sidebar-item flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all {{ request()->routeIs('admin.users.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}" title="Users">
                         <div class="flex items-center gap-3">
-                            <i class="fa-solid fa-users-gear w-5 text-center"></i>
-                            <span>Users</span>
+                            <i class="fa-solid fa-users-gear text-sm w-5 text-center flex-shrink-0"></i>
+                            <span class="sidebar-text">Users</span>
                         </div>
-                        <i class="fa-solid fa-chevron-right text-[10px] opacity-60"></i>
+                        <i class="sidebar-chevron fa-solid fa-chevron-right text-[10px] opacity-60"></i>
                     </a>
 
-                    <!-- SYSTEM SETTINGS (Matching User's Screenshot Menu Group) -->
-                    <p class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 pt-4 pb-1">System Settings</p>
+                    <!-- Settings -->
+                    <p class="sidebar-heading px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 pt-3 pb-1">Settings</p>
 
-                    <a href="{{ route('admin.settings.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('admin.settings.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}">
-                        <i class="fa-solid fa-gear w-5 text-center"></i>
-                        <span>Settings</span>
+                    <a href="{{ route('admin.settings.index') }}" class="sidebar-item flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all {{ request()->routeIs('admin.settings.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}" title="Settings">
+                        <i class="fa-solid fa-gear text-sm w-5 text-center flex-shrink-0"></i>
+                        <span class="sidebar-text">Settings</span>
                     </a>
                 </div>
 
                 <!-- Sidebar Footer & Logout -->
-                <div class="p-4 border-t border-slate-800 bg-black/40">
+                <div class="p-3 border-t border-white/10 bg-black/40">
                     <form action="{{ route('admin.logout') }}" method="POST">
                         @csrf
-                        <button type="submit" class="w-full flex items-center justify-center gap-2 py-2 px-3 bg-white/10 hover:bg-rose-600/30 text-rose-300 hover:text-rose-200 rounded-xl text-xs font-bold transition">
-                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                            <span>Logout Account</span>
+                        <button type="submit" class="sidebar-item w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-white/10 hover:bg-rose-600/40 text-rose-300 hover:text-rose-100 rounded-xl text-xs font-bold transition" title="Logout Account">
+                            <i class="fa-solid fa-arrow-right-from-bracket flex-shrink-0"></i>
+                            <span class="sidebar-text">Logout</span>
                         </button>
                     </form>
                 </div>
@@ -420,14 +658,61 @@
             $('#themeDropdownMenu').toggleClass('hidden');
         });
 
-        $(document).on('click', function() {
-            $('#themeDropdownMenu').addClass('hidden');
+        // Sidebar Collapsible Mini/Icon-Only Toggle & Mobile Responsive Toggle
+        function applySidebarState(isCollapsed) {
+            const sidebar = $('#adminSidebar');
+            if (isCollapsed) {
+                sidebar.addClass('collapsed');
+            } else {
+                sidebar.removeClass('collapsed');
+            }
+        }
+
+        // Initialize sidebar state from localStorage
+        const savedSidebarState = localStorage.getItem('admin_sidebar_collapsed') === 'true';
+        if (savedSidebarState && window.innerWidth >= 1024) {
+            $('#adminSidebar').addClass('collapsed');
+        }
+
+        $('#sidebarCollapseToggle').on('click', function() {
+            const sidebar = $('#adminSidebar');
+            if (window.innerWidth < 1024) {
+                // Mobile: toggle visibility
+                sidebar.toggleClass('hidden');
+            } else {
+                // Desktop: toggle mini icon-only collapsed mode
+                sidebar.toggleClass('collapsed');
+                const isCollapsed = sidebar.hasClass('collapsed');
+                localStorage.setItem('admin_sidebar_collapsed', isCollapsed ? 'true' : 'false');
+            }
         });
 
-        // Mobile Sidebar toggle
-        $('#sidebarToggle').on('click', function() {
-            $('#adminSidebar').toggleClass('hidden');
-        });
+        // Setup DataTables Global Defaults with modern design
+        if ($.fn.dataTable) {
+            $.extend(true, $.fn.dataTable.defaults, {
+                responsive: true,
+                language: {
+                    search: "",
+                    searchPlaceholder: "Search records...",
+                    lengthMenu: "Show _MENU_ entries",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    infoEmpty: "Showing 0 to 0 of 0 entries",
+                    infoFiltered: "(filtered from _MAX_ total records)",
+                    zeroRecords: "No matching records found",
+                    paginate: {
+                        first: '<i class="fa-solid fa-angles-left"></i>',
+                        previous: '<i class="fa-solid fa-chevron-left"></i>',
+                        next: '<i class="fa-solid fa-chevron-right"></i>',
+                        last: '<i class="fa-solid fa-angles-right"></i>'
+                    }
+                },
+                dom: '<"dt-header flex flex-col sm:flex-row items-center justify-between gap-4 mb-4"lf>rt<"dt-footer flex flex-col sm:flex-row items-center justify-between gap-4 mt-4"ip>',
+                drawCallback: function() {
+                    // Modernize pagination buttons styling on render
+                    $('.dataTables_paginate .paginate_button').addClass('transition duration-150');
+                }
+            });
+        }
 
         // Quick Search keyboard shortcut Ctrl+/
         document.addEventListener('keydown', function(e) {

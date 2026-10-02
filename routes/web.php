@@ -81,12 +81,17 @@ Route::delete('/addresses/{address}', [AddressController::class, 'destroy'])->na
 
 // Customer Auth (Mobile OTP)
 Route::get('/login', [CustomerAuthController::class, 'showLogin'])->name('login');
+Route::get('/customer/login', [CustomerAuthController::class, 'showLogin'])->name('customer.login');
 Route::post('/login/otp/send', [CustomerAuthController::class, 'sendOtp'])->name('auth.send-otp');
+Route::post('/customer/otp/send', [CustomerAuthController::class, 'sendOtp'])->name('customer.otp.send');
 Route::get('/login/verify', [CustomerAuthController::class, 'showVerify'])->name('auth.verify.view');
+Route::get('/customer/verify', [CustomerAuthController::class, 'showVerify'])->name('customer.verify.view');
 Route::post('/login/verify', [CustomerAuthController::class, 'verifyOtp'])->name('auth.verify');
+Route::post('/customer/verify', [CustomerAuthController::class, 'verifyOtp'])->name('customer.verify.post');
 Route::get('/profile', [CustomerAuthController::class, 'profile'])->name('profile.index');
+Route::get('/customer/profile', [CustomerAuthController::class, 'profile'])->name('customer.profile');
 Route::put('/profile/update', [CustomerAuthController::class, 'updateProfile'])->name('profile.update');
-Route::post('/profile/update', [CustomerAuthController::class, 'updateProfile']);
+Route::post('/profile/update', [CustomerAuthController::class, 'updateProfile'])->name('customer.profile.update');
 Route::post('/logout', [CustomerAuthController::class, 'logout'])->name('customer.logout');
 
 // Forgot Password Flow
