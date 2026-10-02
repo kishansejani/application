@@ -13,68 +13,86 @@
     </div>
 
     <!-- Stat Pipeline Grid -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
         <!-- Card 1: All Orders -->
-        <a href="{{ route('admin.orders.index') }}" class="group relative overflow-hidden rounded-2xl p-3.5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ !request('status') && !request('delivery_type') ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white shadow-md border border-slate-700/50' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-slate-300 shadow-sm' }}">
+        <a href="{{ route('admin.orders.index') }}" class="group relative overflow-hidden rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ !request('status') && !request('delivery_type') ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white shadow-lg border border-slate-700/60' : 'bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 hover:border-slate-300 shadow-sm' }}">
             <div class="flex items-center justify-between">
                 <span class="text-[10px] font-extrabold uppercase tracking-wider {{ !request('status') && !request('delivery_type') ? 'text-slate-300' : 'text-slate-500 dark:text-slate-400' }}">All Orders</span>
-                <i class="fa-solid fa-cart-flatbed-suitcase text-xs {{ !request('status') && !request('delivery_type') ? 'text-indigo-300' : 'text-slate-400' }}"></i>
+                <div class="w-8 h-8 rounded-xl flex items-center justify-center text-xs {{ !request('status') && !request('delivery_type') ? 'bg-white/10 text-indigo-300' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300' }}">
+                    <i class="fa-solid fa-cart-flatbed-suitcase"></i>
+                </div>
             </div>
             <div class="text-2xl font-black mt-2 {{ !request('status') && !request('delivery_type') ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['total'] }}</div>
+            <span class="text-[10px] font-bold text-slate-400 block mt-1">● Total Orders</span>
         </a>
 
         <!-- Card 2: 2-Hr Express -->
-        <a href="{{ route('admin.orders.index', ['delivery_type' => 'two_hours']) }}" class="group relative overflow-hidden rounded-2xl p-3.5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('delivery_type') == 'two_hours' ? 'bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-md border border-amber-400' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-amber-500 shadow-sm' }}">
+        <a href="{{ route('admin.orders.index', ['delivery_type' => 'two_hours']) }}" class="group relative overflow-hidden rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('delivery_type') == 'two_hours' ? 'bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-lg border border-amber-400' : 'bg-gradient-to-br from-white via-white to-amber-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-amber-950/30 border border-amber-200/80 dark:border-amber-800/60 shadow-sm' }}">
             <div class="flex items-center justify-between">
-                <span class="text-[10px] font-extrabold uppercase tracking-wider text-amber-600 dark:text-amber-400">⚡ 2-Hr Express</span>
-                <i class="fa-solid fa-bolt text-xs text-amber-500"></i>
+                <span class="text-[10px] font-extrabold uppercase tracking-wider text-amber-700 dark:text-amber-400">⚡ 2-Hr Express</span>
+                <div class="w-8 h-8 rounded-xl flex items-center justify-center text-xs {{ request('delivery_type') == 'two_hours' ? 'bg-white/20 text-white' : 'bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400' }}">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
             </div>
-            <div class="text-2xl font-black mt-2 text-slate-900 dark:text-white">{{ $stats['two_hour_express'] }}</div>
+            <div class="text-2xl font-black mt-2 {{ request('delivery_type') == 'two_hours' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['two_hour_express'] }}</div>
+            <span class="text-[10px] font-bold text-amber-600 dark:text-amber-400 block mt-1">★ Priority</span>
         </a>
 
         <!-- Card 3: Pending -->
-        <a href="{{ route('admin.orders.index', ['status' => 'pending']) }}" class="group relative overflow-hidden rounded-2xl p-3.5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('status') == 'pending' ? 'bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-md border border-amber-400' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-amber-400 shadow-sm' }}">
+        <a href="{{ route('admin.orders.index', ['status' => 'pending']) }}" class="group relative overflow-hidden rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('status') == 'pending' ? 'bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-lg border border-amber-400' : 'bg-gradient-to-br from-white via-white to-amber-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-amber-950/30 border border-amber-200/80 dark:border-amber-800/60 shadow-sm' }}">
             <div class="flex items-center justify-between">
                 <span class="text-[10px] font-extrabold uppercase tracking-wider text-amber-700 dark:text-amber-400">Pending</span>
-                <i class="fa-solid fa-clock text-xs text-amber-500"></i>
+                <div class="w-8 h-8 rounded-xl flex items-center justify-center text-xs {{ request('status') == 'pending' ? 'bg-white/20 text-white' : 'bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400' }}">
+                    <i class="fa-solid fa-clock"></i>
+                </div>
             </div>
-            <div class="text-2xl font-black mt-2 text-slate-900 dark:text-white">{{ $stats['pending'] }}</div>
+            <div class="text-2xl font-black mt-2 {{ request('status') == 'pending' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['pending'] }}</div>
+            <span class="text-[10px] font-bold text-amber-600 dark:text-amber-400 block mt-1">● Queued</span>
         </a>
 
         <!-- Card 4: Processing -->
-        <a href="{{ route('admin.orders.index', ['status' => 'processing']) }}" class="group relative overflow-hidden rounded-2xl p-3.5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('status') == 'processing' ? 'bg-gradient-to-br from-indigo-600 to-blue-700 text-white shadow-md border border-indigo-500' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-indigo-500 shadow-sm' }}">
+        <a href="{{ route('admin.orders.index', ['status' => 'processing']) }}" class="group relative overflow-hidden rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('status') == 'processing' ? 'bg-gradient-to-br from-indigo-600 to-blue-700 text-white shadow-lg border border-indigo-500' : 'bg-gradient-to-br from-white via-white to-indigo-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-indigo-950/30 border border-indigo-200/80 dark:border-indigo-800/60 shadow-sm' }}">
             <div class="flex items-center justify-between">
                 <span class="text-[10px] font-extrabold uppercase tracking-wider text-indigo-700 dark:text-indigo-400">Processing</span>
-                <i class="fa-solid fa-box-open text-xs text-indigo-500"></i>
+                <div class="w-8 h-8 rounded-xl flex items-center justify-center text-xs {{ request('status') == 'processing' ? 'bg-white/20 text-white' : 'bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400' }}">
+                    <i class="fa-solid fa-box-open"></i>
+                </div>
             </div>
-            <div class="text-2xl font-black mt-2 text-slate-900 dark:text-white">{{ $stats['processing'] }}</div>
+            <div class="text-2xl font-black mt-2 {{ request('status') == 'processing' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['processing'] }}</div>
+            <span class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 block mt-1">● Packing</span>
         </a>
 
         <!-- Card 5: Out for Delivery -->
-        <a href="{{ route('admin.orders.index', ['status' => 'out_for_delivery']) }}" class="group relative overflow-hidden rounded-2xl p-3.5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('status') == 'out_for_delivery' ? 'bg-gradient-to-br from-purple-600 to-indigo-700 text-white shadow-md border border-purple-500' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-purple-500 shadow-sm' }}">
+        <a href="{{ route('admin.orders.index', ['status' => 'out_for_delivery']) }}" class="group relative overflow-hidden rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('status') == 'out_for_delivery' ? 'bg-gradient-to-br from-purple-600 to-indigo-700 text-white shadow-lg border border-purple-500' : 'bg-gradient-to-br from-white via-white to-purple-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-purple-950/30 border border-purple-200/80 dark:border-purple-800/60 shadow-sm' }}">
             <div class="flex items-center justify-between">
-                <span class="text-[10px] font-extrabold uppercase tracking-wider text-purple-700 dark:text-purple-400">Out for Delivery</span>
-                <i class="fa-solid fa-truck-fast text-xs text-purple-500"></i>
+                <span class="text-[10px] font-extrabold uppercase tracking-wider text-purple-700 dark:text-purple-400">On The Road</span>
+                <div class="w-8 h-8 rounded-xl flex items-center justify-center text-xs {{ request('status') == 'out_for_delivery' ? 'bg-white/20 text-white' : 'bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-400' }}">
+                    <i class="fa-solid fa-truck-fast"></i>
+                </div>
             </div>
-            <div class="text-2xl font-black mt-2 text-slate-900 dark:text-white">{{ $stats['out_for_delivery'] }}</div>
+            <div class="text-2xl font-black mt-2 {{ request('status') == 'out_for_delivery' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['out_for_delivery'] }}</div>
+            <span class="text-[10px] font-bold text-purple-600 dark:text-purple-400 block mt-1">● Dispatched</span>
         </a>
 
         <!-- Card 6: Delivered -->
-        <a href="{{ route('admin.orders.index', ['status' => 'delivered']) }}" class="group relative overflow-hidden rounded-2xl p-3.5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('status') == 'delivered' ? 'bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-md border border-emerald-500' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-emerald-500 shadow-sm' }}">
+        <a href="{{ route('admin.orders.index', ['status' => 'delivered']) }}" class="group relative overflow-hidden rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('status') == 'delivered' ? 'bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-lg border border-emerald-500' : 'bg-gradient-to-br from-white via-white to-emerald-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/60 shadow-sm' }}">
             <div class="flex items-center justify-between">
                 <span class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">Delivered</span>
-                <i class="fa-solid fa-circle-check text-xs text-emerald-500"></i>
+                <div class="w-8 h-8 rounded-xl flex items-center justify-center text-xs {{ request('status') == 'delivered' ? 'bg-white/20 text-white' : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400' }}">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
             </div>
-            <div class="text-2xl font-black mt-2 text-slate-900 dark:text-white">{{ $stats['delivered'] }}</div>
+            <div class="text-2xl font-black mt-2 {{ request('status') == 'delivered' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['delivered'] }}</div>
+            <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 block mt-1">● Completed</span>
         </a>
     </div>
 
     <!-- Orders DataTable Card -->
-    <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm p-6 overflow-hidden">
+    <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200/90 dark:border-slate-700/80 shadow-sm p-6 overflow-hidden">
         <div class="overflow-x-auto">
             <table id="ordersTable" class="w-full text-left text-xs">
                 <thead>
-                    <tr class="bg-slate-50 dark:bg-slate-900/60 text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px] tracking-wider">
+                    <tr class="bg-slate-50 dark:bg-slate-900/60 text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200 dark:border-slate-700">
                         <th class="px-4 py-3.5 rounded-l-2xl">Order Info</th>
                         <th class="px-4 py-3.5">Customer & Phone</th>
                         <th class="px-4 py-3.5">Delivery Slot</th>
@@ -85,8 +103,8 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-700/60 font-medium">
-                    @forelse($orders as $order)
-                        <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-700/30 transition-colors">
+                    @foreach($orders as $order)
+                        <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition-colors">
                             <td class="px-4 py-3.5">
                                 <a href="{{ route('admin.orders.show', $order) }}" class="font-bold text-indigo-600 dark:text-indigo-400 hover:underline text-sm font-mono">
                                     {{ $order->order_number }}
@@ -143,11 +161,7 @@
                                 </div>
                             </td>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" class="p-8 text-center text-slate-400">No orders found matching criteria.</td>
-                        </tr>
-                    @endforelse
+                    @endforeach
                 </tbody>
             </table>
         </div>

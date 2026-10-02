@@ -25,85 +25,101 @@
     <!-- Top KPI / Pipeline Stats Grid -->
     <div class="grid grid-cols-2 sm:grid-cols-5 gap-4">
         <!-- Card 1: All Products -->
-        <a href="{{ route('admin.products.index') }}" class="group relative overflow-hidden rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ !request('stock_status') && !request('category_id') ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white shadow-md border border-slate-700/50' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-slate-300 shadow-sm' }}">
+        <a href="{{ route('admin.products.index') }}" class="group relative overflow-hidden rounded-2xl p-4.5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ !request('stock_status') && !request('category_id') ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white shadow-lg border border-slate-700/60' : 'bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 hover:border-slate-300 shadow-sm' }}">
             <div class="flex items-center justify-between">
-                <span class="text-[11px] font-extrabold uppercase tracking-wider {{ !request('stock_status') && !request('category_id') ? 'text-slate-300' : 'text-slate-500 dark:text-slate-400' }}">All Products</span>
-                <div class="w-8 h-8 rounded-xl flex items-center justify-center text-xs {{ !request('stock_status') && !request('category_id') ? 'bg-white/10 text-indigo-300' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300' }}">
+                <div>
+                    <span class="text-[11px] font-extrabold uppercase tracking-wider block {{ !request('stock_status') && !request('category_id') ? 'text-slate-300' : 'text-slate-500 dark:text-slate-400' }}">All Products</span>
+                    <div class="text-3xl font-black mt-2 {{ !request('stock_status') && !request('category_id') ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['total'] ?? $products->count() }}</div>
+                </div>
+                <div class="w-11 h-11 rounded-2xl flex items-center justify-center text-sm shadow-inner {{ !request('stock_status') && !request('category_id') ? 'bg-white/10 text-indigo-300 border border-white/20 backdrop-blur-md' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300' }}">
                     <i class="fa-solid fa-boxes-stacked"></i>
                 </div>
             </div>
-            <div class="mt-3 flex items-baseline gap-2">
-                <span class="text-2xl sm:text-3xl font-black {{ !request('stock_status') && !request('category_id') ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['total'] ?? $products->count() }}</span>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ !request('stock_status') && !request('category_id') ? 'bg-white/10 text-slate-300' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300' }}">Total</span>
+            <div class="mt-3 flex items-center gap-1.5">
+                <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full {{ !request('stock_status') && !request('category_id') ? 'bg-white/10 text-slate-200' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300' }}">● Total Catalog</span>
             </div>
-            <i class="fa-solid fa-boxes-stacked absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
+            <i class="fa-solid fa-boxes-stacked absolute -right-3 -bottom-3 text-6xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </a>
 
         <!-- Card 2: In Stock -->
-        <a href="{{ route('admin.products.index', ['stock_status' => 'in_stock']) }}" class="group relative overflow-hidden rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('stock_status') == 'in_stock' ? 'bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-md border border-emerald-500' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-emerald-500 shadow-sm hover:border-emerald-200' }}">
+        <a href="{{ route('admin.products.index', ['stock_status' => 'in_stock']) }}" class="group relative overflow-hidden rounded-2xl p-4.5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('stock_status') == 'in_stock' ? 'bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-lg border border-emerald-500' : 'bg-gradient-to-br from-white via-white to-emerald-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/60 shadow-sm' }}">
             <div class="flex items-center justify-between">
-                <span class="text-[11px] font-extrabold uppercase tracking-wider {{ request('stock_status') == 'in_stock' ? 'text-emerald-100' : 'text-emerald-700 dark:text-emerald-400' }}">In Stock</span>
-                <div class="w-8 h-8 rounded-xl flex items-center justify-center text-xs {{ request('stock_status') == 'in_stock' ? 'bg-white/20 text-white' : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400' }}">
+                <div>
+                    <span class="text-[11px] font-extrabold uppercase tracking-wider block {{ request('stock_status') == 'in_stock' ? 'text-emerald-100' : 'text-emerald-700 dark:text-emerald-400' }}">In Stock</span>
+                    <div class="text-3xl font-black mt-2 {{ request('stock_status') == 'in_stock' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['in_stock'] ?? 0 }}</div>
+                </div>
+                <div class="w-11 h-11 rounded-2xl flex items-center justify-center text-sm text-white shadow-md {{ request('stock_status') == 'in_stock' ? 'bg-white/20 text-white border border-white/30' : 'bg-gradient-to-tr from-emerald-500 to-teal-400 shadow-emerald-500/25' }}">
                     <i class="fa-solid fa-check-double"></i>
                 </div>
             </div>
-            <div class="mt-3 flex items-baseline gap-2">
-                <span class="text-2xl sm:text-3xl font-black {{ request('stock_status') == 'in_stock' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['in_stock'] ?? 0 }}</span>
-                <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full flex items-center gap-1 {{ request('stock_status') == 'in_stock' ? 'bg-white/20 text-white' : 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300' }}">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> &gt;5
+            <div class="mt-3 flex items-center gap-1.5">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold {{ request('stock_status') == 'in_stock' ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800' }}">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> Sufficient (&gt;5)
                 </span>
             </div>
-            <i class="fa-solid fa-check-double absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
+            <i class="fa-solid fa-check-double absolute -right-3 -bottom-3 text-6xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </a>
 
         <!-- Card 3: Low Stock -->
-        <a href="{{ route('admin.products.index', ['stock_status' => 'low_stock']) }}" class="group relative overflow-hidden rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('stock_status') == 'low_stock' ? 'bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-md border border-amber-400' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-amber-500 shadow-sm hover:border-amber-200' }}">
+        <a href="{{ route('admin.products.index', ['stock_status' => 'low_stock']) }}" class="group relative overflow-hidden rounded-2xl p-4.5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('stock_status') == 'low_stock' ? 'bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-lg border border-amber-400' : 'bg-gradient-to-br from-white via-white to-amber-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-amber-950/30 border border-amber-200/80 dark:border-amber-800/60 shadow-sm' }}">
             <div class="flex items-center justify-between">
-                <span class="text-[11px] font-extrabold uppercase tracking-wider {{ request('stock_status') == 'low_stock' ? 'text-amber-100' : 'text-amber-700 dark:text-amber-400' }}">Low Stock</span>
-                <div class="w-8 h-8 rounded-xl flex items-center justify-center text-xs {{ request('stock_status') == 'low_stock' ? 'bg-white/20 text-white' : 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400' }}">
+                <div>
+                    <span class="text-[11px] font-extrabold uppercase tracking-wider block {{ request('stock_status') == 'low_stock' ? 'text-amber-100' : 'text-amber-700 dark:text-amber-400' }}">Low Stock</span>
+                    <div class="text-3xl font-black mt-2 {{ request('stock_status') == 'low_stock' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['low_stock'] ?? 0 }}</div>
+                </div>
+                <div class="w-11 h-11 rounded-2xl flex items-center justify-center text-sm text-white shadow-md {{ request('stock_status') == 'low_stock' ? 'bg-white/20 text-white border border-white/30' : 'bg-gradient-to-tr from-amber-500 to-orange-400 shadow-amber-500/25' }}">
                     <i class="fa-solid fa-triangle-exclamation"></i>
                 </div>
             </div>
-            <div class="mt-3 flex items-baseline gap-2">
-                <span class="text-2xl sm:text-3xl font-black {{ request('stock_status') == 'low_stock' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['low_stock'] ?? 0 }}</span>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ request('stock_status') == 'low_stock' ? 'bg-white/20 text-white' : 'bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300' }}">1 - 5</span>
+            <div class="mt-3 flex items-center gap-1.5">
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold {{ request('stock_status') == 'low_stock' ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800' }}">
+                    ⚠️ 1 - 5 Units
+                </span>
             </div>
-            <i class="fa-solid fa-triangle-exclamation absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
+            <i class="fa-solid fa-triangle-exclamation absolute -right-3 -bottom-3 text-6xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </a>
 
         <!-- Card 4: Out of Stock -->
-        <a href="{{ route('admin.products.index', ['stock_status' => 'out_of_stock']) }}" class="group relative overflow-hidden rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('stock_status') == 'out_of_stock' ? 'bg-gradient-to-br from-rose-600 to-red-700 text-white shadow-md border border-rose-500' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-rose-500 shadow-sm hover:border-rose-200' }}">
+        <a href="{{ route('admin.products.index', ['stock_status' => 'out_of_stock']) }}" class="group relative overflow-hidden rounded-2xl p-4.5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('stock_status') == 'out_of_stock' ? 'bg-gradient-to-br from-rose-600 to-red-700 text-white shadow-lg border border-rose-500' : 'bg-gradient-to-br from-white via-white to-rose-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-rose-950/30 border border-rose-200/80 dark:border-rose-800/60 shadow-sm' }}">
             <div class="flex items-center justify-between">
-                <span class="text-[11px] font-extrabold uppercase tracking-wider {{ request('stock_status') == 'out_of_stock' ? 'text-rose-100' : 'text-rose-700 dark:text-rose-400' }}">Out of Stock</span>
-                <div class="w-8 h-8 rounded-xl flex items-center justify-center text-xs {{ request('stock_status') == 'out_of_stock' ? 'bg-white/20 text-white' : 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400' }}">
+                <div>
+                    <span class="text-[11px] font-extrabold uppercase tracking-wider block {{ request('stock_status') == 'out_of_stock' ? 'text-rose-100' : 'text-rose-700 dark:text-rose-400' }}">Out of Stock</span>
+                    <div class="text-3xl font-black mt-2 {{ request('stock_status') == 'out_of_stock' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['out_of_stock'] ?? 0 }}</div>
+                </div>
+                <div class="w-11 h-11 rounded-2xl flex items-center justify-center text-sm text-white shadow-md {{ request('stock_status') == 'out_of_stock' ? 'bg-white/20 text-white border border-white/30' : 'bg-gradient-to-tr from-rose-500 to-pink-500 shadow-rose-500/25' }}">
                     <i class="fa-solid fa-ban"></i>
                 </div>
             </div>
-            <div class="mt-3 flex items-baseline gap-2">
-                <span class="text-2xl sm:text-3xl font-black {{ request('stock_status') == 'out_of_stock' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['out_of_stock'] ?? 0 }}</span>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ request('stock_status') == 'out_of_stock' ? 'bg-white/20 text-white' : 'bg-rose-100 dark:bg-rose-950/80 text-rose-700 dark:text-rose-300' }}">0 Units</span>
+            <div class="mt-3 flex items-center gap-1.5">
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold {{ request('stock_status') == 'out_of_stock' ? 'bg-white/20 text-white' : 'bg-rose-100 text-rose-800 dark:bg-rose-950/80 dark:text-rose-300 border border-rose-200/80 dark:border-rose-800' }}">
+                    ● 0 Units Left
+                </span>
             </div>
-            <i class="fa-solid fa-ban absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
+            <i class="fa-solid fa-ban absolute -right-3 -bottom-3 text-6xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </a>
 
         <!-- Card 5: Featured -->
-        <div class="group relative overflow-hidden rounded-2xl p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-purple-500 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+        <div class="group relative overflow-hidden rounded-2xl p-4.5 bg-gradient-to-br from-white via-white to-purple-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-purple-950/30 border border-purple-200/80 dark:border-purple-800/60 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
             <div class="flex items-center justify-between">
-                <span class="text-[11px] font-extrabold uppercase tracking-wider text-purple-700 dark:text-purple-400">Featured</span>
-                <div class="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center text-xs">
+                <div>
+                    <span class="text-[11px] font-extrabold uppercase tracking-wider block text-purple-700 dark:text-purple-400">Featured</span>
+                    <div class="text-3xl font-black mt-2 text-slate-900 dark:text-white">{{ $stats['featured'] ?? 0 }}</div>
+                </div>
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-purple-500 to-indigo-500 text-white flex items-center justify-center text-sm shadow-md shadow-purple-500/25">
                     <i class="fa-solid fa-wand-magic-sparkles"></i>
                 </div>
             </div>
-            <div class="mt-3 flex items-baseline gap-2">
-                <span class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">{{ $stats['featured'] ?? 0 }}</span>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300">★ Starred</span>
+            <div class="mt-3 flex items-center gap-1.5">
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-purple-100 text-purple-800 dark:bg-purple-950/80 dark:text-purple-300 border border-purple-200/80 dark:border-purple-800">
+                    ★ Highlights
+                </span>
             </div>
-            <i class="fa-solid fa-wand-magic-sparkles absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
+            <i class="fa-solid fa-wand-magic-sparkles absolute -right-3 -bottom-3 text-6xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </div>
     </div>
 
     <!-- Table Card Container -->
-    <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm p-6 overflow-hidden">
+    <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200/90 dark:border-slate-700/80 shadow-sm p-6 overflow-hidden">
         <!-- Filter bar -->
         <div class="mb-5 flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-700/60">
             <form action="{{ route('admin.products.index') }}" method="GET" class="flex flex-wrap items-center gap-3">
@@ -136,7 +152,7 @@
         <div class="overflow-x-auto">
             <table id="productsTable" class="w-full text-left text-xs">
                 <thead>
-                    <tr class="bg-slate-50 dark:bg-slate-900/60 text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px] tracking-wider">
+                    <tr class="bg-slate-50 dark:bg-slate-900/60 text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200 dark:border-slate-700">
                         <th class="px-4 py-3.5 rounded-l-2xl">Product</th>
                         <th class="px-4 py-3.5">Category</th>
                         <th class="px-4 py-3.5">Unit & Price</th>
@@ -147,12 +163,12 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-700/60 font-medium">
-                    @forelse($products as $product)
-                        <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-700/30 transition-colors">
+                    @foreach($products as $product)
+                        <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition-colors">
                             <td class="px-4 py-3.5">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-12 h-12 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 shrink-0 shadow-sm">
-                                        <img src="{{ $product->thumbnail_url }}" alt="{{ $product->name_en }}" class="w-full h-full object-cover">
+                                    <div class="w-12 h-12 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 shrink-0 shadow-sm group">
+                                        <img src="{{ $product->thumbnail_url }}" alt="{{ $product->name_en }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                                     </div>
                                     <div>
                                         <a href="{{ route('admin.products.edit', $product) }}" class="font-bold text-slate-900 dark:text-white text-sm hover:underline leading-tight">
@@ -164,7 +180,7 @@
                                 </div>
                             </td>
                             <td class="px-4 py-3.5">
-                                <span class="inline-block px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-[11px]">
+                                <span class="inline-block px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-[11px]">
                                     {{ $product->category->name_en ?? 'N/A' }}
                                 </span>
                                 @if($product->subCategory)
@@ -225,11 +241,7 @@
                                 </div>
                             </td>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" class="p-8 text-center text-slate-400">No products found.</td>
-                        </tr>
-                    @endforelse
+                    @endforeach
                 </tbody>
             </table>
         </div>

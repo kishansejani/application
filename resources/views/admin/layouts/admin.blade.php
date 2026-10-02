@@ -724,8 +724,10 @@
 
         // Setup DataTables Global Defaults with modern design
         if ($.fn.dataTable) {
+            $.fn.dataTable.ext.errMode = 'none'; // Suppress intrusive DataTables alert popups globally
             $.extend(true, $.fn.dataTable.defaults, {
                 responsive: true,
+                pageLength: 10,
                 language: {
                     search: "",
                     searchPlaceholder: "Search records...",
@@ -733,7 +735,8 @@
                     info: "Showing _START_ to _END_ of _TOTAL_ entries",
                     infoEmpty: "Showing 0 to 0 of 0 entries",
                     infoFiltered: "(filtered from _MAX_ total records)",
-                    zeroRecords: "No matching records found",
+                    emptyTable: '<div class="py-12 text-center text-slate-400 dark:text-slate-500 font-medium"><i class="fa-solid fa-folder-open text-4xl mb-3 text-slate-300 dark:text-slate-600 block"></i>No records found matching criteria</div>',
+                    zeroRecords: '<div class="py-12 text-center text-slate-400 dark:text-slate-500 font-medium"><i class="fa-solid fa-magnifying-glass text-4xl mb-3 text-slate-300 dark:text-slate-600 block"></i>No matching records found</div>',
                     paginate: {
                         first: '<i class="fa-solid fa-angles-left"></i>',
                         previous: '<i class="fa-solid fa-chevron-left"></i>',

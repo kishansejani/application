@@ -19,70 +19,82 @@
     <!-- Stat Metrics -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <!-- Card 1: Total Units -->
-        <div class="group relative overflow-hidden rounded-2xl p-4 bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white shadow-md border border-slate-700/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+        <div class="group relative overflow-hidden rounded-2xl p-4.5 bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white shadow-lg border border-slate-700/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
             <div class="flex items-center justify-between">
-                <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-300">Total Units</span>
-                <div class="w-8 h-8 rounded-xl bg-white/10 text-indigo-300 flex items-center justify-center text-xs">
+                <div>
+                    <span class="text-[11px] font-extrabold uppercase tracking-wider block text-slate-300">Total Units</span>
+                    <div class="text-3xl font-black mt-2 text-white">{{ number_format($stats['total_items']) }}</div>
+                </div>
+                <div class="w-11 h-11 rounded-2xl bg-white/10 text-indigo-300 flex items-center justify-center text-sm shadow-inner border border-white/20 backdrop-blur-md">
                     <i class="fa-solid fa-boxes-stacked"></i>
                 </div>
             </div>
-            <div class="mt-3 flex items-baseline gap-2">
-                <span class="text-2xl sm:text-3xl font-black text-white">{{ number_format($stats['total_items']) }}</span>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-slate-300">In Warehouse</span>
+            <div class="mt-3 flex items-center gap-1.5">
+                <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-white/10 text-slate-200">● In Warehouse</span>
             </div>
-            <i class="fa-solid fa-boxes-stacked absolute -right-3 -bottom-3 text-5xl opacity-5 pointer-events-none group-hover:scale-110 transition-transform"></i>
+            <i class="fa-solid fa-boxes-stacked absolute -right-3 -bottom-3 text-6xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </div>
 
         <!-- Card 2: Tracked SKUs -->
-        <div class="group relative overflow-hidden rounded-2xl p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-emerald-500 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+        <div class="group relative overflow-hidden rounded-2xl p-4.5 bg-gradient-to-br from-white via-white to-emerald-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/60 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
             <div class="flex items-center justify-between">
-                <span class="text-[11px] font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">Tracked SKUs</span>
-                <div class="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xs">
+                <div>
+                    <span class="text-[11px] font-extrabold uppercase tracking-wider block text-emerald-700 dark:text-emerald-400">Tracked SKUs</span>
+                    <div class="text-3xl font-black mt-2 text-slate-900 dark:text-white">{{ $stats['total_products'] }}</div>
+                </div>
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-white flex items-center justify-center text-sm shadow-md shadow-emerald-500/25">
                     <i class="fa-solid fa-circle-check"></i>
                 </div>
             </div>
-            <div class="mt-3 flex items-baseline gap-2">
-                <span class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">{{ $stats['total_products'] }}</span>
-                <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 flex items-center gap-1">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Active
+            <div class="mt-3 flex items-center gap-1.5">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> Active SKUs
                 </span>
             </div>
-            <i class="fa-solid fa-circle-check absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
+            <i class="fa-solid fa-circle-check absolute -right-3 -bottom-3 text-6xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </div>
 
         <!-- Card 3: Low Stock Alerts -->
-        <div class="group relative overflow-hidden rounded-2xl p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-amber-500 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+        <div class="group relative overflow-hidden rounded-2xl p-4.5 bg-gradient-to-br from-white via-white to-amber-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-amber-950/30 border border-amber-200/80 dark:border-amber-800/60 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
             <div class="flex items-center justify-between">
-                <span class="text-[11px] font-extrabold uppercase tracking-wider text-amber-700 dark:text-amber-400">Low Stock Alerts</span>
-                <div class="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xs">
+                <div>
+                    <span class="text-[11px] font-extrabold uppercase tracking-wider block text-amber-700 dark:text-amber-400">Low Stock Alerts</span>
+                    <div class="text-3xl font-black mt-2 text-slate-900 dark:text-white">{{ $stats['low_stock_count'] }}</div>
+                </div>
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-400 text-white flex items-center justify-center text-sm shadow-md shadow-amber-500/25">
                     <i class="fa-solid fa-triangle-exclamation"></i>
                 </div>
             </div>
-            <div class="mt-3 flex items-baseline gap-2">
-                <span class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">{{ $stats['low_stock_count'] }}</span>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300">Reorder</span>
+            <div class="mt-3 flex items-center gap-1.5">
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800">
+                    ⚠️ Urgent Reorder
+                </span>
             </div>
-            <i class="fa-solid fa-triangle-exclamation absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
+            <i class="fa-solid fa-triangle-exclamation absolute -right-3 -bottom-3 text-6xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </div>
 
         <!-- Card 4: Out of Stock -->
-        <div class="group relative overflow-hidden rounded-2xl p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-rose-500 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+        <div class="group relative overflow-hidden rounded-2xl p-4.5 bg-gradient-to-br from-white via-white to-rose-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-rose-950/30 border border-rose-200/80 dark:border-rose-800/60 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
             <div class="flex items-center justify-between">
-                <span class="text-[11px] font-extrabold uppercase tracking-wider text-rose-700 dark:text-rose-400">Out of Stock</span>
-                <div class="w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center text-xs">
+                <div>
+                    <span class="text-[11px] font-extrabold uppercase tracking-wider block text-rose-700 dark:text-rose-400">Out of Stock</span>
+                    <div class="text-3xl font-black mt-2 text-slate-900 dark:text-white">{{ $stats['out_of_stock_count'] }}</div>
+                </div>
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-rose-500 to-pink-500 text-white flex items-center justify-center text-sm shadow-md shadow-rose-500/25">
                     <i class="fa-solid fa-ban"></i>
                 </div>
             </div>
-            <div class="mt-3 flex items-baseline gap-2">
-                <span class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">{{ $stats['out_of_stock_count'] }}</span>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950/80 text-rose-700 dark:text-rose-300">Critical</span>
+            <div class="mt-3 flex items-center gap-1.5">
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800 dark:bg-rose-950/80 dark:text-rose-300 border border-rose-200/80 dark:border-rose-800">
+                    ● Critical (0 Left)
+                </span>
             </div>
-            <i class="fa-solid fa-ban absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
+            <i class="fa-solid fa-ban absolute -right-3 -bottom-3 text-6xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </div>
     </div>
 
     <!-- Stock Table Card -->
-    <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm p-6 overflow-hidden">
+    <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200/90 dark:border-slate-700/80 shadow-sm p-6 overflow-hidden">
         <!-- Filter buttons -->
         <div class="mb-5 flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-700/60">
             <div class="flex items-center gap-2">
@@ -112,7 +124,7 @@
         <div class="overflow-x-auto">
             <table id="stockTable" class="w-full text-left text-xs">
                 <thead>
-                    <tr class="bg-slate-50 dark:bg-slate-900/60 text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px] tracking-wider">
+                    <tr class="bg-slate-50 dark:bg-slate-900/60 text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200 dark:border-slate-700">
                         <th class="px-4 py-3.5 rounded-l-2xl">Product Item</th>
                         <th class="px-4 py-3.5">Category</th>
                         <th class="px-4 py-3.5">Price</th>
@@ -123,11 +135,13 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-700/60 font-medium">
-                    @forelse($products as $prod)
-                        <tr id="row-prod-{{ $prod->id }}" class="hover:bg-slate-50/70 dark:hover:bg-slate-700/30 transition-colors">
+                    @foreach($products as $prod)
+                        <tr id="row-prod-{{ $prod->id }}" class="hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition-colors">
                             <td class="px-4 py-3.5">
                                 <div class="flex items-center gap-3">
-                                    <img src="{{ $prod->thumbnail_url }}" class="w-10 h-10 rounded-xl object-cover border border-slate-200 dark:border-slate-700 shrink-0">
+                                    <div class="w-11 h-11 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0 group">
+                                        <img src="{{ $prod->thumbnail_url }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                                    </div>
                                     <div>
                                         <div class="font-bold text-slate-900 dark:text-white text-sm leading-tight">{{ $prod->name_en }}</div>
                                         <div class="text-xs text-indigo-600 dark:text-indigo-400 font-semibold mt-0.5">{{ $prod->name_gu }}</div>
@@ -136,9 +150,11 @@
                                 </div>
                             </td>
                             <td class="px-4 py-3.5 font-semibold text-slate-600 dark:text-slate-300">
-                                {{ $prod->category->name_en ?? 'N/A' }}
+                                <span class="px-2.5 py-1 bg-slate-100 dark:bg-slate-700 rounded-lg text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                                    {{ $prod->category->name_en ?? 'N/A' }}
+                                </span>
                             </td>
-                            <td class="px-4 py-3.5 font-bold text-slate-900 dark:text-white">
+                            <td class="px-4 py-3.5 font-bold text-slate-900 dark:text-white text-sm">
                                 ₹{{ number_format($prod->effective_price, 2) }}
                             </td>
                             <td class="px-4 py-3.5 text-slate-500 dark:text-slate-400 font-semibold">
@@ -164,22 +180,18 @@
                             </td>
                             <td class="px-4 py-3.5 text-right">
                                 <div class="flex items-center justify-end gap-1.5">
-                                    <button onclick="quickAdjust({{ $prod->id }}, -10)" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-700 dark:text-slate-200 font-bold text-xs" title="-10">-10</button>
-                                    <button onclick="quickAdjust({{ $prod->id }}, -1)" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-700 dark:text-slate-200 font-bold text-xs" title="-1">-1</button>
-                                    <input type="number" id="input-qty-{{ $prod->id }}" value="{{ $prod->stock_quantity }}" class="w-16 px-2 py-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-center font-bold text-xs text-slate-900 dark:text-white focus:outline-none">
-                                    <button onclick="quickAdjust({{ $prod->id }}, 1)" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-700 dark:text-slate-200 font-bold text-xs" title="+1">+1</button>
-                                    <button onclick="quickAdjust({{ $prod->id }}, 10)" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-700 dark:text-slate-200 font-bold text-xs" title="+10">+10</button>
+                                    <button onclick="quickAdjust({{ $prod->id }}, -10)" class="w-7 h-7 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold text-xs" title="-10">-10</button>
+                                    <button onclick="quickAdjust({{ $prod->id }}, -1)" class="w-7 h-7 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold text-xs" title="-1">-1</button>
+                                    <input type="number" id="input-qty-{{ $prod->id }}" value="{{ $prod->stock_quantity }}" class="w-16 px-2 py-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-center font-bold text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-slate-400">
+                                    <button onclick="quickAdjust({{ $prod->id }}, 1)" class="w-7 h-7 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold text-xs" title="+1">+1</button>
+                                    <button onclick="quickAdjust({{ $prod->id }}, 10)" class="w-7 h-7 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold text-xs" title="+10">+10</button>
                                     <button onclick="saveStock({{ $prod->id }})" class="w-8 h-8 rounded-xl bg-slate-900 hover:bg-black text-white dark:bg-white dark:text-slate-900 flex items-center justify-center text-xs font-bold transition shadow-sm" title="Save Stock">
                                         <i class="fa-solid fa-floppy-disk"></i>
                                     </button>
                                 </div>
                             </td>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" class="p-8 text-center text-slate-400">No products found.</td>
-                        </tr>
-                    @endforelse
+                    @endforeach
                 </tbody>
             </table>
         </div>

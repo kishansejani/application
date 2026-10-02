@@ -19,70 +19,82 @@
     <!-- Top KPI / Pipeline Stats Grid -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <!-- Card 1: All Sub Categories -->
-        <a href="{{ route('admin.subcategories.index') }}" class="group relative overflow-hidden rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ !request('status') && !request('category_id') ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white shadow-md border border-slate-700/50' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-slate-300 shadow-sm' }}">
+        <a href="{{ route('admin.subcategories.index') }}" class="group relative overflow-hidden rounded-2xl p-4.5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ !request('status') && !request('category_id') ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white shadow-lg border border-slate-700/60' : 'bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 hover:border-slate-300 shadow-sm' }}">
             <div class="flex items-center justify-between">
-                <span class="text-[11px] font-extrabold uppercase tracking-wider {{ !request('status') && !request('category_id') ? 'text-slate-300' : 'text-slate-500 dark:text-slate-400' }}">All Sub Categories</span>
-                <div class="w-8 h-8 rounded-xl flex items-center justify-center text-xs {{ !request('status') && !request('category_id') ? 'bg-white/10 text-indigo-300' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300' }}">
+                <div>
+                    <span class="text-[11px] font-extrabold uppercase tracking-wider block {{ !request('status') && !request('category_id') ? 'text-slate-300' : 'text-slate-500 dark:text-slate-400' }}">All Sub Categories</span>
+                    <div class="text-3xl font-black mt-2 {{ !request('status') && !request('category_id') ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['total'] ?? $subCategories->count() }}</div>
+                </div>
+                <div class="w-11 h-11 rounded-2xl flex items-center justify-center text-sm shadow-inner {{ !request('status') && !request('category_id') ? 'bg-white/10 text-indigo-300 border border-white/20 backdrop-blur-md' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300' }}">
                     <i class="fa-solid fa-layer-group"></i>
                 </div>
             </div>
-            <div class="mt-3 flex items-baseline gap-2">
-                <span class="text-2xl sm:text-3xl font-black {{ !request('status') && !request('category_id') ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['total'] ?? $subCategories->count() }}</span>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ !request('status') && !request('category_id') ? 'bg-white/10 text-slate-300' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300' }}">Total</span>
+            <div class="mt-3 flex items-center gap-1.5">
+                <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full {{ !request('status') && !request('category_id') ? 'bg-white/10 text-slate-200' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300' }}">● Sub-Level Branches</span>
             </div>
-            <i class="fa-solid fa-layer-group absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
+            <i class="fa-solid fa-layer-group absolute -right-3 -bottom-3 text-6xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </a>
 
         <!-- Card 2: Active Subs -->
-        <a href="{{ route('admin.subcategories.index', ['status' => 'active']) }}" class="group relative overflow-hidden rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('status') == 'active' ? 'bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-md border border-emerald-500' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-emerald-500 shadow-sm hover:border-emerald-200' }}">
+        <a href="{{ route('admin.subcategories.index', ['status' => 'active']) }}" class="group relative overflow-hidden rounded-2xl p-4.5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('status') == 'active' ? 'bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-lg border border-emerald-500' : 'bg-gradient-to-br from-white via-white to-emerald-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/60 shadow-sm' }}">
             <div class="flex items-center justify-between">
-                <span class="text-[11px] font-extrabold uppercase tracking-wider {{ request('status') == 'active' ? 'text-emerald-100' : 'text-emerald-700 dark:text-emerald-400' }}">Active Subs</span>
-                <div class="w-8 h-8 rounded-xl flex items-center justify-center text-xs {{ request('status') == 'active' ? 'bg-white/20 text-white' : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400' }}">
+                <div>
+                    <span class="text-[11px] font-extrabold uppercase tracking-wider block {{ request('status') == 'active' ? 'text-emerald-100' : 'text-emerald-700 dark:text-emerald-400' }}">Active Subs</span>
+                    <div class="text-3xl font-black mt-2 {{ request('status') == 'active' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['active'] ?? 0 }}</div>
+                </div>
+                <div class="w-11 h-11 rounded-2xl flex items-center justify-center text-sm text-white shadow-md {{ request('status') == 'active' ? 'bg-white/20 text-white border border-white/30' : 'bg-gradient-to-tr from-emerald-500 to-teal-400 shadow-emerald-500/25' }}">
                     <i class="fa-solid fa-circle-check"></i>
                 </div>
             </div>
-            <div class="mt-3 flex items-baseline gap-2">
-                <span class="text-2xl sm:text-3xl font-black {{ request('status') == 'active' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['active'] ?? 0 }}</span>
-                <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full flex items-center gap-1 {{ request('status') == 'active' ? 'bg-white/20 text-white' : 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300' }}">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Live
+            <div class="mt-3 flex items-center gap-1.5">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold {{ request('status') == 'active' ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800' }}">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> Live & Published
                 </span>
             </div>
-            <i class="fa-solid fa-circle-check absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
+            <i class="fa-solid fa-circle-check absolute -right-3 -bottom-3 text-6xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </a>
 
         <!-- Card 3: Inactive Subs -->
-        <a href="{{ route('admin.subcategories.index', ['status' => 'inactive']) }}" class="group relative overflow-hidden rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('status') == 'inactive' ? 'bg-gradient-to-br from-rose-600 to-red-700 text-white shadow-md border border-rose-500' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-rose-500 shadow-sm hover:border-rose-200' }}">
+        <a href="{{ route('admin.subcategories.index', ['status' => 'inactive']) }}" class="group relative overflow-hidden rounded-2xl p-4.5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('status') == 'inactive' ? 'bg-gradient-to-br from-rose-600 to-red-700 text-white shadow-lg border border-rose-500' : 'bg-gradient-to-br from-white via-white to-rose-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-rose-950/30 border border-rose-200/80 dark:border-rose-800/60 shadow-sm' }}">
             <div class="flex items-center justify-between">
-                <span class="text-[11px] font-extrabold uppercase tracking-wider {{ request('status') == 'inactive' ? 'text-rose-100' : 'text-rose-700 dark:text-rose-400' }}">Inactive</span>
-                <div class="w-8 h-8 rounded-xl flex items-center justify-center text-xs {{ request('status') == 'inactive' ? 'bg-white/20 text-white' : 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400' }}">
+                <div>
+                    <span class="text-[11px] font-extrabold uppercase tracking-wider block {{ request('status') == 'inactive' ? 'text-rose-100' : 'text-rose-700 dark:text-rose-400' }}">Inactive</span>
+                    <div class="text-3xl font-black mt-2 {{ request('status') == 'inactive' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['inactive'] ?? 0 }}</div>
+                </div>
+                <div class="w-11 h-11 rounded-2xl flex items-center justify-center text-sm text-white shadow-md {{ request('status') == 'inactive' ? 'bg-white/20 text-white border border-white/30' : 'bg-gradient-to-tr from-rose-500 to-pink-500 shadow-rose-500/25' }}">
                     <i class="fa-solid fa-circle-pause"></i>
                 </div>
             </div>
-            <div class="mt-3 flex items-baseline gap-2">
-                <span class="text-2xl sm:text-3xl font-black {{ request('status') == 'inactive' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['inactive'] ?? 0 }}</span>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ request('status') == 'inactive' ? 'bg-white/20 text-white' : 'bg-rose-100 dark:bg-rose-950/80 text-rose-700 dark:text-rose-300' }}">Hidden</span>
+            <div class="mt-3 flex items-center gap-1.5">
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold {{ request('status') == 'inactive' ? 'bg-white/20 text-white' : 'bg-rose-100 text-rose-800 dark:bg-rose-950/80 dark:text-rose-300 border border-rose-200/80 dark:border-rose-800' }}">
+                    ● Hidden / Paused
+                </span>
             </div>
-            <i class="fa-solid fa-circle-pause absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
+            <i class="fa-solid fa-circle-pause absolute -right-3 -bottom-3 text-6xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </a>
 
         <!-- Card 4: Parent Categories -->
-        <a href="{{ route('admin.categories.index') }}" class="group relative overflow-hidden rounded-2xl p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-indigo-500 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+        <a href="{{ route('admin.categories.index') }}" class="group relative overflow-hidden rounded-2xl p-4.5 bg-gradient-to-br from-white via-white to-indigo-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-indigo-950/30 border border-indigo-200/80 dark:border-indigo-800/60 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
             <div class="flex items-center justify-between">
-                <span class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-700 dark:text-indigo-400">Parent Categories</span>
-                <div class="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xs">
+                <div>
+                    <span class="text-[11px] font-extrabold uppercase tracking-wider block text-indigo-700 dark:text-indigo-400">Parent Categories</span>
+                    <div class="text-3xl font-black mt-2 text-slate-900 dark:text-white">{{ $stats['categories'] ?? 0 }}</div>
+                </div>
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-500 to-blue-500 text-white flex items-center justify-center text-sm shadow-md shadow-indigo-500/25">
                     <i class="fa-solid fa-folder-tree"></i>
                 </div>
             </div>
-            <div class="mt-3 flex items-baseline gap-2">
-                <span class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">{{ $stats['categories'] ?? 0 }}</span>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300">Roots</span>
+            <div class="mt-3 flex items-center gap-1.5">
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-indigo-100 text-indigo-800 dark:bg-indigo-950/80 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800">
+                    ★ Root Taxonomies
+                </span>
             </div>
-            <i class="fa-solid fa-folder-tree absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
+            <i class="fa-solid fa-folder-tree absolute -right-3 -bottom-3 text-6xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </a>
     </div>
 
     <!-- Table Card Container -->
-    <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm p-6 overflow-hidden">
+    <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200/90 dark:border-slate-700/80 shadow-sm p-6 overflow-hidden">
         <!-- Category Filter Bar -->
         <div class="mb-5 flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-700/60">
             <form action="{{ route('admin.subcategories.index') }}" method="GET" class="flex items-center gap-3">
@@ -106,7 +118,7 @@
         <div class="overflow-x-auto">
             <table id="subCategoriesTable" class="w-full text-left text-xs">
                 <thead>
-                    <tr class="bg-slate-50 dark:bg-slate-900/60 text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px] tracking-wider">
+                    <tr class="bg-slate-50 dark:bg-slate-900/60 text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200 dark:border-slate-700">
                         <th class="px-4 py-3.5 rounded-l-2xl">Order</th>
                         <th class="px-4 py-3.5">Image</th>
                         <th class="px-4 py-3.5">Sub Category</th>
@@ -117,14 +129,14 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-700/60 font-medium">
-                    @forelse($subCategories as $sub)
-                        <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-700/30 transition-colors">
+                    @foreach($subCategories as $sub)
+                        <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition-colors">
                             <td class="px-4 py-3.5 font-mono font-bold text-slate-400">
-                                <span class="px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded-lg text-[11px] text-slate-600 dark:text-slate-300">#{{ $sub->sort_order }}</span>
+                                <span class="px-2.5 py-1 bg-slate-100 dark:bg-slate-700 rounded-lg text-[11px] text-slate-600 dark:text-slate-300 font-bold">#{{ $sub->sort_order }}</span>
                             </td>
                             <td class="px-4 py-3.5">
-                                <div class="w-12 h-12 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 shadow-sm flex items-center justify-center text-slate-700 dark:text-slate-200">
-                                    <img src="{{ $sub->image_url }}" alt="{{ $sub->name_en }}" class="w-full h-full object-cover">
+                                <div class="w-12 h-12 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 shadow-sm flex items-center justify-center text-slate-700 dark:text-slate-200 group">
+                                    <img src="{{ $sub->image_url }}" alt="{{ $sub->name_en }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                                 </div>
                             </td>
                             <td class="px-4 py-3.5">
@@ -133,13 +145,13 @@
                                 <div class="text-[10px] font-mono text-slate-400 dark:text-slate-500 mt-0.5">/subcategory/{{ $sub->slug }}</div>
                             </td>
                             <td class="px-4 py-3.5">
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-[11px]">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-[11px]">
                                     <i class="fa-solid fa-folder-tree text-slate-400"></i>
                                     <span>{{ $sub->category->name_en ?? 'N/A' }}</span>
                                 </span>
                             </td>
                             <td class="px-4 py-3.5">
-                                <a href="{{ route('admin.products.index', ['sub_category_id' => $sub->id]) }}" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 font-bold text-[11px] transition shadow-sm border border-emerald-100 dark:border-emerald-800">
+                                <a href="{{ route('admin.products.index', ['sub_category_id' => $sub->id]) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 font-bold text-[11px] transition shadow-sm border border-emerald-100 dark:border-emerald-800">
                                     <i class="fa-solid fa-boxes-stacked text-[10px]"></i>
                                     <span>{{ $sub->products_count }} Products</span>
                                 </a>
@@ -165,11 +177,7 @@
                                 </div>
                             </td>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" class="p-8 text-center text-slate-400">No subcategories found.</td>
-                        </tr>
-                    @endforelse
+                    @endforeach
                 </tbody>
             </table>
         </div>

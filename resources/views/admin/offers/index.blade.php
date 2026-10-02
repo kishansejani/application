@@ -19,74 +19,86 @@
     <!-- Top KPI / Pipeline Stats Grid -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <!-- Card 1: All Offers -->
-        <a href="{{ route('admin.offers.index') }}" class="group relative overflow-hidden rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ !request('status') ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white shadow-md border border-slate-700/50' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-slate-300 shadow-sm' }}">
+        <a href="{{ route('admin.offers.index') }}" class="group relative overflow-hidden rounded-2xl p-4.5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ !request('status') ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white shadow-lg border border-slate-700/60' : 'bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 hover:border-slate-300 shadow-sm' }}">
             <div class="flex items-center justify-between">
-                <span class="text-[11px] font-extrabold uppercase tracking-wider {{ !request('status') ? 'text-slate-300' : 'text-slate-500 dark:text-slate-400' }}">All Offers</span>
-                <div class="w-8 h-8 rounded-xl flex items-center justify-center text-xs {{ !request('status') ? 'bg-white/10 text-indigo-300' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300' }}">
+                <div>
+                    <span class="text-[11px] font-extrabold uppercase tracking-wider block {{ !request('status') ? 'text-slate-300' : 'text-slate-500 dark:text-slate-400' }}">All Offers</span>
+                    <div class="text-3xl font-black mt-2 {{ !request('status') ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['total'] ?? $offers->count() }}</div>
+                </div>
+                <div class="w-11 h-11 rounded-2xl flex items-center justify-center text-sm shadow-inner {{ !request('status') ? 'bg-white/10 text-indigo-300 border border-white/20 backdrop-blur-md' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300' }}">
                     <i class="fa-solid fa-gift"></i>
                 </div>
             </div>
-            <div class="mt-3 flex items-baseline gap-2">
-                <span class="text-2xl sm:text-3xl font-black {{ !request('status') ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['total'] ?? $offers->count() }}</span>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ !request('status') ? 'bg-white/10 text-slate-300' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300' }}">Total</span>
+            <div class="mt-3 flex items-center gap-1.5">
+                <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full {{ !request('status') ? 'bg-white/10 text-slate-200' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300' }}">● Coupon Campaigns</span>
             </div>
-            <i class="fa-solid fa-gift absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
+            <i class="fa-solid fa-gift absolute -right-3 -bottom-3 text-6xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </a>
 
         <!-- Card 2: Active Coupons -->
-        <a href="{{ route('admin.offers.index', ['status' => 'active']) }}" class="group relative overflow-hidden rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('status') == 'active' ? 'bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-md border border-emerald-500' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-emerald-500 shadow-sm hover:border-emerald-200' }}">
+        <a href="{{ route('admin.offers.index', ['status' => 'active']) }}" class="group relative overflow-hidden rounded-2xl p-4.5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('status') == 'active' ? 'bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-lg border border-emerald-500' : 'bg-gradient-to-br from-white via-white to-emerald-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/60 shadow-sm' }}">
             <div class="flex items-center justify-between">
-                <span class="text-[11px] font-extrabold uppercase tracking-wider {{ request('status') == 'active' ? 'text-emerald-100' : 'text-emerald-700 dark:text-emerald-400' }}">Active Coupons</span>
-                <div class="w-8 h-8 rounded-xl flex items-center justify-center text-xs {{ request('status') == 'active' ? 'bg-white/20 text-white' : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400' }}">
+                <div>
+                    <span class="text-[11px] font-extrabold uppercase tracking-wider block {{ request('status') == 'active' ? 'text-emerald-100' : 'text-emerald-700 dark:text-emerald-400' }}">Active Coupons</span>
+                    <div class="text-3xl font-black mt-2 {{ request('status') == 'active' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['active'] ?? 0 }}</div>
+                </div>
+                <div class="w-11 h-11 rounded-2xl flex items-center justify-center text-sm text-white shadow-md {{ request('status') == 'active' ? 'bg-white/20 text-white border border-white/30' : 'bg-gradient-to-tr from-emerald-500 to-teal-400 shadow-emerald-500/25' }}">
                     <i class="fa-solid fa-circle-check"></i>
                 </div>
             </div>
-            <div class="mt-3 flex items-baseline gap-2">
-                <span class="text-2xl sm:text-3xl font-black {{ request('status') == 'active' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['active'] ?? 0 }}</span>
-                <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full flex items-center gap-1 {{ request('status') == 'active' ? 'bg-white/20 text-white' : 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300' }}">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Running
+            <div class="mt-3 flex items-center gap-1.5">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold {{ request('status') == 'active' ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800' }}">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> Live & Redeemable
                 </span>
             </div>
-            <i class="fa-solid fa-circle-check absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
+            <i class="fa-solid fa-circle-check absolute -right-3 -bottom-3 text-6xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </a>
 
         <!-- Card 3: % Percentage Deals -->
-        <div class="group relative overflow-hidden rounded-2xl p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-indigo-500 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+        <div class="group relative overflow-hidden rounded-2xl p-4.5 bg-gradient-to-br from-white via-white to-indigo-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-indigo-950/30 border border-indigo-200/80 dark:border-indigo-800/60 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
             <div class="flex items-center justify-between">
-                <span class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-700 dark:text-indigo-400">% Percentage Deals</span>
-                <div class="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xs">
+                <div>
+                    <span class="text-[11px] font-extrabold uppercase tracking-wider block text-indigo-700 dark:text-indigo-400">% Percentage Deals</span>
+                    <div class="text-3xl font-black mt-2 text-slate-900 dark:text-white">{{ $stats['percentage'] ?? 0 }}</div>
+                </div>
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-500 to-blue-500 text-white flex items-center justify-center text-sm shadow-md shadow-indigo-500/25">
                     <i class="fa-solid fa-percent"></i>
                 </div>
             </div>
-            <div class="mt-3 flex items-baseline gap-2">
-                <span class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">{{ $stats['percentage'] ?? 0 }}</span>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300">Discount</span>
+            <div class="mt-3 flex items-center gap-1.5">
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-indigo-100 text-indigo-800 dark:bg-indigo-950/80 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800">
+                    ★ % Discounts
+                </span>
             </div>
-            <i class="fa-solid fa-percent absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
+            <i class="fa-solid fa-percent absolute -right-3 -bottom-3 text-6xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </div>
 
         <!-- Card 4: Flat Cash Off -->
-        <div class="group relative overflow-hidden rounded-2xl p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-amber-500 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+        <div class="group relative overflow-hidden rounded-2xl p-4.5 bg-gradient-to-br from-white via-white to-amber-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-amber-950/30 border border-amber-200/80 dark:border-amber-800/60 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
             <div class="flex items-center justify-between">
-                <span class="text-[11px] font-extrabold uppercase tracking-wider text-amber-700 dark:text-amber-400">Flat Cash Off</span>
-                <div class="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xs">
+                <div>
+                    <span class="text-[11px] font-extrabold uppercase tracking-wider block text-amber-700 dark:text-amber-400">Flat Cash Off</span>
+                    <div class="text-3xl font-black mt-2 text-slate-900 dark:text-white">{{ $stats['flat'] ?? 0 }}</div>
+                </div>
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-400 text-white flex items-center justify-center text-sm shadow-md shadow-amber-500/25">
                     <i class="fa-solid fa-indian-rupee-sign"></i>
                 </div>
             </div>
-            <div class="mt-3 flex items-baseline gap-2">
-                <span class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">{{ $stats['flat'] ?? 0 }}</span>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300">Fixed ₹</span>
+            <div class="mt-3 flex items-center gap-1.5">
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800">
+                    Fixed ₹ Cuts
+                </span>
             </div>
-            <i class="fa-solid fa-indian-rupee-sign absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
+            <i class="fa-solid fa-indian-rupee-sign absolute -right-3 -bottom-3 text-6xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </div>
     </div>
 
     <!-- Table Card Container -->
-    <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm p-6 overflow-hidden">
+    <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200/90 dark:border-slate-700/80 shadow-sm p-6 overflow-hidden">
         <div class="overflow-x-auto">
             <table id="offersTable" class="w-full text-left text-xs">
                 <thead>
-                    <tr class="bg-slate-50 dark:bg-slate-900/60 text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px] tracking-wider">
+                    <tr class="bg-slate-50 dark:bg-slate-900/60 text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200 dark:border-slate-700">
                         <th class="px-4 py-3.5 rounded-l-2xl">Coupon Code</th>
                         <th class="px-4 py-3.5">Title & Info</th>
                         <th class="px-4 py-3.5">Discount Value</th>
@@ -97,8 +109,8 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-700/60 font-medium">
-                    @forelse($offers as $offer)
-                        <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-700/30 transition-colors">
+                    @foreach($offers as $offer)
+                        <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition-colors">
                             <td class="px-4 py-3.5">
                                 <span class="inline-block px-3 py-1.5 bg-amber-50 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-800 font-mono font-black text-xs rounded-xl shadow-sm tracking-wider">
                                     {{ $offer->code }}
@@ -148,11 +160,7 @@
                                 </div>
                             </td>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" class="p-8 text-center text-slate-400">No promo offers found.</td>
-                        </tr>
-                    @endforelse
+                    @endforeach
                 </tbody>
             </table>
         </div>

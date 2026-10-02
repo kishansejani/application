@@ -4,11 +4,20 @@
 
 @section('content')
 <div class="space-y-6">
-    <!-- Breadcrumb / Header -->
+    <!-- Breadcrumb / Header with Quick Save -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-slate-900 dark:text-white">System & Theme Settings</h1>
-            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Configure global branding, footer credits, theme colors and appearance preferences.</p>
+            <h1 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">System & Theme Customization</h1>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Configure global branding, button colors, and set permanent default theme.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="{{ route('admin.settings.reset') }}" onclick="return confirm('Reset all colors and branding to defaults?')" class="px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl transition">
+                <i class="fa-solid fa-rotate-left mr-1"></i> Reset
+            </a>
+            <button type="submit" form="settingsForm" class="px-5 py-2.5 btn-theme-primary font-bold rounded-xl text-xs shadow-md transition active:scale-95 flex items-center gap-2">
+                <i class="fa-solid fa-floppy-disk"></i>
+                <span>Save Theme as Default</span>
+            </button>
         </div>
     </div>
 
@@ -16,56 +25,93 @@
     <form action="{{ route('admin.settings.update') }}" method="POST" id="settingsForm" class="space-y-6">
         @csrf
 
-        <!-- Brand & Footer Configuration Card (Matching Screenshot Top Section) -->
-        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm">
-            <div class="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100 dark:border-slate-700">
-                <i class="fas fa-heart text-rose-500"></i>
-                <h2 class="text-base font-bold text-slate-900 dark:text-white">Footer & Branding</h2>
+        <!-- 1-Click Quick Theme Presets -->
+        <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-wand-magic-sparkles text-indigo-500"></i>
+                    <h3 class="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-wider">1-Click Professional Theme Presets</h3>
+                </div>
+                <span class="text-[11px] font-bold text-slate-400">Click any preset to apply instantly</span>
             </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <!-- Text prefix -->
-                <div>
-                    <input type="text" name="footer_copyright_prefix" value="{{ old('footer_copyright_prefix', $settings['footer_copyright_prefix'] ?? '© 2026, made with ❤️ by') }}"
-                           class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-400">
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1.5">Text displayed before the creator link.</p>
-                </div>
 
-                <!-- Creator Name -->
-                <div>
-                    <input type="text" name="footer_creator_name" value="{{ old('footer_creator_name', $settings['footer_creator_name'] ?? 'Decent Infoways') }}"
-                           class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-400">
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1.5">The clickable creator name in the footer.</p>
-                </div>
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                <!-- Preset 1: Midnight Slate -->
+                <button type="button" onclick="applyPreset('#0F172A', '#1E293B', '#10B981', '#000000', '#ADD8E6', '#0F172A', '#334155')" class="p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-slate-900 dark:hover:border-white bg-slate-50 dark:bg-slate-900 text-left transition group hover:shadow-md">
+                    <div class="flex items-center gap-1.5 mb-2">
+                        <span class="w-3.5 h-3.5 rounded-full bg-slate-900 dark:bg-slate-700 inline-block"></span>
+                        <span class="w-3.5 h-3.5 rounded-full bg-emerald-500 inline-block"></span>
+                        <span class="w-3.5 h-3.5 rounded-full bg-sky-300 inline-block"></span>
+                    </div>
+                    <h4 class="text-xs font-bold text-slate-900 dark:text-white group-hover:text-indigo-600">Midnight Slate</h4>
+                    <p class="text-[10px] text-slate-400 mt-0.5">Classic Dark & Clean</p>
+                </button>
 
-                <!-- Creator URL -->
-                <div>
-                    <input type="text" name="footer_creator_url" value="{{ old('footer_creator_url', $settings['footer_creator_url'] ?? 'https://decentinfoways.com') }}"
-                           class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-400">
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1.5">Website URL for the creator brand link.</p>
-                </div>
+                <!-- Preset 2: Emerald Green Store -->
+                <button type="button" onclick="applyPreset('#059669', '#047857', '#0284C7', '#064E3B', '#6EE7B7', '#059669', '#047857')" class="p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-emerald-500 bg-emerald-50/50 dark:bg-slate-900 text-left transition group hover:shadow-md">
+                    <div class="flex items-center gap-1.5 mb-2">
+                        <span class="w-3.5 h-3.5 rounded-full bg-emerald-600 inline-block"></span>
+                        <span class="w-3.5 h-3.5 rounded-full bg-sky-500 inline-block"></span>
+                        <span class="w-3.5 h-3.5 rounded-full bg-emerald-300 inline-block"></span>
+                    </div>
+                    <h4 class="text-xs font-bold text-slate-900 dark:text-white group-hover:text-emerald-600">Emerald Fresh</h4>
+                    <p class="text-[10px] text-slate-400 mt-0.5">Grocery & Organic</p>
+                </button>
+
+                <!-- Preset 3: Royal Indigo -->
+                <button type="button" onclick="applyPreset('#4338CA', '#3730A3', '#06B6D4', '#1E1B4B', '#C7D2FE', '#4338CA', '#3730A3')" class="p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-500 bg-indigo-50/50 dark:bg-slate-900 text-left transition group hover:shadow-md">
+                    <div class="flex items-center gap-1.5 mb-2">
+                        <span class="w-3.5 h-3.5 rounded-full bg-indigo-600 inline-block"></span>
+                        <span class="w-3.5 h-3.5 rounded-full bg-cyan-500 inline-block"></span>
+                        <span class="w-3.5 h-3.5 rounded-full bg-indigo-300 inline-block"></span>
+                    </div>
+                    <h4 class="text-xs font-bold text-slate-900 dark:text-white group-hover:text-indigo-600">Royal Indigo</h4>
+                    <p class="text-[10px] text-slate-400 mt-0.5">Modern Tech SaaS</p>
+                </button>
+
+                <!-- Preset 4: Luxury Violet -->
+                <button type="button" onclick="applyPreset('#7C3AED', '#6D28D9', '#EC4899', '#0F172A', '#E9D5FF', '#7C3AED', '#6D28D9')" class="p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-purple-500 bg-purple-50/50 dark:bg-slate-900 text-left transition group hover:shadow-md">
+                    <div class="flex items-center gap-1.5 mb-2">
+                        <span class="w-3.5 h-3.5 rounded-full bg-purple-600 inline-block"></span>
+                        <span class="w-3.5 h-3.5 rounded-full bg-pink-500 inline-block"></span>
+                        <span class="w-3.5 h-3.5 rounded-full bg-purple-300 inline-block"></span>
+                    </div>
+                    <h4 class="text-xs font-bold text-slate-900 dark:text-white group-hover:text-purple-600">Luxury Violet</h4>
+                    <p class="text-[10px] text-slate-400 mt-0.5">Premium & Royal</p>
+                </button>
+
+                <!-- Preset 5: Amber Gold -->
+                <button type="button" onclick="applyPreset('#D97706', '#B45309', '#EF4444', '#18181B', '#FDE68A', '#D97706', '#B45309')" class="p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-amber-500 bg-amber-50/50 dark:bg-slate-900 text-left transition group hover:shadow-md">
+                    <div class="flex items-center gap-1.5 mb-2">
+                        <span class="w-3.5 h-3.5 rounded-full bg-amber-600 inline-block"></span>
+                        <span class="w-3.5 h-3.5 rounded-full bg-rose-500 inline-block"></span>
+                        <span class="w-3.5 h-3.5 rounded-full bg-amber-300 inline-block"></span>
+                    </div>
+                    <h4 class="text-xs font-bold text-slate-900 dark:text-white group-hover:text-amber-600">Amber Gold</h4>
+                    <p class="text-[10px] text-slate-400 mt-0.5">Warm E-commerce</p>
+                </button>
             </div>
         </div>
 
         <!-- Theme Color & Button Customization Card -->
-        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm space-y-6">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm space-y-6">
             <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700">
                 <div class="flex items-center gap-2">
                     <i class="fas fa-palette text-slate-700 dark:text-slate-300"></i>
-                    <h2 class="text-base font-bold text-slate-900 dark:text-white">Theme & Button Colors Customization</h2>
+                    <h2 class="text-base font-bold text-slate-900 dark:text-white">Custom Color Palette</h2>
                 </div>
-                <span class="text-xs font-semibold px-2.5 py-1 bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 rounded-lg">Live Color Sync</span>
+                <span class="text-xs font-semibold px-2.5 py-1 bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 rounded-lg">Live Sync</span>
             </div>
 
             <!-- Live Button Preview Strip -->
-            <div class="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-4">
+            <div class="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-4">
                 <div>
-                    <h4 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Live Preview of Buttons & Elements</h4>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">See how your buttons and accents look in real-time as you pick colors.</p>
+                    <h4 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Live Preview of Buttons & Theme</h4>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">See how your buttons and highlights look in real-time as you pick colors.</p>
                 </div>
                 <div class="flex items-center gap-3">
                     <button type="button" id="previewPrimaryBtn" class="px-5 py-2.5 rounded-xl font-bold text-xs shadow-md transition" style="background-color: {{ $settings['btn_primary_bg'] ?? '#0f172a' }}; color: {{ $settings['btn_primary_text'] ?? '#ffffff' }};">
-                        <i class="fas fa-save mr-1.5"></i> Primary Button
+                        <i class="fas fa-floppy-disk mr-1.5"></i> Primary Button
                     </button>
                     <button type="button" id="previewAccentBtn" class="px-5 py-2.5 rounded-xl font-bold text-xs shadow-md transition" style="background-color: {{ $settings['btn_accent_bg'] ?? '#10b981' }}; color: {{ $settings['btn_accent_text'] ?? '#ffffff' }};">
                         <i class="fas fa-plus mr-1.5"></i> Accent Action
@@ -242,6 +288,38 @@
 </div>
 
 <script>
+window.applyPreset = function(primaryBg, primaryHover, accentBg, sidebarBg, sidebarActive, themePrimary, themeHover) {
+    function setVal(pickerId, textId, val) {
+        const picker = document.getElementById(pickerId);
+        const text = document.getElementById(textId);
+        if (picker) picker.value = val;
+        if (text) text.value = val;
+    }
+
+    setVal('btnPrimaryBgPicker', 'btnPrimaryBgText', primaryBg);
+    setVal('btnPrimaryHoverPicker', 'btnPrimaryHoverText', primaryHover);
+    setVal('btnAccentBgPicker', 'btnAccentBgText', accentBg);
+    setVal('sidebarBgPicker', 'sidebarBgText', sidebarBg);
+    setVal('sidebarActivePicker', 'sidebarActiveText', sidebarActive);
+    setVal('primaryColorPicker', 'primaryColorText', themePrimary);
+    setVal('hoverColorPicker', 'hoverColorText', themeHover);
+
+    const previewPrimary = document.getElementById('previewPrimaryBtn');
+    const previewAccent = document.getElementById('previewAccentBtn');
+    if (previewPrimary) {
+        previewPrimary.style.backgroundColor = primaryBg;
+        previewPrimary.style.color = '#FFFFFF';
+    }
+    if (previewAccent) {
+        previewAccent.style.backgroundColor = accentBg;
+        previewAccent.style.color = '#FFFFFF';
+    }
+
+    if (window.toastr) {
+        toastr.success('Theme preset loaded! Click "Save Theme as Default" to make it permanent.');
+    }
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     function linkColorPickers(pickerId, textId, callback) {
         const picker = document.getElementById(pickerId);
