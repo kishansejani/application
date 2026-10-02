@@ -13,25 +13,67 @@
     </div>
 
     <!-- Top KPI / Pipeline Stats Grid -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div class="p-4 rounded-2xl border bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-slate-900 dark:border-white shadow-md">
-            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75">Total Pages</p>
-            <h4 class="text-xl font-extrabold mt-1">{{ $stats['total'] ?? $pages->count() }}</h4>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <!-- Card 1: Total Pages -->
+        <div class="group relative overflow-hidden rounded-2xl p-4 bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white shadow-md border border-slate-700/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <div class="flex items-center justify-between">
+                <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-300">Total Pages</span>
+                <div class="w-8 h-8 rounded-xl bg-white/10 text-indigo-300 flex items-center justify-center text-xs">
+                    <i class="fa-solid fa-file-lines"></i>
+                </div>
+            </div>
+            <div class="mt-3 flex items-baseline gap-2">
+                <span class="text-2xl sm:text-3xl font-black text-white">{{ $stats['total'] ?? $pages->count() }}</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-slate-300">Total</span>
+            </div>
+            <i class="fa-solid fa-file-lines absolute -right-3 -bottom-3 text-5xl opacity-5 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </div>
 
-        <div class="p-4 rounded-2xl border bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200">
-            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75 text-emerald-600 dark:text-emerald-400">Live / Published</p>
-            <h4 class="text-xl font-extrabold mt-1">{{ $stats['active'] ?? 0 }}</h4>
+        <!-- Card 2: Published -->
+        <div class="group relative overflow-hidden rounded-2xl p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-emerald-500 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <div class="flex items-center justify-between">
+                <span class="text-[11px] font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">Live / Published</span>
+                <div class="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xs">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+            </div>
+            <div class="mt-3 flex items-baseline gap-2">
+                <span class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">{{ $stats['active'] ?? 0 }}</span>
+                <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Online
+                </span>
+            </div>
+            <i class="fa-solid fa-circle-check absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </div>
 
-        <div class="p-4 rounded-2xl border bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200">
-            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75 text-amber-600 dark:text-amber-400">Draft Pages</p>
-            <h4 class="text-xl font-extrabold mt-1">{{ $stats['draft'] ?? 0 }}</h4>
+        <!-- Card 3: Drafts -->
+        <div class="group relative overflow-hidden rounded-2xl p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-amber-500 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <div class="flex items-center justify-between">
+                <span class="text-[11px] font-extrabold uppercase tracking-wider text-amber-700 dark:text-amber-400">Draft Pages</span>
+                <div class="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xs">
+                    <i class="fa-solid fa-pen-ruler"></i>
+                </div>
+            </div>
+            <div class="mt-3 flex items-baseline gap-2">
+                <span class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">{{ $stats['draft'] ?? 0 }}</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300">Draft</span>
+            </div>
+            <i class="fa-solid fa-pen-ruler absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </div>
 
-        <div class="p-4 rounded-2xl border bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200">
-            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75 text-indigo-600 dark:text-indigo-400">⚖️ Legal & Policies</p>
-            <h4 class="text-xl font-extrabold mt-1">{{ $stats['policy'] ?? 0 }}</h4>
+        <!-- Card 4: Legal & Policies -->
+        <div class="group relative overflow-hidden rounded-2xl p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-indigo-500 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <div class="flex items-center justify-between">
+                <span class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-700 dark:text-indigo-400">Legal & Policies</span>
+                <div class="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xs">
+                    <i class="fa-solid fa-scale-balanced"></i>
+                </div>
+            </div>
+            <div class="mt-3 flex items-baseline gap-2">
+                <span class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">{{ $stats['policy'] ?? 0 }}</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300">Terms & Policy</span>
+            </div>
+            <i class="fa-solid fa-scale-balanced absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </div>
     </div>
 

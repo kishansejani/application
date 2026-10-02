@@ -17,25 +17,67 @@
     </div>
 
     <!-- Top KPI / Pipeline Stats Grid -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <a href="{{ route('admin.offers.index') }}" class="p-4 rounded-2xl border transition-all {{ !request('status') ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-slate-900 dark:border-white shadow-md' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50' }}">
-            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75">All Offers</p>
-            <h4 class="text-xl font-extrabold mt-1">{{ $stats['total'] ?? $offers->count() }}</h4>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <!-- Card 1: All Offers -->
+        <a href="{{ route('admin.offers.index') }}" class="group relative overflow-hidden rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ !request('status') ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white shadow-md border border-slate-700/50' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-slate-300 shadow-sm' }}">
+            <div class="flex items-center justify-between">
+                <span class="text-[11px] font-extrabold uppercase tracking-wider {{ !request('status') ? 'text-slate-300' : 'text-slate-500 dark:text-slate-400' }}">All Offers</span>
+                <div class="w-8 h-8 rounded-xl flex items-center justify-center text-xs {{ !request('status') ? 'bg-white/10 text-indigo-300' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300' }}">
+                    <i class="fa-solid fa-gift"></i>
+                </div>
+            </div>
+            <div class="mt-3 flex items-baseline gap-2">
+                <span class="text-2xl sm:text-3xl font-black {{ !request('status') ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['total'] ?? $offers->count() }}</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ !request('status') ? 'bg-white/10 text-slate-300' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300' }}">Total</span>
+            </div>
+            <i class="fa-solid fa-gift absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </a>
 
-        <a href="{{ route('admin.offers.index', ['status' => 'active']) }}" class="p-4 rounded-2xl border transition-all {{ request('status') == 'active' ? 'bg-emerald-600 text-white border-emerald-600 shadow-md' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-emerald-950/30' }}">
-            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75">Active Coupons</p>
-            <h4 class="text-xl font-extrabold mt-1">{{ $stats['active'] ?? 0 }}</h4>
+        <!-- Card 2: Active Coupons -->
+        <a href="{{ route('admin.offers.index', ['status' => 'active']) }}" class="group relative overflow-hidden rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('status') == 'active' ? 'bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-md border border-emerald-500' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-emerald-500 shadow-sm hover:border-emerald-200' }}">
+            <div class="flex items-center justify-between">
+                <span class="text-[11px] font-extrabold uppercase tracking-wider {{ request('status') == 'active' ? 'text-emerald-100' : 'text-emerald-700 dark:text-emerald-400' }}">Active Coupons</span>
+                <div class="w-8 h-8 rounded-xl flex items-center justify-center text-xs {{ request('status') == 'active' ? 'bg-white/20 text-white' : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400' }}">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+            </div>
+            <div class="mt-3 flex items-baseline gap-2">
+                <span class="text-2xl sm:text-3xl font-black {{ request('status') == 'active' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['active'] ?? 0 }}</span>
+                <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full flex items-center gap-1 {{ request('status') == 'active' ? 'bg-white/20 text-white' : 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300' }}">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Running
+                </span>
+            </div>
+            <i class="fa-solid fa-circle-check absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </a>
 
-        <div class="p-4 rounded-2xl border bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200">
-            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75 text-indigo-600 dark:text-indigo-400">🏷️ % Percentage Deals</p>
-            <h4 class="text-xl font-extrabold mt-1">{{ $stats['percentage'] ?? 0 }}</h4>
+        <!-- Card 3: % Percentage Deals -->
+        <div class="group relative overflow-hidden rounded-2xl p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-indigo-500 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <div class="flex items-center justify-between">
+                <span class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-700 dark:text-indigo-400">% Percentage Deals</span>
+                <div class="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xs">
+                    <i class="fa-solid fa-percent"></i>
+                </div>
+            </div>
+            <div class="mt-3 flex items-baseline gap-2">
+                <span class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">{{ $stats['percentage'] ?? 0 }}</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300">Discount</span>
+            </div>
+            <i class="fa-solid fa-percent absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </div>
 
-        <div class="p-4 rounded-2xl border bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200">
-            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75 text-amber-600 dark:text-amber-400">💵 Flat Cash Off</p>
-            <h4 class="text-xl font-extrabold mt-1">{{ $stats['flat'] ?? 0 }}</h4>
+        <!-- Card 4: Flat Cash Off -->
+        <div class="group relative overflow-hidden rounded-2xl p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-amber-500 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <div class="flex items-center justify-between">
+                <span class="text-[11px] font-extrabold uppercase tracking-wider text-amber-700 dark:text-amber-400">Flat Cash Off</span>
+                <div class="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xs">
+                    <i class="fa-solid fa-indian-rupee-sign"></i>
+                </div>
+            </div>
+            <div class="mt-3 flex items-baseline gap-2">
+                <span class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">{{ $stats['flat'] ?? 0 }}</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300">Fixed ₹</span>
+            </div>
+            <i class="fa-solid fa-indian-rupee-sign absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </div>
     </div>
 

@@ -16,37 +16,67 @@
     </div>
 
     <!-- KPI Stats Cards -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div class="bg-slate-900 text-white dark:bg-slate-950 p-4 rounded-2xl shadow-sm border border-slate-800 flex flex-col justify-between">
-            <div class="flex items-center justify-between text-xs text-slate-400 font-semibold uppercase tracking-wider">
-                <span>ALL ROLES</span>
-                <i class="fas fa-shield-alt text-slate-400"></i>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <!-- Card 1: All Roles -->
+        <div class="group relative overflow-hidden rounded-2xl p-4 bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white shadow-md border border-slate-700/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <div class="flex items-center justify-between">
+                <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-300">All Roles</span>
+                <div class="w-8 h-8 rounded-xl bg-white/10 text-indigo-300 flex items-center justify-center text-xs">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
             </div>
-            <div class="text-2xl font-black mt-2 text-white">{{ $stats['total'] ?? $roles->count() }}</div>
+            <div class="mt-3 flex items-baseline gap-2">
+                <span class="text-2xl sm:text-3xl font-black text-white">{{ $stats['total'] ?? $roles->count() }}</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-slate-300">Total</span>
+            </div>
+            <i class="fa-solid fa-shield-halved absolute -right-3 -bottom-3 text-5xl opacity-5 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </div>
 
-        <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col justify-between">
-            <div class="flex items-center justify-between text-xs text-emerald-600 dark:text-emerald-400 font-semibold uppercase tracking-wider">
-                <span>SYSTEM ROLES</span>
-                <i class="fas fa-crown text-emerald-500"></i>
+        <!-- Card 2: System Roles -->
+        <div class="group relative overflow-hidden rounded-2xl p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-emerald-500 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <div class="flex items-center justify-between">
+                <span class="text-[11px] font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">System Roles</span>
+                <div class="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xs">
+                    <i class="fa-solid fa-crown"></i>
+                </div>
             </div>
-            <div class="text-2xl font-black mt-2 text-slate-900 dark:text-white">{{ $stats['system_roles'] ?? 3 }} Active</div>
+            <div class="mt-3 flex items-baseline gap-2">
+                <span class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">{{ $stats['system_roles'] ?? 3 }}</span>
+                <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Protected
+                </span>
+            </div>
+            <i class="fa-solid fa-crown absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </div>
 
-        <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col justify-between">
-            <div class="flex items-center justify-between text-xs text-blue-600 dark:text-blue-400 font-semibold uppercase tracking-wider">
-                <span>PERMISSIONS</span>
-                <i class="fas fa-key text-blue-500"></i>
+        <!-- Card 3: Permissions -->
+        <div class="group relative overflow-hidden rounded-2xl p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-blue-500 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <div class="flex items-center justify-between">
+                <span class="text-[11px] font-extrabold uppercase tracking-wider text-blue-700 dark:text-blue-400">Permissions</span>
+                <div class="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs">
+                    <i class="fa-solid fa-key"></i>
+                </div>
             </div>
-            <div class="text-2xl font-black mt-2 text-slate-900 dark:text-white">{{ $stats['permissions_count'] ?? 0 }} Total</div>
+            <div class="mt-3 flex items-baseline gap-2">
+                <span class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">{{ $stats['permissions_count'] ?? 0 }}</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300">Rules</span>
+            </div>
+            <i class="fa-solid fa-key absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </div>
 
-        <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col justify-between">
-            <div class="flex items-center justify-between text-xs text-purple-600 dark:text-purple-400 font-semibold uppercase tracking-wider">
-                <span>ASSIGNED USERS</span>
-                <i class="fas fa-user-shield text-purple-500"></i>
+        <!-- Card 4: Assigned Users -->
+        <div class="group relative overflow-hidden rounded-2xl p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-purple-500 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <div class="flex items-center justify-between">
+                <span class="text-[11px] font-extrabold uppercase tracking-wider text-purple-700 dark:text-purple-400">Assigned Users</span>
+                <div class="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center text-xs">
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
             </div>
-            <div class="text-2xl font-black mt-2 text-slate-900 dark:text-white">{{ $stats['assigned_users'] ?? 0 }}</div>
+            <div class="mt-3 flex items-baseline gap-2">
+                <span class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">{{ $stats['assigned_users'] ?? 0 }}</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300">Assigned</span>
+            </div>
+            <i class="fa-solid fa-user-shield absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </div>
     </div>
 

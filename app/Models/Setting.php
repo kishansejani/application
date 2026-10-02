@@ -36,10 +36,16 @@ class Setting extends Model
     public static function getAllSettings(): array
     {
         $defaults = [
-            'theme_primary_color' => '#000000',
-            'theme_hover_color' => '#a1a1a1',
+            'theme_primary_color' => '#0f172a',
+            'theme_hover_color' => '#334155',
+            'btn_primary_bg' => '#0f172a',
+            'btn_primary_text' => '#ffffff',
+            'btn_primary_hover' => '#1e293b',
+            'btn_accent_bg' => '#10b981',
+            'btn_accent_text' => '#ffffff',
             'sidebar_bg_color' => '#000000',
             'sidebar_active_color' => '#add8e6',
+            'sidebar_text_color' => '#ffffff',
             'footer_copyright_prefix' => '© 2026, made with ❤️ by',
             'footer_creator_name' => 'Decent Infoways',
             'footer_creator_url' => 'https://decentinfoways.com',

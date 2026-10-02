@@ -23,30 +23,82 @@
     </div>
 
     <!-- Top KPI / Pipeline Stats Grid -->
-    <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
-        <a href="{{ route('admin.products.index') }}" class="p-4 rounded-2xl border transition-all {{ !request('stock_status') && !request('category_id') ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-slate-900 dark:border-white shadow-md' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50' }}">
-            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75">All Products</p>
-            <h4 class="text-xl font-extrabold mt-1">{{ $stats['total'] ?? $products->count() }}</h4>
+    <div class="grid grid-cols-2 sm:grid-cols-5 gap-4">
+        <!-- Card 1: All Products -->
+        <a href="{{ route('admin.products.index') }}" class="group relative overflow-hidden rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ !request('stock_status') && !request('category_id') ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white shadow-md border border-slate-700/50' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-slate-300 shadow-sm' }}">
+            <div class="flex items-center justify-between">
+                <span class="text-[11px] font-extrabold uppercase tracking-wider {{ !request('stock_status') && !request('category_id') ? 'text-slate-300' : 'text-slate-500 dark:text-slate-400' }}">All Products</span>
+                <div class="w-8 h-8 rounded-xl flex items-center justify-center text-xs {{ !request('stock_status') && !request('category_id') ? 'bg-white/10 text-indigo-300' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300' }}">
+                    <i class="fa-solid fa-boxes-stacked"></i>
+                </div>
+            </div>
+            <div class="mt-3 flex items-baseline gap-2">
+                <span class="text-2xl sm:text-3xl font-black {{ !request('stock_status') && !request('category_id') ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['total'] ?? $products->count() }}</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ !request('stock_status') && !request('category_id') ? 'bg-white/10 text-slate-300' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300' }}">Total</span>
+            </div>
+            <i class="fa-solid fa-boxes-stacked absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </a>
 
-        <a href="{{ route('admin.products.index', ['stock_status' => 'in_stock']) }}" class="p-4 rounded-2xl border transition-all {{ request('stock_status') == 'in_stock' ? 'bg-emerald-600 text-white border-emerald-600 shadow-md' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-emerald-950/30' }}">
-            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75">In Stock (>5)</p>
-            <h4 class="text-xl font-extrabold mt-1">{{ $stats['in_stock'] ?? 0 }}</h4>
+        <!-- Card 2: In Stock -->
+        <a href="{{ route('admin.products.index', ['stock_status' => 'in_stock']) }}" class="group relative overflow-hidden rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('stock_status') == 'in_stock' ? 'bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-md border border-emerald-500' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-emerald-500 shadow-sm hover:border-emerald-200' }}">
+            <div class="flex items-center justify-between">
+                <span class="text-[11px] font-extrabold uppercase tracking-wider {{ request('stock_status') == 'in_stock' ? 'text-emerald-100' : 'text-emerald-700 dark:text-emerald-400' }}">In Stock</span>
+                <div class="w-8 h-8 rounded-xl flex items-center justify-center text-xs {{ request('stock_status') == 'in_stock' ? 'bg-white/20 text-white' : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400' }}">
+                    <i class="fa-solid fa-check-double"></i>
+                </div>
+            </div>
+            <div class="mt-3 flex items-baseline gap-2">
+                <span class="text-2xl sm:text-3xl font-black {{ request('stock_status') == 'in_stock' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['in_stock'] ?? 0 }}</span>
+                <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full flex items-center gap-1 {{ request('stock_status') == 'in_stock' ? 'bg-white/20 text-white' : 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300' }}">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> &gt;5
+                </span>
+            </div>
+            <i class="fa-solid fa-check-double absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </a>
 
-        <a href="{{ route('admin.products.index', ['stock_status' => 'low_stock']) }}" class="p-4 rounded-2xl border transition-all {{ request('stock_status') == 'low_stock' ? 'bg-amber-500 text-white border-amber-500 shadow-md' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-amber-50 dark:hover:bg-amber-950/30' }}">
-            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75">⚠️ Low Stock</p>
-            <h4 class="text-xl font-extrabold mt-1">{{ $stats['low_stock'] ?? 0 }}</h4>
+        <!-- Card 3: Low Stock -->
+        <a href="{{ route('admin.products.index', ['stock_status' => 'low_stock']) }}" class="group relative overflow-hidden rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('stock_status') == 'low_stock' ? 'bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-md border border-amber-400' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-amber-500 shadow-sm hover:border-amber-200' }}">
+            <div class="flex items-center justify-between">
+                <span class="text-[11px] font-extrabold uppercase tracking-wider {{ request('stock_status') == 'low_stock' ? 'text-amber-100' : 'text-amber-700 dark:text-amber-400' }}">Low Stock</span>
+                <div class="w-8 h-8 rounded-xl flex items-center justify-center text-xs {{ request('stock_status') == 'low_stock' ? 'bg-white/20 text-white' : 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400' }}">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+            </div>
+            <div class="mt-3 flex items-baseline gap-2">
+                <span class="text-2xl sm:text-3xl font-black {{ request('stock_status') == 'low_stock' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['low_stock'] ?? 0 }}</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ request('stock_status') == 'low_stock' ? 'bg-white/20 text-white' : 'bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300' }}">1 - 5</span>
+            </div>
+            <i class="fa-solid fa-triangle-exclamation absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </a>
 
-        <a href="{{ route('admin.products.index', ['stock_status' => 'out_of_stock']) }}" class="p-4 rounded-2xl border transition-all {{ request('stock_status') == 'out_of_stock' ? 'bg-rose-600 text-white border-rose-600 shadow-md' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-950/30' }}">
-            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75">🚫 Out of Stock</p>
-            <h4 class="text-xl font-extrabold mt-1">{{ $stats['out_of_stock'] ?? 0 }}</h4>
+        <!-- Card 4: Out of Stock -->
+        <a href="{{ route('admin.products.index', ['stock_status' => 'out_of_stock']) }}" class="group relative overflow-hidden rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('stock_status') == 'out_of_stock' ? 'bg-gradient-to-br from-rose-600 to-red-700 text-white shadow-md border border-rose-500' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-rose-500 shadow-sm hover:border-rose-200' }}">
+            <div class="flex items-center justify-between">
+                <span class="text-[11px] font-extrabold uppercase tracking-wider {{ request('stock_status') == 'out_of_stock' ? 'text-rose-100' : 'text-rose-700 dark:text-rose-400' }}">Out of Stock</span>
+                <div class="w-8 h-8 rounded-xl flex items-center justify-center text-xs {{ request('stock_status') == 'out_of_stock' ? 'bg-white/20 text-white' : 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400' }}">
+                    <i class="fa-solid fa-ban"></i>
+                </div>
+            </div>
+            <div class="mt-3 flex items-baseline gap-2">
+                <span class="text-2xl sm:text-3xl font-black {{ request('stock_status') == 'out_of_stock' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['out_of_stock'] ?? 0 }}</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ request('stock_status') == 'out_of_stock' ? 'bg-white/20 text-white' : 'bg-rose-100 dark:bg-rose-950/80 text-rose-700 dark:text-rose-300' }}">0 Units</span>
+            </div>
+            <i class="fa-solid fa-ban absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </a>
 
-        <div class="p-4 rounded-2xl border bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200">
-            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75 text-amber-500">⭐ Featured</p>
-            <h4 class="text-xl font-extrabold mt-1">{{ $stats['featured'] ?? 0 }}</h4>
+        <!-- Card 5: Featured -->
+        <div class="group relative overflow-hidden rounded-2xl p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-purple-500 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <div class="flex items-center justify-between">
+                <span class="text-[11px] font-extrabold uppercase tracking-wider text-purple-700 dark:text-purple-400">Featured</span>
+                <div class="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center text-xs">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+            </div>
+            <div class="mt-3 flex items-baseline gap-2">
+                <span class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">{{ $stats['featured'] ?? 0 }}</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300">★ Starred</span>
+            </div>
+            <i class="fa-solid fa-wand-magic-sparkles absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </div>
     </div>
 

@@ -19,8 +19,14 @@ class SettingController extends Controller
         $request->validate([
             'theme_primary_color' => 'required|string|max:20',
             'theme_hover_color' => 'required|string|max:20',
+            'btn_primary_bg' => 'required|string|max:20',
+            'btn_primary_text' => 'required|string|max:20',
+            'btn_primary_hover' => 'required|string|max:20',
+            'btn_accent_bg' => 'required|string|max:20',
+            'btn_accent_text' => 'required|string|max:20',
             'sidebar_bg_color' => 'required|string|max:20',
             'sidebar_active_color' => 'required|string|max:20',
+            'sidebar_text_color' => 'nullable|string|max:20',
             'footer_copyright_prefix' => 'nullable|string|max:100',
             'footer_creator_name' => 'nullable|string|max:100',
             'footer_creator_url' => 'nullable|url|max:255',
@@ -29,8 +35,14 @@ class SettingController extends Controller
 
         Setting::set('theme_primary_color', $request->theme_primary_color, 'theme');
         Setting::set('theme_hover_color', $request->theme_hover_color, 'theme');
+        Setting::set('btn_primary_bg', $request->btn_primary_bg, 'theme');
+        Setting::set('btn_primary_text', $request->btn_primary_text, 'theme');
+        Setting::set('btn_primary_hover', $request->btn_primary_hover, 'theme');
+        Setting::set('btn_accent_bg', $request->btn_accent_bg, 'theme');
+        Setting::set('btn_accent_text', $request->btn_accent_text, 'theme');
         Setting::set('sidebar_bg_color', $request->sidebar_bg_color, 'theme');
         Setting::set('sidebar_active_color', $request->sidebar_active_color, 'theme');
+        Setting::set('sidebar_text_color', $request->sidebar_text_color ?? '#ffffff', 'theme');
         Setting::set('footer_copyright_prefix', $request->footer_copyright_prefix ?? '© 2026, made with ❤️ by', 'footer');
         Setting::set('footer_creator_name', $request->footer_creator_name ?? 'Decent Infoways', 'footer');
         Setting::set('footer_creator_url', $request->footer_creator_url ?? 'https://decentinfoways.com', 'footer');
@@ -39,20 +51,26 @@ class SettingController extends Controller
             Setting::set('theme_mode', $request->theme_mode, 'theme');
         }
 
-        return redirect()->route('admin.settings.index')->with('success', 'System and Theme settings updated successfully!');
+        return redirect()->route('admin.settings.index')->with('success', 'System, button colors, and theme settings updated successfully!');
     }
 
     public function reset()
     {
-        Setting::set('theme_primary_color', '#000000', 'theme');
-        Setting::set('theme_hover_color', '#a1a1a1', 'theme');
+        Setting::set('theme_primary_color', '#0f172a', 'theme');
+        Setting::set('theme_hover_color', '#334155', 'theme');
+        Setting::set('btn_primary_bg', '#0f172a', 'theme');
+        Setting::set('btn_primary_text', '#ffffff', 'theme');
+        Setting::set('btn_primary_hover', '#1e293b', 'theme');
+        Setting::set('btn_accent_bg', '#10b981', 'theme');
+        Setting::set('btn_accent_text', '#ffffff', 'theme');
         Setting::set('sidebar_bg_color', '#000000', 'theme');
         Setting::set('sidebar_active_color', '#add8e6', 'theme');
+        Setting::set('sidebar_text_color', '#ffffff', 'theme');
         Setting::set('footer_copyright_prefix', '© 2026, made with ❤️ by', 'footer');
         Setting::set('footer_creator_name', 'Decent Infoways', 'footer');
         Setting::set('footer_creator_url', 'https://decentinfoways.com', 'footer');
         Setting::set('theme_mode', 'system', 'theme');
 
-        return redirect()->route('admin.settings.index')->with('success', 'Settings have been reset to default values!');
+        return redirect()->route('admin.settings.index')->with('success', 'Settings and button colors have been reset to default values!');
     }
 }

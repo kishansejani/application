@@ -60,8 +60,9 @@
         </div>
 
         <div class="flex justify-end gap-3">
-            <button type="submit" class="px-6 py-2.5 bg-black hover:bg-slate-900 text-white dark:bg-white dark:text-black font-semibold rounded-xl text-sm shadow-md transition active:scale-95">
-                Update Role Permissions
+            <button type="submit" class="px-6 py-2.5 btn-theme-primary font-bold rounded-xl text-xs shadow-md transition active:scale-95 flex items-center gap-2">
+                <i class="fas fa-check"></i>
+                <span>Update Role Permissions</span>
             </button>
         </div>
     </form>

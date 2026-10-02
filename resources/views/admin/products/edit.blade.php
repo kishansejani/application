@@ -226,8 +226,11 @@
         </div>
 
         <div class="flex items-center justify-end gap-3 pt-6 border-t border-slate-100">
-            <a href="{{ route('admin.products.index') }}" class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-bold">Cancel</a>
-            <button type="submit" class="px-7 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-brand-500/25 transition-all">Update Product</button>
+            <a href="{{ route('admin.products.index') }}" class="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 text-xs font-bold transition">Cancel</a>
+            <button type="submit" class="px-7 py-3 btn-theme-primary font-bold rounded-xl text-xs shadow-md transition active:scale-95 flex items-center gap-2">
+                <i class="fas fa-check"></i>
+                <span>Update Product</span>
+            </button>
         </div>
     </form>
 </div>

@@ -17,45 +17,67 @@
     </div>
 
     <!-- Stat Metrics -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm flex items-center justify-between">
-            <div>
-                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Units</p>
-                <h3 class="text-2xl font-black text-slate-900 dark:text-white mt-1">{{ number_format($stats['total_items']) }}</h3>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <!-- Card 1: Total Units -->
+        <div class="group relative overflow-hidden rounded-2xl p-4 bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white shadow-md border border-slate-700/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <div class="flex items-center justify-between">
+                <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-300">Total Units</span>
+                <div class="w-8 h-8 rounded-xl bg-white/10 text-indigo-300 flex items-center justify-center text-xs">
+                    <i class="fa-solid fa-boxes-stacked"></i>
+                </div>
             </div>
-            <div class="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center text-lg">
-                <i class="fa-solid fa-boxes-stacked"></i>
+            <div class="mt-3 flex items-baseline gap-2">
+                <span class="text-2xl sm:text-3xl font-black text-white">{{ number_format($stats['total_items']) }}</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-slate-300">In Warehouse</span>
             </div>
+            <i class="fa-solid fa-boxes-stacked absolute -right-3 -bottom-3 text-5xl opacity-5 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </div>
 
-        <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm flex items-center justify-between">
-            <div>
-                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Low Stock Alerts</p>
-                <h3 class="text-2xl font-black text-amber-600 dark:text-amber-400 mt-1">{{ $stats['low_stock_count'] }}</h3>
+        <!-- Card 2: Tracked SKUs -->
+        <div class="group relative overflow-hidden rounded-2xl p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-emerald-500 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <div class="flex items-center justify-between">
+                <span class="text-[11px] font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">Tracked SKUs</span>
+                <div class="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xs">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
             </div>
-            <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center text-lg">
-                <i class="fa-solid fa-triangle-exclamation"></i>
+            <div class="mt-3 flex items-baseline gap-2">
+                <span class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">{{ $stats['total_products'] }}</span>
+                <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Active
+                </span>
             </div>
+            <i class="fa-solid fa-circle-check absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </div>
 
-        <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm flex items-center justify-between">
-            <div>
-                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Out of Stock</p>
-                <h3 class="text-2xl font-black text-rose-600 dark:text-rose-400 mt-1">{{ $stats['out_of_stock_count'] }}</h3>
+        <!-- Card 3: Low Stock Alerts -->
+        <div class="group relative overflow-hidden rounded-2xl p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-amber-500 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <div class="flex items-center justify-between">
+                <span class="text-[11px] font-extrabold uppercase tracking-wider text-amber-700 dark:text-amber-400">Low Stock Alerts</span>
+                <div class="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xs">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
             </div>
-            <div class="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center text-lg">
-                <i class="fa-solid fa-ban"></i>
+            <div class="mt-3 flex items-baseline gap-2">
+                <span class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">{{ $stats['low_stock_count'] }}</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300">Reorder</span>
             </div>
+            <i class="fa-solid fa-triangle-exclamation absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </div>
 
-        <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm flex items-center justify-between">
-            <div>
-                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Tracked SKUs</p>
-                <h3 class="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">{{ $stats['total_products'] }}</h3>
+        <!-- Card 4: Out of Stock -->
+        <div class="group relative overflow-hidden rounded-2xl p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-rose-500 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <div class="flex items-center justify-between">
+                <span class="text-[11px] font-extrabold uppercase tracking-wider text-rose-700 dark:text-rose-400">Out of Stock</span>
+                <div class="w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center text-xs">
+                    <i class="fa-solid fa-ban"></i>
+                </div>
             </div>
-            <div class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-lg">
-                <i class="fa-solid fa-circle-check"></i>
+            <div class="mt-3 flex items-baseline gap-2">
+                <span class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">{{ $stats['out_of_stock_count'] }}</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950/80 text-rose-700 dark:text-rose-300">Critical</span>
             </div>
+            <i class="fa-solid fa-ban absolute -right-3 -bottom-3 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </div>
     </div>
 

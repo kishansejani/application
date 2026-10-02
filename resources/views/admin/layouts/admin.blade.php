@@ -30,6 +30,19 @@
                         hover: 'var(--theme-hover)',
                         sidebarBg: 'var(--sidebar-bg)',
                         sidebarActive: 'var(--sidebar-active)',
+                        brand: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            200: '#a7f3d0',
+                            300: '#6ee7b7',
+                            400: '#34d399',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                            950: '#022c22',
+                        }
                     },
                     fontFamily: {
                         sans: ['"Plus Jakarta Sans"', '"Hind Vadodara"', 'sans-serif'],
@@ -52,13 +65,35 @@
 
     <style>
         :root {
-            --theme-primary: {{ $sysSettings['theme_primary_color'] ?? '#000000' }};
-            --theme-hover: {{ $sysSettings['theme_hover_color'] ?? '#a1a1a1' }};
+            --theme-primary: {{ $sysSettings['theme_primary_color'] ?? '#0f172a' }};
+            --theme-hover: {{ $sysSettings['theme_hover_color'] ?? '#334155' }};
+            --btn-primary-bg: {{ $sysSettings['btn_primary_bg'] ?? '#0f172a' }};
+            --btn-primary-text: {{ $sysSettings['btn_primary_text'] ?? '#ffffff' }};
+            --btn-primary-hover: {{ $sysSettings['btn_primary_hover'] ?? '#1e293b' }};
+            --btn-accent-bg: {{ $sysSettings['btn_accent_bg'] ?? '#10b981' }};
+            --btn-accent-text: {{ $sysSettings['btn_accent_text'] ?? '#ffffff' }};
             --sidebar-bg: {{ $sysSettings['sidebar_bg_color'] ?? '#000000' }};
             --sidebar-active: {{ $sysSettings['sidebar_active_color'] ?? '#add8e6' }};
+            --sidebar-text: {{ $sysSettings['sidebar_text_color'] ?? '#ffffff' }};
         }
         body {
             font-family: 'Plus Jakarta Sans', 'Hind Vadodara', sans-serif;
+        }
+        .btn-theme-primary, .btn-primary-custom { 
+            background-color: var(--btn-primary-bg) !important; 
+            color: var(--btn-primary-text) !important; 
+            border: none;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-theme-primary:hover, .btn-primary-custom:hover {
+            background-color: var(--btn-primary-hover) !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .btn-theme-accent {
+            background-color: var(--btn-accent-bg) !important;
+            color: var(--btn-accent-text) !important;
+            transition: all 0.2s ease;
         }
         .bg-primary-custom { background-color: var(--theme-primary) !important; }
         .text-primary-custom { color: var(--theme-primary) !important; }

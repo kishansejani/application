@@ -14,34 +14,58 @@
 
     <!-- Stat Pipeline Grid -->
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        <a href="{{ route('admin.orders.index') }}" class="p-4 rounded-2xl border transition-all {{ !request('status') && !request('delivery_type') ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-slate-900 dark:border-white shadow-md' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50' }}">
-            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75">All Orders</p>
-            <h4 class="text-xl font-extrabold mt-1">{{ $stats['total'] }}</h4>
+        <!-- Card 1: All Orders -->
+        <a href="{{ route('admin.orders.index') }}" class="group relative overflow-hidden rounded-2xl p-3.5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ !request('status') && !request('delivery_type') ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white shadow-md border border-slate-700/50' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-slate-300 shadow-sm' }}">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-extrabold uppercase tracking-wider {{ !request('status') && !request('delivery_type') ? 'text-slate-300' : 'text-slate-500 dark:text-slate-400' }}">All Orders</span>
+                <i class="fa-solid fa-cart-flatbed-suitcase text-xs {{ !request('status') && !request('delivery_type') ? 'text-indigo-300' : 'text-slate-400' }}"></i>
+            </div>
+            <div class="text-2xl font-black mt-2 {{ !request('status') && !request('delivery_type') ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['total'] }}</div>
         </a>
 
-        <a href="{{ route('admin.orders.index', ['delivery_type' => 'two_hours']) }}" class="p-4 rounded-2xl border transition-all {{ request('delivery_type') == 'two_hours' ? 'bg-amber-500 text-white border-amber-500 shadow-md' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-amber-50 dark:hover:bg-amber-950/30' }}">
-            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75">⚡ 2-Hr Express</p>
-            <h4 class="text-xl font-extrabold mt-1">{{ $stats['two_hour_express'] }}</h4>
+        <!-- Card 2: 2-Hr Express -->
+        <a href="{{ route('admin.orders.index', ['delivery_type' => 'two_hours']) }}" class="group relative overflow-hidden rounded-2xl p-3.5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('delivery_type') == 'two_hours' ? 'bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-md border border-amber-400' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-amber-500 shadow-sm' }}">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-extrabold uppercase tracking-wider text-amber-600 dark:text-amber-400">⚡ 2-Hr Express</span>
+                <i class="fa-solid fa-bolt text-xs text-amber-500"></i>
+            </div>
+            <div class="text-2xl font-black mt-2 text-slate-900 dark:text-white">{{ $stats['two_hour_express'] }}</div>
         </a>
 
-        <a href="{{ route('admin.orders.index', ['status' => 'pending']) }}" class="p-4 rounded-2xl border transition-all {{ request('status') == 'pending' ? 'bg-amber-500 text-white border-amber-500 shadow-md' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50' }}">
-            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75">Pending</p>
-            <h4 class="text-xl font-extrabold mt-1">{{ $stats['pending'] }}</h4>
+        <!-- Card 3: Pending -->
+        <a href="{{ route('admin.orders.index', ['status' => 'pending']) }}" class="group relative overflow-hidden rounded-2xl p-3.5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('status') == 'pending' ? 'bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-md border border-amber-400' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-amber-400 shadow-sm' }}">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-extrabold uppercase tracking-wider text-amber-700 dark:text-amber-400">Pending</span>
+                <i class="fa-solid fa-clock text-xs text-amber-500"></i>
+            </div>
+            <div class="text-2xl font-black mt-2 text-slate-900 dark:text-white">{{ $stats['pending'] }}</div>
         </a>
 
-        <a href="{{ route('admin.orders.index', ['status' => 'processing']) }}" class="p-4 rounded-2xl border transition-all {{ request('status') == 'processing' ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50' }}">
-            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75">Processing</p>
-            <h4 class="text-xl font-extrabold mt-1">{{ $stats['processing'] }}</h4>
+        <!-- Card 4: Processing -->
+        <a href="{{ route('admin.orders.index', ['status' => 'processing']) }}" class="group relative overflow-hidden rounded-2xl p-3.5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('status') == 'processing' ? 'bg-gradient-to-br from-indigo-600 to-blue-700 text-white shadow-md border border-indigo-500' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-indigo-500 shadow-sm' }}">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-extrabold uppercase tracking-wider text-indigo-700 dark:text-indigo-400">Processing</span>
+                <i class="fa-solid fa-box-open text-xs text-indigo-500"></i>
+            </div>
+            <div class="text-2xl font-black mt-2 text-slate-900 dark:text-white">{{ $stats['processing'] }}</div>
         </a>
 
-        <a href="{{ route('admin.orders.index', ['status' => 'out_for_delivery']) }}" class="p-4 rounded-2xl border transition-all {{ request('status') == 'out_for_delivery' ? 'bg-purple-600 text-white border-purple-600 shadow-md' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50' }}">
-            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75">Out for Delivery</p>
-            <h4 class="text-xl font-extrabold mt-1">{{ $stats['out_for_delivery'] }}</h4>
+        <!-- Card 5: Out for Delivery -->
+        <a href="{{ route('admin.orders.index', ['status' => 'out_for_delivery']) }}" class="group relative overflow-hidden rounded-2xl p-3.5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('status') == 'out_for_delivery' ? 'bg-gradient-to-br from-purple-600 to-indigo-700 text-white shadow-md border border-purple-500' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-purple-500 shadow-sm' }}">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-extrabold uppercase tracking-wider text-purple-700 dark:text-purple-400">Out for Delivery</span>
+                <i class="fa-solid fa-truck-fast text-xs text-purple-500"></i>
+            </div>
+            <div class="text-2xl font-black mt-2 text-slate-900 dark:text-white">{{ $stats['out_for_delivery'] }}</div>
         </a>
 
-        <a href="{{ route('admin.orders.index', ['status' => 'delivered']) }}" class="p-4 rounded-2xl border transition-all {{ request('status') == 'delivered' ? 'bg-emerald-600 text-white border-emerald-600 shadow-md' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50' }}">
-            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75">Delivered</p>
-            <h4 class="text-xl font-extrabold mt-1">{{ $stats['delivered'] }}</h4>
+        <!-- Card 6: Delivered -->
+        <a href="{{ route('admin.orders.index', ['status' => 'delivered']) }}" class="group relative overflow-hidden rounded-2xl p-3.5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('status') == 'delivered' ? 'bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-md border border-emerald-500' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 border-t-4 border-t-emerald-500 shadow-sm' }}">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">Delivered</span>
+                <i class="fa-solid fa-circle-check text-xs text-emerald-500"></i>
+            </div>
+            <div class="text-2xl font-black mt-2 text-slate-900 dark:text-white">{{ $stats['delivered'] }}</div>
         </a>
     </div>
 
