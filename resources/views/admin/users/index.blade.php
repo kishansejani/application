@@ -18,77 +18,77 @@
     <!-- Top KPI / Pipeline Stats Grid -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <!-- Card 1: Total Accounts -->
-        <a href="{{ route('admin.users.index') }}" class="group relative overflow-hidden rounded-2xl p-4.5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ !request('role') ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white shadow-lg border border-slate-700/60' : 'bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 hover:border-slate-300 shadow-sm' }}">
-            <div class="flex items-center justify-between">
+        <a href="{{ route('admin.users.index') }}" class="group relative overflow-hidden rounded-2xl p-5 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ !request('role') ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white shadow-lg border border-slate-700/60' : 'bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 hover:border-slate-300 shadow-sm' }}">
+            <div class="flex items-start justify-between gap-2">
                 <div>
                     <span class="text-[11px] font-extrabold uppercase tracking-wider block {{ !request('role') ? 'text-slate-300' : 'text-slate-500 dark:text-slate-400' }}">Total Accounts</span>
-                    <div class="text-3xl font-black mt-2 {{ !request('role') ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['total'] ?? $users->total() }}</div>
+                    <div class="text-3xl font-black mt-2 leading-none {{ !request('role') ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['total'] ?? $users->total() }}</div>
                 </div>
-                <div class="w-11 h-11 rounded-2xl flex items-center justify-center text-sm shadow-inner {{ !request('role') ? 'bg-white/10 text-indigo-300 border border-white/20 backdrop-blur-md' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300' }}">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm shadow-sm flex-shrink-0 {{ !request('role') ? 'bg-white/10 text-indigo-300 border border-white/20 backdrop-blur-md' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300' }}">
                     <i class="fa-solid fa-users"></i>
                 </div>
             </div>
-            <div class="mt-3 flex items-center gap-1.5">
+            <div class="mt-4 flex items-center gap-1.5">
                 <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full {{ !request('role') ? 'bg-white/10 text-slate-200' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300' }}">● Registered Users</span>
             </div>
-            <i class="fa-solid fa-users absolute -right-3 -bottom-3 text-6xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
+            <i class="fa-solid fa-users absolute -right-2 -bottom-2 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </a>
 
         <!-- Card 2: Super Admins -->
-        <a href="{{ route('admin.users.index', ['role' => 'super_admin']) }}" class="group relative overflow-hidden rounded-2xl p-4.5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('role') == 'super_admin' ? 'bg-gradient-to-br from-purple-600 to-indigo-700 text-white shadow-lg border border-purple-500' : 'bg-gradient-to-br from-white via-white to-purple-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-purple-950/30 border border-purple-200/80 dark:border-purple-800/60 shadow-sm' }}">
-            <div class="flex items-center justify-between">
+        <a href="{{ route('admin.users.index', ['role' => 'super_admin']) }}" class="group relative overflow-hidden rounded-2xl p-5 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('role') == 'super_admin' ? 'bg-gradient-to-br from-purple-600 to-indigo-700 text-white shadow-lg border border-purple-500' : 'bg-gradient-to-br from-white via-white to-purple-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-purple-950/30 border border-purple-200/80 dark:border-purple-800/60 shadow-sm' }}">
+            <div class="flex items-start justify-between gap-2">
                 <div>
                     <span class="text-[11px] font-extrabold uppercase tracking-wider block {{ request('role') == 'super_admin' ? 'text-purple-100' : 'text-purple-700 dark:text-purple-400' }}">Super Admins</span>
-                    <div class="text-3xl font-black mt-2 {{ request('role') == 'super_admin' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['super_admin'] ?? 0 }}</div>
+                    <div class="text-3xl font-black mt-2 leading-none {{ request('role') == 'super_admin' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['super_admin'] ?? 0 }}</div>
                 </div>
-                <div class="w-11 h-11 rounded-2xl flex items-center justify-center text-sm text-white shadow-md {{ request('role') == 'super_admin' ? 'bg-white/20 text-white border border-white/30' : 'bg-gradient-to-tr from-purple-500 to-indigo-500 shadow-purple-500/25' }}">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm text-white shadow-md flex-shrink-0 {{ request('role') == 'super_admin' ? 'bg-white/20 text-white border border-white/30' : 'bg-gradient-to-tr from-purple-500 to-indigo-500 shadow-purple-500/25' }}">
                     <i class="fa-solid fa-crown"></i>
                 </div>
             </div>
-            <div class="mt-3 flex items-center gap-1.5">
+            <div class="mt-4 flex items-center gap-1.5">
                 <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold {{ request('role') == 'super_admin' ? 'bg-white/20 text-white' : 'bg-purple-100 text-purple-800 dark:bg-purple-950/80 dark:text-purple-300 border border-purple-200/80 dark:border-purple-800' }}">
                     ★ Full Authority
                 </span>
             </div>
-            <i class="fa-solid fa-crown absolute -right-3 -bottom-3 text-6xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
+            <i class="fa-solid fa-crown absolute -right-2 -bottom-2 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </a>
 
         <!-- Card 3: Store Staff -->
-        <a href="{{ route('admin.users.index', ['role' => 'admin']) }}" class="group relative overflow-hidden rounded-2xl p-4.5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('role') == 'admin' ? 'bg-gradient-to-br from-blue-600 to-cyan-700 text-white shadow-lg border border-blue-500' : 'bg-gradient-to-br from-white via-white to-blue-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-blue-950/30 border border-blue-200/80 dark:border-blue-800/60 shadow-sm' }}">
-            <div class="flex items-center justify-between">
+        <a href="{{ route('admin.users.index', ['role' => 'admin']) }}" class="group relative overflow-hidden rounded-2xl p-5 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('role') == 'admin' ? 'bg-gradient-to-br from-blue-600 to-cyan-700 text-white shadow-lg border border-blue-500' : 'bg-gradient-to-br from-white via-white to-blue-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-blue-950/30 border border-blue-200/80 dark:border-blue-800/60 shadow-sm' }}">
+            <div class="flex items-start justify-between gap-2">
                 <div>
                     <span class="text-[11px] font-extrabold uppercase tracking-wider block {{ request('role') == 'admin' ? 'text-blue-100' : 'text-blue-700 dark:text-blue-400' }}">Store Staff</span>
-                    <div class="text-3xl font-black mt-2 {{ request('role') == 'admin' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['admin'] ?? 0 }}</div>
+                    <div class="text-3xl font-black mt-2 leading-none {{ request('role') == 'admin' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['admin'] ?? 0 }}</div>
                 </div>
-                <div class="w-11 h-11 rounded-2xl flex items-center justify-center text-sm text-white shadow-md {{ request('role') == 'admin' ? 'bg-white/20 text-white border border-white/30' : 'bg-gradient-to-tr from-blue-500 to-cyan-400 shadow-blue-500/25' }}">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm text-white shadow-md flex-shrink-0 {{ request('role') == 'admin' ? 'bg-white/20 text-white border border-white/30' : 'bg-gradient-to-tr from-blue-500 to-cyan-400 shadow-blue-500/25' }}">
                     <i class="fa-solid fa-user-shield"></i>
                 </div>
             </div>
-            <div class="mt-3 flex items-center gap-1.5">
+            <div class="mt-4 flex items-center gap-1.5">
                 <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold {{ request('role') == 'admin' ? 'bg-white/20 text-white' : 'bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300 border border-blue-200/80 dark:border-blue-800' }}">
                     ● Operations
                 </span>
             </div>
-            <i class="fa-solid fa-user-shield absolute -right-3 -bottom-3 text-6xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
+            <i class="fa-solid fa-user-shield absolute -right-2 -bottom-2 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </a>
 
         <!-- Card 4: Customers -->
-        <a href="{{ route('admin.users.index', ['role' => 'user']) }}" class="group relative overflow-hidden rounded-2xl p-4.5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('role') == 'user' ? 'bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-lg border border-emerald-500' : 'bg-gradient-to-br from-white via-white to-emerald-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/60 shadow-sm' }}">
-            <div class="flex items-center justify-between">
+        <a href="{{ route('admin.users.index', ['role' => 'user']) }}" class="group relative overflow-hidden rounded-2xl p-5 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('role') == 'user' ? 'bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-lg border border-emerald-500' : 'bg-gradient-to-br from-white via-white to-emerald-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/60 shadow-sm' }}">
+            <div class="flex items-start justify-between gap-2">
                 <div>
                     <span class="text-[11px] font-extrabold uppercase tracking-wider block {{ request('role') == 'user' ? 'text-emerald-100' : 'text-emerald-700 dark:text-emerald-400' }}">Customers</span>
-                    <div class="text-3xl font-black mt-2 {{ request('role') == 'user' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['customer'] ?? 0 }}</div>
+                    <div class="text-3xl font-black mt-2 leading-none {{ request('role') == 'user' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['customer'] ?? 0 }}</div>
                 </div>
-                <div class="w-11 h-11 rounded-2xl flex items-center justify-center text-sm text-white shadow-md {{ request('role') == 'user' ? 'bg-white/20 text-white border border-white/30' : 'bg-gradient-to-tr from-emerald-500 to-teal-400 shadow-emerald-500/25' }}">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm text-white shadow-md flex-shrink-0 {{ request('role') == 'user' ? 'bg-white/20 text-white border border-white/30' : 'bg-gradient-to-tr from-emerald-500 to-teal-400 shadow-emerald-500/25' }}">
                     <i class="fa-solid fa-basket-shopping"></i>
                 </div>
             </div>
-            <div class="mt-3 flex items-center gap-1.5">
+            <div class="mt-4 flex items-center gap-1.5">
                 <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold {{ request('role') == 'user' ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800' }}">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> Active Buyers
                 </span>
             </div>
-            <i class="fa-solid fa-basket-shopping absolute -right-3 -bottom-3 text-6xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
+            <i class="fa-solid fa-basket-shopping absolute -right-2 -bottom-2 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </a>
     </div>
 

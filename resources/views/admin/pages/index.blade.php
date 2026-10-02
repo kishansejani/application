@@ -15,77 +15,77 @@
     <!-- Top KPI / Pipeline Stats Grid -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <!-- Card 1: Total Pages -->
-        <div class="group relative overflow-hidden rounded-2xl p-4.5 bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white shadow-lg border border-slate-700/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-            <div class="flex items-center justify-between">
+        <div class="group relative overflow-hidden rounded-2xl p-5 flex flex-col justify-between bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white shadow-lg border border-slate-700/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <div class="flex items-start justify-between gap-2">
                 <div>
                     <span class="text-[11px] font-extrabold uppercase tracking-wider block text-slate-300">Total Pages</span>
-                    <div class="text-3xl font-black mt-2 text-white">{{ $stats['total'] ?? $pages->count() }}</div>
+                    <div class="text-3xl font-black mt-2 leading-none text-white">{{ $stats['total'] ?? $pages->count() }}</div>
                 </div>
-                <div class="w-11 h-11 rounded-2xl bg-white/10 text-indigo-300 flex items-center justify-center text-sm shadow-inner border border-white/20 backdrop-blur-md">
+                <div class="w-10 h-10 rounded-xl bg-white/10 text-indigo-300 flex items-center justify-center text-sm shadow-inner border border-white/20 backdrop-blur-md flex-shrink-0">
                     <i class="fa-solid fa-file-lines"></i>
                 </div>
             </div>
-            <div class="mt-3 flex items-center gap-1.5">
+            <div class="mt-4 flex items-center gap-1.5">
                 <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-white/10 text-slate-200">● CMS Documents</span>
             </div>
-            <i class="fa-solid fa-file-lines absolute -right-3 -bottom-3 text-6xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
+            <i class="fa-solid fa-file-lines absolute -right-2 -bottom-2 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </div>
 
         <!-- Card 2: Published -->
-        <div class="group relative overflow-hidden rounded-2xl p-4.5 bg-gradient-to-br from-white via-white to-emerald-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/60 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-            <div class="flex items-center justify-between">
+        <div class="group relative overflow-hidden rounded-2xl p-5 flex flex-col justify-between bg-gradient-to-br from-white via-white to-emerald-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/60 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <div class="flex items-start justify-between gap-2">
                 <div>
                     <span class="text-[11px] font-extrabold uppercase tracking-wider block text-emerald-700 dark:text-emerald-400">Live / Published</span>
-                    <div class="text-3xl font-black mt-2 text-slate-900 dark:text-white">{{ $stats['active'] ?? 0 }}</div>
+                    <div class="text-3xl font-black mt-2 leading-none text-slate-900 dark:text-white">{{ $stats['active'] ?? 0 }}</div>
                 </div>
-                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-white flex items-center justify-center text-sm shadow-md shadow-emerald-500/25">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-white flex items-center justify-center text-sm shadow-md shadow-emerald-500/25 flex-shrink-0">
                     <i class="fa-solid fa-circle-check"></i>
                 </div>
             </div>
-            <div class="mt-3 flex items-center gap-1.5">
+            <div class="mt-4 flex items-center gap-1.5">
                 <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> Live on Web
                 </span>
             </div>
-            <i class="fa-solid fa-circle-check absolute -right-3 -bottom-3 text-6xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
+            <i class="fa-solid fa-circle-check absolute -right-2 -bottom-2 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </div>
 
         <!-- Card 3: Drafts -->
-        <div class="group relative overflow-hidden rounded-2xl p-4.5 bg-gradient-to-br from-white via-white to-amber-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-amber-950/30 border border-amber-200/80 dark:border-amber-800/60 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-            <div class="flex items-center justify-between">
+        <div class="group relative overflow-hidden rounded-2xl p-5 flex flex-col justify-between bg-gradient-to-br from-white via-white to-amber-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-amber-950/30 border border-amber-200/80 dark:border-amber-800/60 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <div class="flex items-start justify-between gap-2">
                 <div>
                     <span class="text-[11px] font-extrabold uppercase tracking-wider block text-amber-700 dark:text-amber-400">Draft Pages</span>
-                    <div class="text-3xl font-black mt-2 text-slate-900 dark:text-white">{{ $stats['draft'] ?? 0 }}</div>
+                    <div class="text-3xl font-black mt-2 leading-none text-slate-900 dark:text-white">{{ $stats['draft'] ?? 0 }}</div>
                 </div>
-                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-400 text-white flex items-center justify-center text-sm shadow-md shadow-amber-500/25">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-400 text-white flex items-center justify-center text-sm shadow-md shadow-amber-500/25 flex-shrink-0">
                     <i class="fa-solid fa-pen-ruler"></i>
                 </div>
             </div>
-            <div class="mt-3 flex items-center gap-1.5">
+            <div class="mt-4 flex items-center gap-1.5">
                 <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800">
                     ● Unpublished
                 </span>
             </div>
-            <i class="fa-solid fa-pen-ruler absolute -right-3 -bottom-3 text-6xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
+            <i class="fa-solid fa-pen-ruler absolute -right-2 -bottom-2 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </div>
 
         <!-- Card 4: Legal & Policies -->
-        <div class="group relative overflow-hidden rounded-2xl p-4.5 bg-gradient-to-br from-white via-white to-indigo-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-indigo-950/30 border border-indigo-200/80 dark:border-indigo-800/60 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-            <div class="flex items-center justify-between">
+        <div class="group relative overflow-hidden rounded-2xl p-5 flex flex-col justify-between bg-gradient-to-br from-white via-white to-indigo-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-indigo-950/30 border border-indigo-200/80 dark:border-indigo-800/60 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <div class="flex items-start justify-between gap-2">
                 <div>
                     <span class="text-[11px] font-extrabold uppercase tracking-wider block text-indigo-700 dark:text-indigo-400">Legal & Policies</span>
-                    <div class="text-3xl font-black mt-2 text-slate-900 dark:text-white">{{ $stats['policy'] ?? 0 }}</div>
+                    <div class="text-3xl font-black mt-2 leading-none text-slate-900 dark:text-white">{{ $stats['policy'] ?? 0 }}</div>
                 </div>
-                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-500 to-blue-500 text-white flex items-center justify-center text-sm shadow-md shadow-indigo-500/25">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-blue-500 text-white flex items-center justify-center text-sm shadow-md shadow-indigo-500/25 flex-shrink-0">
                     <i class="fa-solid fa-scale-balanced"></i>
                 </div>
             </div>
-            <div class="mt-3 flex items-center gap-1.5">
+            <div class="mt-4 flex items-center gap-1.5">
                 <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-indigo-100 text-indigo-800 dark:bg-indigo-950/80 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800">
                     ★ Terms & Compliance
                 </span>
             </div>
-            <i class="fa-solid fa-scale-balanced absolute -right-3 -bottom-3 text-6xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
+            <i class="fa-solid fa-scale-balanced absolute -right-2 -bottom-2 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </div>
     </div>
 

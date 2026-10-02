@@ -18,77 +18,77 @@
     <!-- KPI Stats Cards -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <!-- Card 1: All Roles -->
-        <div class="group relative overflow-hidden rounded-2xl p-4.5 bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white shadow-lg border border-slate-700/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-            <div class="flex items-center justify-between">
+        <div class="group relative overflow-hidden rounded-2xl p-5 flex flex-col justify-between bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white shadow-lg border border-slate-700/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <div class="flex items-start justify-between gap-2">
                 <div>
                     <span class="text-[11px] font-extrabold uppercase tracking-wider block text-slate-300">All Roles</span>
-                    <div class="text-3xl font-black mt-2 text-white">{{ $stats['total'] ?? $roles->count() }}</div>
+                    <div class="text-3xl font-black mt-2 leading-none text-white">{{ $stats['total'] ?? $roles->count() }}</div>
                 </div>
-                <div class="w-11 h-11 rounded-2xl bg-white/10 text-indigo-300 flex items-center justify-center text-sm shadow-inner border border-white/20 backdrop-blur-md">
+                <div class="w-10 h-10 rounded-xl bg-white/10 text-indigo-300 flex items-center justify-center text-sm shadow-inner border border-white/20 backdrop-blur-md flex-shrink-0">
                     <i class="fa-solid fa-shield-halved"></i>
                 </div>
             </div>
-            <div class="mt-3 flex items-center gap-1.5">
+            <div class="mt-4 flex items-center gap-1.5">
                 <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-white/10 text-slate-200">● Access Roles</span>
             </div>
-            <i class="fa-solid fa-shield-halved absolute -right-3 -bottom-3 text-6xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
+            <i class="fa-solid fa-shield-halved absolute -right-2 -bottom-2 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </div>
 
         <!-- Card 2: System Roles -->
-        <div class="group relative overflow-hidden rounded-2xl p-4.5 bg-gradient-to-br from-white via-white to-emerald-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/60 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-            <div class="flex items-center justify-between">
+        <div class="group relative overflow-hidden rounded-2xl p-5 flex flex-col justify-between bg-gradient-to-br from-white via-white to-emerald-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/60 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <div class="flex items-start justify-between gap-2">
                 <div>
                     <span class="text-[11px] font-extrabold uppercase tracking-wider block text-emerald-700 dark:text-emerald-400">System Roles</span>
-                    <div class="text-3xl font-black mt-2 text-slate-900 dark:text-white">{{ $stats['system_roles'] ?? 3 }}</div>
+                    <div class="text-3xl font-black mt-2 leading-none text-slate-900 dark:text-white">{{ $stats['system_roles'] ?? 3 }}</div>
                 </div>
-                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-white flex items-center justify-center text-sm shadow-md shadow-emerald-500/25">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-white flex items-center justify-center text-sm shadow-md shadow-emerald-500/25 flex-shrink-0">
                     <i class="fa-solid fa-crown"></i>
                 </div>
             </div>
-            <div class="mt-3 flex items-center gap-1.5">
+            <div class="mt-4 flex items-center gap-1.5">
                 <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> Protected
                 </span>
             </div>
-            <i class="fa-solid fa-crown absolute -right-3 -bottom-3 text-6xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
+            <i class="fa-solid fa-crown absolute -right-2 -bottom-2 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </div>
 
         <!-- Card 3: Permissions -->
-        <div class="group relative overflow-hidden rounded-2xl p-4.5 bg-gradient-to-br from-white via-white to-blue-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-blue-950/30 border border-blue-200/80 dark:border-blue-800/60 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-            <div class="flex items-center justify-between">
+        <div class="group relative overflow-hidden rounded-2xl p-5 flex flex-col justify-between bg-gradient-to-br from-white via-white to-blue-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-blue-950/30 border border-blue-200/80 dark:border-blue-800/60 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <div class="flex items-start justify-between gap-2">
                 <div>
                     <span class="text-[11px] font-extrabold uppercase tracking-wider block text-blue-700 dark:text-blue-400">Permissions</span>
-                    <div class="text-3xl font-black mt-2 text-slate-900 dark:text-white">{{ $stats['permissions_count'] ?? 0 }}</div>
+                    <div class="text-3xl font-black mt-2 leading-none text-slate-900 dark:text-white">{{ $stats['permissions_count'] ?? 0 }}</div>
                 </div>
-                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-500 to-cyan-400 text-white flex items-center justify-center text-sm shadow-md shadow-blue-500/25">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-500 to-cyan-400 text-white flex items-center justify-center text-sm shadow-md shadow-blue-500/25 flex-shrink-0">
                     <i class="fa-solid fa-key"></i>
                 </div>
             </div>
-            <div class="mt-3 flex items-center gap-1.5">
+            <div class="mt-4 flex items-center gap-1.5">
                 <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300 border border-blue-200/80 dark:border-blue-800">
                     ★ Matrix Rules
                 </span>
             </div>
-            <i class="fa-solid fa-key absolute -right-3 -bottom-3 text-6xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
+            <i class="fa-solid fa-key absolute -right-2 -bottom-2 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </div>
 
         <!-- Card 4: Assigned Users -->
-        <div class="group relative overflow-hidden rounded-2xl p-4.5 bg-gradient-to-br from-white via-white to-purple-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-purple-950/30 border border-purple-200/80 dark:border-purple-800/60 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-            <div class="flex items-center justify-between">
+        <div class="group relative overflow-hidden rounded-2xl p-5 flex flex-col justify-between bg-gradient-to-br from-white via-white to-purple-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-purple-950/30 border border-purple-200/80 dark:border-purple-800/60 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <div class="flex items-start justify-between gap-2">
                 <div>
                     <span class="text-[11px] font-extrabold uppercase tracking-wider block text-purple-700 dark:text-purple-400">Assigned Users</span>
-                    <div class="text-3xl font-black mt-2 text-slate-900 dark:text-white">{{ $stats['assigned_users'] ?? 0 }}</div>
+                    <div class="text-3xl font-black mt-2 leading-none text-slate-900 dark:text-white">{{ $stats['assigned_users'] ?? 0 }}</div>
                 </div>
-                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-purple-500 to-indigo-500 text-white flex items-center justify-center text-sm shadow-md shadow-purple-500/25">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-500 to-indigo-500 text-white flex items-center justify-center text-sm shadow-md shadow-purple-500/25 flex-shrink-0">
                     <i class="fa-solid fa-user-shield"></i>
                 </div>
             </div>
-            <div class="mt-3 flex items-center gap-1.5">
+            <div class="mt-4 flex items-center gap-1.5">
                 <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-purple-100 text-purple-800 dark:bg-purple-950/80 dark:text-purple-300 border border-purple-200/80 dark:border-purple-800">
                     ● Active Staff
                 </span>
             </div>
-            <i class="fa-solid fa-user-shield absolute -right-3 -bottom-3 text-6xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
+            <i class="fa-solid fa-user-shield absolute -right-2 -bottom-2 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
         </div>
     </div>
 
