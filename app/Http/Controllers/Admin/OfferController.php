@@ -9,10 +9,24 @@ use Illuminate\Support\Facades\Storage;
 
 class OfferController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $offers = Offer::latest()->get();
-        return view('admin.offers.index', compact('offers'));
+        $query = Offer::query();
+        if ($request->has('status')) {
+            if ($request->status === 'active') $query->where('is_active', true);
+            elseif ($request->status === 'inactive') $query->where('is_active', false);
+        }
+
+        $offers = $query->latest()->get();
+        $stats = [
+            'total' => Offer::count(),
+            'active' => Offer::where('is_active', true)->count(),
+            'inactive' => Offer::where('is_active', false)->count(),
+            'percentage' => Offer::where('discount_type', 'percentage')->count(),
+            'flat' => Offer::where('discount_type', 'flat')->count(),
+        ];
+
+        return view('admin.offers.index', compact('offers', 'stats'));
     }
 
     public function create()

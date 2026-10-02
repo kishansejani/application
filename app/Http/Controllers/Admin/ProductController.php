@@ -33,7 +33,15 @@ class ProductController extends Controller
         }
 
         $products = $query->get();
-        return view('admin.products.index', compact('products', 'categories'));
+        $stats = [
+            'total' => Product::count(),
+            'in_stock' => Product::where('stock_quantity', '>', 5)->count(),
+            'low_stock' => Product::where('stock_quantity', '>', 0)->where('stock_quantity', '<=', 5)->count(),
+            'out_of_stock' => Product::where('stock_quantity', '<=', 0)->count(),
+            'featured' => Product::where('is_featured', true)->count(),
+        ];
+
+        return view('admin.products.index', compact('products', 'categories', 'stats'));
     }
 
     public function create()

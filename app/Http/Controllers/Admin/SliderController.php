@@ -12,10 +12,23 @@ use Illuminate\Support\Facades\Storage;
 
 class SliderController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $sliders = Slider::orderBy('sort_order')->get();
-        return view('admin.sliders.index', compact('sliders'));
+        $query = Slider::query();
+        if ($request->has('status')) {
+            if ($request->status === 'active') $query->where('is_active', true);
+            elseif ($request->status === 'inactive') $query->where('is_active', false);
+        }
+
+        $sliders = $query->orderBy('sort_order')->get();
+        $stats = [
+            'total' => Slider::count(),
+            'active' => Slider::where('is_active', true)->count(),
+            'inactive' => Slider::where('is_active', false)->count(),
+            'with_badge' => Slider::whereNotNull('badge_en')->where('badge_en', '!=', '')->count(),
+        ];
+
+        return view('admin.sliders.index', compact('sliders', 'stats'));
     }
 
     public function create()

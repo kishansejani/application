@@ -16,6 +16,29 @@
         </a>
     </div>
 
+    <!-- Top KPI / Pipeline Stats Grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <a href="{{ route('admin.offers.index') }}" class="p-4 rounded-2xl border transition-all {{ !request('status') ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-slate-900 dark:border-white shadow-md' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50' }}">
+            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75">All Offers</p>
+            <h4 class="text-xl font-extrabold mt-1">{{ $stats['total'] ?? $offers->count() }}</h4>
+        </a>
+
+        <a href="{{ route('admin.offers.index', ['status' => 'active']) }}" class="p-4 rounded-2xl border transition-all {{ request('status') == 'active' ? 'bg-emerald-600 text-white border-emerald-600 shadow-md' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-emerald-950/30' }}">
+            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75">Active Coupons</p>
+            <h4 class="text-xl font-extrabold mt-1">{{ $stats['active'] ?? 0 }}</h4>
+        </a>
+
+        <div class="p-4 rounded-2xl border bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200">
+            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75 text-indigo-600 dark:text-indigo-400">🏷️ % Percentage Deals</p>
+            <h4 class="text-xl font-extrabold mt-1">{{ $stats['percentage'] ?? 0 }}</h4>
+        </div>
+
+        <div class="p-4 rounded-2xl border bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200">
+            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75 text-amber-600 dark:text-amber-400">💵 Flat Cash Off</p>
+            <h4 class="text-xl font-extrabold mt-1">{{ $stats['flat'] ?? 0 }}</h4>
+        </div>
+    </div>
+
     <!-- Table Card Container -->
     <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm p-6 overflow-hidden">
         <div class="overflow-x-auto">

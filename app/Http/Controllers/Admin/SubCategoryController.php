@@ -19,9 +19,20 @@ class SubCategoryController extends Controller
         if ($request->filled('category_id')) {
             $query->where('category_id', $request->category_id);
         }
+        if ($request->has('status')) {
+            if ($request->status === 'active') $query->where('is_active', true);
+            elseif ($request->status === 'inactive') $query->where('is_active', false);
+        }
 
         $subCategories = $query->get();
-        return view('admin.subcategories.index', compact('subCategories', 'categories'));
+        $stats = [
+            'total' => SubCategory::count(),
+            'active' => SubCategory::where('is_active', true)->count(),
+            'inactive' => SubCategory::where('is_active', false)->count(),
+            'categories' => Category::count(),
+        ];
+
+        return view('admin.subcategories.index', compact('subCategories', 'categories', 'stats'));
     }
 
     public function create()

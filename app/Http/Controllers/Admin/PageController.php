@@ -11,7 +11,13 @@ class PageController extends Controller
     public function index()
     {
         $pages = Page::all();
-        return view('admin.pages.index', compact('pages'));
+        $stats = [
+            'total' => Page::count(),
+            'active' => Page::where('is_active', true)->count(),
+            'draft' => Page::where('is_active', false)->count(),
+            'policy' => Page::whereIn('slug', ['privacy-policy', 'terms-and-conditions', 'return-policy', 'legal-information'])->count(),
+        ];
+        return view('admin.pages.index', compact('pages', 'stats'));
     }
 
     public function edit(Page $page)

@@ -29,8 +29,15 @@ class UserController extends Controller
 
         $users = $query->latest()->paginate(15);
         $roles = Role::all();
+        $stats = [
+            'total' => User::count(),
+            'super_admin' => User::where('role', 'super_admin')->count(),
+            'admin' => User::where('role', 'admin')->count(),
+            'customer' => User::where(function($q){ $q->where('role', 'user')->orWhereNull('role'); })->count(),
+            'active' => User::where('is_active', true)->count(),
+        ];
 
-        return view('admin.users.index', compact('users', 'roles'));
+        return view('admin.users.index', compact('users', 'roles', 'stats'));
     }
 
     public function create()

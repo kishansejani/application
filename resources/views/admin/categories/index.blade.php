@@ -16,6 +16,29 @@
         </a>
     </div>
 
+    <!-- Top KPI / Pipeline Stats Grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <a href="{{ route('admin.categories.index') }}" class="p-4 rounded-2xl border transition-all {{ !request('status') && !request('featured') ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-slate-900 dark:border-white shadow-md' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50' }}">
+            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75">All Categories</p>
+            <h4 class="text-xl font-extrabold mt-1">{{ $stats['total'] ?? $categories->count() }}</h4>
+        </a>
+
+        <a href="{{ route('admin.categories.index', ['status' => 'active']) }}" class="p-4 rounded-2xl border transition-all {{ request('status') == 'active' ? 'bg-emerald-600 text-white border-emerald-600 shadow-md' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-emerald-950/30' }}">
+            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75">Active Categories</p>
+            <h4 class="text-xl font-extrabold mt-1">{{ $stats['active'] ?? 0 }}</h4>
+        </a>
+
+        <a href="{{ route('admin.categories.index', ['featured' => '1']) }}" class="p-4 rounded-2xl border transition-all {{ request('featured') == '1' ? 'bg-amber-500 text-white border-amber-500 shadow-md' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-amber-50 dark:hover:bg-amber-950/30' }}">
+            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75">⭐ Featured</p>
+            <h4 class="text-xl font-extrabold mt-1">{{ $stats['featured'] ?? 0 }}</h4>
+        </a>
+
+        <a href="{{ route('admin.categories.index', ['status' => 'inactive']) }}" class="p-4 rounded-2xl border transition-all {{ request('status') == 'inactive' ? 'bg-rose-600 text-white border-rose-600 shadow-md' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-950/30' }}">
+            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75">Inactive Categories</p>
+            <h4 class="text-xl font-extrabold mt-1">{{ $stats['inactive'] ?? 0 }}</h4>
+        </a>
+    </div>
+
     <!-- Table Card Container -->
     <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm p-6 overflow-hidden">
         <div class="overflow-x-auto">

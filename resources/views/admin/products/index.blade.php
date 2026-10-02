@@ -22,6 +22,34 @@
         </div>
     </div>
 
+    <!-- Top KPI / Pipeline Stats Grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+        <a href="{{ route('admin.products.index') }}" class="p-4 rounded-2xl border transition-all {{ !request('stock_status') && !request('category_id') ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-slate-900 dark:border-white shadow-md' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50' }}">
+            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75">All Products</p>
+            <h4 class="text-xl font-extrabold mt-1">{{ $stats['total'] ?? $products->count() }}</h4>
+        </a>
+
+        <a href="{{ route('admin.products.index', ['stock_status' => 'in_stock']) }}" class="p-4 rounded-2xl border transition-all {{ request('stock_status') == 'in_stock' ? 'bg-emerald-600 text-white border-emerald-600 shadow-md' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-emerald-950/30' }}">
+            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75">In Stock (>5)</p>
+            <h4 class="text-xl font-extrabold mt-1">{{ $stats['in_stock'] ?? 0 }}</h4>
+        </a>
+
+        <a href="{{ route('admin.products.index', ['stock_status' => 'low_stock']) }}" class="p-4 rounded-2xl border transition-all {{ request('stock_status') == 'low_stock' ? 'bg-amber-500 text-white border-amber-500 shadow-md' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-amber-50 dark:hover:bg-amber-950/30' }}">
+            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75">⚠️ Low Stock</p>
+            <h4 class="text-xl font-extrabold mt-1">{{ $stats['low_stock'] ?? 0 }}</h4>
+        </a>
+
+        <a href="{{ route('admin.products.index', ['stock_status' => 'out_of_stock']) }}" class="p-4 rounded-2xl border transition-all {{ request('stock_status') == 'out_of_stock' ? 'bg-rose-600 text-white border-rose-600 shadow-md' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-950/30' }}">
+            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75">🚫 Out of Stock</p>
+            <h4 class="text-xl font-extrabold mt-1">{{ $stats['out_of_stock'] ?? 0 }}</h4>
+        </a>
+
+        <div class="p-4 rounded-2xl border bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200">
+            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75 text-amber-500">⭐ Featured</p>
+            <h4 class="text-xl font-extrabold mt-1">{{ $stats['featured'] ?? 0 }}</h4>
+        </div>
+    </div>
+
     <!-- Table Card Container -->
     <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm p-6 overflow-hidden">
         <!-- Filter bar -->

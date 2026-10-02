@@ -12,6 +12,29 @@
         </div>
     </div>
 
+    <!-- Top KPI / Pipeline Stats Grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="p-4 rounded-2xl border bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-slate-900 dark:border-white shadow-md">
+            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75">Total Pages</p>
+            <h4 class="text-xl font-extrabold mt-1">{{ $stats['total'] ?? $pages->count() }}</h4>
+        </div>
+
+        <div class="p-4 rounded-2xl border bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200">
+            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75 text-emerald-600 dark:text-emerald-400">Live / Published</p>
+            <h4 class="text-xl font-extrabold mt-1">{{ $stats['active'] ?? 0 }}</h4>
+        </div>
+
+        <div class="p-4 rounded-2xl border bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200">
+            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75 text-amber-600 dark:text-amber-400">Draft Pages</p>
+            <h4 class="text-xl font-extrabold mt-1">{{ $stats['draft'] ?? 0 }}</h4>
+        </div>
+
+        <div class="p-4 rounded-2xl border bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200">
+            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75 text-indigo-600 dark:text-indigo-400">⚖️ Legal & Policies</p>
+            <h4 class="text-xl font-extrabold mt-1">{{ $stats['policy'] ?? 0 }}</h4>
+        </div>
+    </div>
+
     <!-- Table Card Container -->
     <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm p-6 overflow-hidden">
         <div class="overflow-x-auto">

@@ -15,6 +15,41 @@
         </a>
     </div>
 
+    <!-- KPI Stats Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-slate-900 text-white dark:bg-slate-950 p-4 rounded-2xl shadow-sm border border-slate-800 flex flex-col justify-between">
+            <div class="flex items-center justify-between text-xs text-slate-400 font-semibold uppercase tracking-wider">
+                <span>ALL ROLES</span>
+                <i class="fas fa-shield-alt text-slate-400"></i>
+            </div>
+            <div class="text-2xl font-black mt-2 text-white">{{ $stats['total'] ?? $roles->count() }}</div>
+        </div>
+
+        <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col justify-between">
+            <div class="flex items-center justify-between text-xs text-emerald-600 dark:text-emerald-400 font-semibold uppercase tracking-wider">
+                <span>SYSTEM ROLES</span>
+                <i class="fas fa-crown text-emerald-500"></i>
+            </div>
+            <div class="text-2xl font-black mt-2 text-slate-900 dark:text-white">{{ $stats['system_roles'] ?? 3 }} Active</div>
+        </div>
+
+        <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col justify-between">
+            <div class="flex items-center justify-between text-xs text-blue-600 dark:text-blue-400 font-semibold uppercase tracking-wider">
+                <span>PERMISSIONS</span>
+                <i class="fas fa-key text-blue-500"></i>
+            </div>
+            <div class="text-2xl font-black mt-2 text-slate-900 dark:text-white">{{ $stats['permissions_count'] ?? 0 }} Total</div>
+        </div>
+
+        <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col justify-between">
+            <div class="flex items-center justify-between text-xs text-purple-600 dark:text-purple-400 font-semibold uppercase tracking-wider">
+                <span>ASSIGNED USERS</span>
+                <i class="fas fa-user-shield text-purple-500"></i>
+            </div>
+            <div class="text-2xl font-black mt-2 text-slate-900 dark:text-white">{{ $stats['assigned_users'] ?? 0 }}</div>
+        </div>
+    </div>
+
     <!-- Roles Grid -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         @foreach($roles as $role)

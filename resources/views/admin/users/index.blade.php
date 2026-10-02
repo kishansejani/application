@@ -6,12 +6,35 @@
 <div class="space-y-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Users & Accounts Management</h1>
-            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage system administrators, store staff, and customer accounts.</p>
+            <h1 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Users & Accounts</h1>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Manage super admins, store staff, and customer accounts.</p>
         </div>
-        <a href="{{ route('admin.users.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-black hover:bg-slate-900 text-white dark:bg-white dark:text-black dark:hover:bg-slate-200 font-semibold rounded-xl text-sm shadow-md transition active:scale-95">
-            <i class="fas fa-user-plus"></i>
+        <a href="{{ route('admin.users.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 rounded-2xl text-xs font-bold shadow-md transition active:scale-95">
+            <i class="fa-solid fa-user-plus text-xs"></i>
             <span>Add New User</span>
+        </a>
+    </div>
+
+    <!-- Top KPI / Pipeline Stats Grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <a href="{{ route('admin.users.index') }}" class="p-4 rounded-2xl border transition-all {{ !request('role') ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-slate-900 dark:border-white shadow-md' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50' }}">
+            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75">Total Accounts</p>
+            <h4 class="text-xl font-extrabold mt-1">{{ $stats['total'] ?? $users->total() }}</h4>
+        </a>
+
+        <a href="{{ route('admin.users.index', ['role' => 'super_admin']) }}" class="p-4 rounded-2xl border transition-all {{ request('role') == 'super_admin' ? 'bg-purple-600 text-white border-purple-600 shadow-md' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-purple-50 dark:hover:bg-purple-950/30' }}">
+            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75">👑 Super Admins</p>
+            <h4 class="text-xl font-extrabold mt-1">{{ $stats['super_admin'] ?? 0 }}</h4>
+        </a>
+
+        <a href="{{ route('admin.users.index', ['role' => 'admin']) }}" class="p-4 rounded-2xl border transition-all {{ request('role') == 'admin' ? 'bg-blue-600 text-white border-blue-600 shadow-md' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-blue-950/30' }}">
+            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75">🛡️ Store Staff</p>
+            <h4 class="text-xl font-extrabold mt-1">{{ $stats['admin'] ?? 0 }}</h4>
+        </a>
+
+        <a href="{{ route('admin.users.index', ['role' => 'user']) }}" class="p-4 rounded-2xl border transition-all {{ request('role') == 'user' ? 'bg-emerald-600 text-white border-emerald-600 shadow-md' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-emerald-950/30' }}">
+            <p class="text-[10px] font-bold uppercase tracking-wider opacity-75">🛍️ Customers</p>
+            <h4 class="text-xl font-extrabold mt-1">{{ $stats['customer'] ?? 0 }}</h4>
         </a>
     </div>
 

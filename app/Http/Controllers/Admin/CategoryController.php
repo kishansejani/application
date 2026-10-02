@@ -10,10 +10,26 @@ use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $categories = Category::withCount(['subCategories', 'products'])->orderBy('sort_order')->get();
-        return view('admin.categories.index', compact('categories'));
+        $query = Category::withCount(['subCategories', 'products']);
+        if ($request->has('status')) {
+            if ($request->status === 'active') $query->where('is_active', true);
+            elseif ($request->status === 'inactive') $query->where('is_active', false);
+        }
+        if ($request->has('featured')) {
+            $query->where('is_featured', true);
+        }
+
+        $categories = $query->orderBy('sort_order')->get();
+        $stats = [
+            'total' => Category::count(),
+            'active' => Category::where('is_active', true)->count(),
+            'inactive' => Category::where('is_active', false)->count(),
+            'featured' => Category::where('is_featured', true)->count(),
+        ];
+
+        return view('admin.categories.index', compact('categories', 'stats'));
     }
 
     public function create()

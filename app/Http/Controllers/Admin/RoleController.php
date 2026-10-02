@@ -12,7 +12,13 @@ class RoleController extends Controller
     public function index()
     {
         $roles = Role::with('permissions', 'users')->get();
-        return view('admin.roles.index', compact('roles'));
+        $stats = [
+            'total' => $roles->count(),
+            'permissions_count' => Permission::count(),
+            'assigned_users' => \App\Models\User::whereNotNull('role_id')->count(),
+            'system_roles' => $roles->whereIn('name', ['super_admin', 'admin', 'user'])->count(),
+        ];
+        return view('admin.roles.index', compact('roles', 'stats'));
     }
 
     public function create()
