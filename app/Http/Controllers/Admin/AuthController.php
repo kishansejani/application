@@ -37,6 +37,11 @@ class AuthController extends Controller
                 return back()->withInput()->with('error', 'Access denied. You do not have administrator permissions.');
             }
 
+            if (Auth::user()->is_active === false) {
+                Auth::logout();
+                return back()->withInput()->with('error', 'Your account has been deactivated. Please contact the super administrator.');
+            }
+
             $request->session()->regenerate();
             return redirect()->intended(route('admin.dashboard'))->with('success', 'Welcome back, ' . Auth::user()->name . '!');
         }

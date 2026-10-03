@@ -1,10 +1,11 @@
 name: grocery_app
-description: "A premium Flutter grocery e-commerce app with Gujarati & English translation, OTP login, Map picker, and 2-Hour fast delivery support."
+description: "Fresh Express Grocery - a bilingual (English / Gujarati) Flutter grocery app with OTP login, map address picker, 2-hour express delivery and in-app WebView pages."
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.1.0+2
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: '>=3.5.0 <4.0.0'
+  flutter: '>=3.24.0'
 
 dependencies:
   flutter:
@@ -14,16 +15,19 @@ dependencies:
   provider: ^6.1.2
   http: ^1.2.0
   shared_preferences: ^2.2.2
-  intl: ^0.19.0
+  # flutter_localizations pins the exact intl version per Flutter release,
+  # so let the SDK decide (avoids "intl ^0.19 vs 0.20" resolution failures).
+  intl: any
   cached_network_image: ^3.3.1
-  flutter_staggered_grid_view: ^0.7.0
   shimmer: ^3.0.0
-  carousel_slider: ^4.2.1
   google_fonts: ^6.1.0
-  flutter_svg: ^2.0.9
   latlong2: ^0.9.0
-  flutter_map: ^6.1.0
+  # Code only uses APIs shared by flutter_map 6.x - 8.x (MapOptions.initialCenter,
+  # TileLayer, MarkerLayer, Marker.child, MapController.move).
+  flutter_map: '>=6.1.0 <9.0.0'
   geolocator: ^11.0.0
+  webview_flutter: ^4.10.0
+  url_launcher: ^6.3.0
 
 dev_dependencies:
   flutter_test:

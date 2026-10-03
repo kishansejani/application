@@ -1,26 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'constants/app_colors.dart';
 import 'l10n/app_localizations.dart';
+import 'providers/address_provider.dart';
 import 'providers/auth_provider.dart';
 import 'providers/cart_provider.dart';
 import 'providers/locale_provider.dart';
+import 'providers/order_provider.dart';
 import 'providers/product_provider.dart';
+import 'providers/theme_provider.dart';
 import 'providers/wishlist_provider.dart';
 import 'screens/splash_screen.dart';
+import 'theme/app_theme.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => WishlistProvider()),
+        ChangeNotifierProvider(create: (_) => AddressProvider()),
+        ChangeNotifierProvider(create: (_) => OrderProvider()),
       ],
       child: const FreshGroceryApp(),
     ),
@@ -28,45 +33,36 @@ void main() {
 }
 
 class FreshGroceryApp extends StatelessWidget {
-  const FreshGroceryApp({Key? key}) : super(key: key);
+  const FreshGroceryApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final localeProvider = Provider.of<LocaleProvider>(context);
+    final locale = context.watch<LocaleProvider>().locale;
+    final themeMode = context.watch<ThemeProvider>().themeMode;
 
     return MaterialApp(
-      title: 'Fresh Grocery',
+      // Localised app title (task switcher / web tab) - follows the selected language.
+      onGenerateTitle: (context) => context.tr('app_name'),
       debugShowCheckedModeBanner: false,
-      locale: localeProvider.locale,
-      supportedLocales: const [
-        Locale('en', 'US'),
-        Locale('gu', 'IN'),
-      ],
+      theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
+      themeMode: themeMode,
+      locale: locale,
+      supportedLocales: LocaleProvider.supported,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      theme: ThemeData(
-        useMaterial3: true,
-        scaffoldBackgroundColor: AppColors.background,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppColors.primary,
-          primary: AppColors.primary,
-          secondary: AppColors.accent,
-        ),
-        textTheme: GoogleFonts.interTextTheme(
-          Theme.of(context).textTheme,
-        ),
-        appBarTheme: const AppBarTheme(
-          centerTitle: false,
-          elevation: 0,
-          backgroundColor: Colors.white,
-          foregroundColor: AppColors.textPrimary,
-          iconTheme: IconThemeData(color: AppColors.textPrimary),
-        ),
-      ),
+      // Keep text readable but prevent extreme system font scales from breaking layouts.
+      builder: (context, child) {
+        final mq = MediaQuery.of(context);
+        return MediaQuery(
+          data: mq.copyWith(textScaler: mq.textScaler.clamp(minScaleFactor: 0.85, maxScaleFactor: 1.3)),
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
       home: const SplashScreen(),
     );
   }

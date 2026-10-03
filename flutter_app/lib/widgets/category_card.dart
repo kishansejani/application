@@ -1,82 +1,74 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import '../constants/api_constants.dart';
 import '../constants/app_colors.dart';
+import '../l10n/app_localizations.dart';
 import '../models/category.dart';
-import '../screens/catalog/subcategories_screen.dart';
+import '../theme/app_theme.dart';
+import 'app_network_image.dart';
 
+/// Maps the backend's Font Awesome class names to Material icons (fallback when
+/// the category has no image).
+IconData categoryIcon(String? faIcon) {
+  final s = (faIcon ?? '').toLowerCase();
+  if (s.contains('carrot') || s.contains('leaf') || s.contains('seedling') || s.contains('lemon')) return Icons.eco_rounded;
+  if (s.contains('cheese') || s.contains('milk') || s.contains('cow') || s.contains('glass')) return Icons.local_drink_rounded;
+  if (s.contains('bread') || s.contains('wheat') || s.contains('cake')) return Icons.bakery_dining_rounded;
+  if (s.contains('cookie') || s.contains('candy')) return Icons.icecream_rounded;
+  if (s.contains('mug') || s.contains('coffee') || s.contains('bottle') || s.contains('wine')) return Icons.local_cafe_rounded;
+  if (s.contains('pepper') || s.contains('fire') || s.contains('mortar')) return Icons.local_fire_department_rounded;
+  if (s.contains('soap') || s.contains('spray') || s.contains('broom')) return Icons.cleaning_services_rounded;
+  return Icons.category_rounded;
+}
+
+Color categoryTint(BuildContext context, int index) {
+  final list = context.isDark ? AppColors.categoryTintsDark : AppColors.categoryTints;
+  return list[index.abs() % list.length];
+}
+
+/// Rounded image tile with the category name underneath (home grid).
 class CategoryCard extends StatelessWidget {
   final Category category;
+  final VoidCallback? onTap;
+  final int index;
 
-  const CategoryCard({Key? key, required this.category}) : super(key: key);
-
-  String _getImageUrl(String? path) {
-    if (path == null || path.isEmpty) return 'https://placehold.co/200x200/png?text=Category';
-    if (path.startsWith('http')) return path;
-    return '${ApiConstants.imageBaseUrl}/$path';
-  }
+  const CategoryCard({super.key, required this.category, this.onTap, this.index = 0});
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => SubCategoriesScreen(category: category),
-          ),
-        );
-      },
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 72,
-            height: 72,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: AppColors.borderLight, width: 1.5),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
+    final tint = categoryTint(context, index);
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppRadius.md),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.xs),
+        child: Column(
+          children: [
+            AspectRatio(
+              aspectRatio: 1,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: tint,
+                  borderRadius: BorderRadius.circular(AppRadius.md),
                 ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: CachedNetworkImage(
-                imageUrl: _getImageUrl(category.image),
-                fit: BoxFit.cover,
-                placeholder: (context, url) => Container(
-                  color: Colors.grey.shade100,
-                  child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                ),
-                errorWidget: (context, url, error) => const Center(
-                  child: Icon(Icons.category_outlined, color: AppColors.primary, size: 28),
-                ),
+                padding: const EdgeInsets.all(6),
+                child: category.image != null
+                    ? AppNetworkImage(
+                        url: category.image,
+                        borderRadius: BorderRadius.circular(AppRadius.sm),
+                        placeholderIcon: categoryIcon(category.icon),
+                      )
+                    : Icon(categoryIcon(category.icon), size: 32, color: context.colors.primary),
               ),
             ),
-          ),
-          const SizedBox(height: 8),
-          SizedBox(
-            width: 78,
-            child: Text(
-              category.name,
-              textAlign: TextAlign.center,
+            const SizedBox(height: 6),
+            Text(
+              category.nameFor(context.langCode),
               maxLines: 2,
+              textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
-                height: 1.1,
-              ),
+              style: context.textStyles.labelMedium?.copyWith(fontWeight: FontWeight.w700, height: 1.2),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

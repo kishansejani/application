@@ -1,256 +1,232 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:provider/provider.dart';
-import '../constants/app_colors.dart';
-import '../constants/api_constants.dart';
 import '../l10n/app_localizations.dart';
 import '../models/product.dart';
 import '../providers/cart_provider.dart';
 import '../providers/wishlist_provider.dart';
 import '../screens/catalog/product_detail_screen.dart';
+import '../theme/app_theme.dart';
+import '../utils/app_actions.dart';
+import 'app_network_image.dart';
+import 'price_text.dart';
+import 'qty_stepper.dart';
 
+/// Grid / rail product card. Give it a bounded height
+/// (e.g. grid `mainAxisExtent: 290` or a `SizedBox(height: 290)` in rails).
 class ProductCard extends StatelessWidget {
   final Product product;
+  final double? width;
 
-  const ProductCard({Key? key, required this.product}) : super(key: key);
+  const ProductCard({super.key, required this.product, this.width});
 
-  String _getImageUrl(String? path) {
-    if (path == null || path.isEmpty) return 'https://placehold.co/400x400/png?text=Grocery';
-    if (path.startsWith('http')) return path;
-    return '${ApiConstants.imageBaseUrl}/$path';
+  void _open(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => ProductDetailScreen(product: product)),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final cartProvider = Provider.of<CartProvider>(context);
-    final wishlistProvider = Provider.of<WishlistProvider>(context);
-    final isFav = wishlistProvider.isFavorite(product.id);
-    final cartQty = cartProvider.getProductQuantity(product.id);
+    final scheme = context.colors;
+    final name = product.nameFor(context.langCode);
 
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ProductDetailScreen(product: product),
-          ),
-        );
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.cardBg,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.borderLight, width: 1.5),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.03),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
+    final card = Material(
+      color: scheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        side: BorderSide(color: scheme.outlineVariant.fade(context.isDark ? 0.5 : 0.7)),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => _open(context),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image with badges & Wishlist Button
-            Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                  child: AspectRatio(
-                    aspectRatio: 1.1,
-                    child: CachedNetworkImage(
-                      imageUrl: _getImageUrl(product.mainImage),
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => Container(
-                        color: Colors.grey.shade100,
-                        child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                      ),
-                      errorWidget: (context, url, error) => Container(
-                        color: Colors.grey.shade100,
-                        child: const Icon(Icons.shopping_basket, color: Colors.grey, size: 40),
-                      ),
-                    ),
-                  ),
-                ),
-                // Discount Badge
-                if (product.discountPercentage > 0)
-                  Positioned(
-                    top: 8,
-                    left: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: AppColors.accent,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        '${product.discountPercentage}% OFF',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                // Favorite Button
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: GestureDetector(
-                    onTap: () => wishlistProvider.toggleWishlist(product),
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.9),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 4,
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        isFav ? Icons.favorite : Icons.favorite_border,
-                        color: isFav ? AppColors.error : AppColors.textSecondary,
-                        size: 16,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-            // Content
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          product.name,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
-                            color: AppColors.textPrimary,
-                            height: 1.2,
-                          ),
-                        ),
-                        const SizedBox(height: 3),
-                        Text(
-                          product.unit,
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: AppColors.textMuted,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: Padding(
+                      padding: const EdgeInsets.all(AppSpacing.sm),
+                      child: AppNetworkImage(
+                        url: product.mainImage,
+                        borderRadius: BorderRadius.circular(AppRadius.sm),
+                        backgroundColor: scheme.surfaceContainerLow,
+                      ),
                     ),
-
-                    // Price & Cart Button
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '₹${product.price.toStringAsFixed(0)}',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w900,
-                                fontSize: 15,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                            if (product.strikePrice != null)
-                              Text(
-                                '₹${product.strikePrice!.toStringAsFixed(0)}',
-                                style: const TextStyle(
-                                  decoration: TextDecoration.lineThrough,
-                                  fontSize: 11,
-                                  color: AppColors.textMuted,
-                                ),
-                              ),
-                          ],
-                        ),
-
-                        // Add / Quantity Controller
-                        if (cartQty > 0)
-                          Container(
-                            height: 32,
-                            padding: const EdgeInsets.symmetric(horizontal: 4),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    final cartItem = cartProvider.items.firstWhere((i) => i.productId == product.id);
-                                    cartProvider.updateQuantity(cartItem.id, cartQty - 1);
-                                  },
-                                  child: const Icon(Icons.remove, color: Colors.white, size: 14),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6),
-                                  child: Text(
-                                    '$cartQty',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    final cartItem = cartProvider.items.firstWhere((i) => i.productId == product.id);
-                                    cartProvider.updateQuantity(cartItem.id, cartQty + 1);
-                                  },
-                                  child: const Icon(Icons.add, color: Colors.white, size: 14),
-                                ),
-                              ],
-                            ),
-                          )
-                        else
-                          GestureDetector(
-                            onTap: product.isInStock ? () => cartProvider.addToCart(product) : null,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: product.isInStock ? AppColors.primaryLight : Colors.grey.shade200,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Text(
-                                product.isInStock ? context.tr('add_to_cart') : context.tr('out_of_stock'),
-                                style: TextStyle(
-                                  color: product.isInStock ? AppColors.primaryDark : AppColors.textMuted,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
+                  ),
+                  if (product.hasDiscount)
+                    Positioned(
+                      top: AppSpacing.md,
+                      left: AppSpacing.md,
+                      child: DiscountBadge(percent: product.discountPercentage),
                     ),
-                  ],
-                ),
+                  Positioned(
+                    top: AppSpacing.xs + 2,
+                    right: AppSpacing.xs + 2,
+                    child: _FavoriteButton(product: product),
+                  ),
+                  if (!product.isInStock)
+                    Positioned.fill(
+                      child: Container(
+                        margin: const EdgeInsets.all(AppSpacing.sm),
+                        decoration: BoxDecoration(
+                          color: scheme.surface.fade(0.6),
+                          borderRadius: BorderRadius.circular(AppRadius.sm),
+                        ),
+                        alignment: Alignment.center,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: scheme.inverseSurface,
+                            borderRadius: BorderRadius.circular(AppRadius.pill),
+                          ),
+                          child: Text(
+                            context.tr('out_of_stock'),
+                            style: TextStyle(color: scheme.onInverseSurface, fontSize: 11, fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(AppSpacing.md, 0, AppSpacing.md, AppSpacing.md),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 38,
+                    child: Text(
+                      name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.textStyles.titleSmall?.copyWith(fontWeight: FontWeight.w700, height: 1.25, fontSize: 13.5),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    product.unit,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.textStyles.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: PriceText(
+                            price: product.price,
+                            strikePrice: product.strikePrice,
+                            fontSize: 15,
+                            vertical: true,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.xs),
+                      CartControl(product: product),
+                    ],
+                  ),
+                ],
               ),
             ),
           ],
+        ),
+      ),
+    );
+
+    return width != null ? SizedBox(width: width, child: card) : card;
+  }
+}
+
+/// "ADD" button that turns into a quantity stepper once the item is in the cart.
+class CartControl extends StatelessWidget {
+  final Product product;
+  final bool large;
+
+  const CartControl({super.key, required this.product, this.large = false});
+
+  @override
+  Widget build(BuildContext context) {
+    final cart = context.watch<CartProvider>();
+    final qty = cart.getProductQuantity(product.id);
+    final busy = cart.isBusy(product.id);
+    final scheme = context.colors;
+
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 200),
+      transitionBuilder: (child, anim) => FadeTransition(
+        opacity: anim,
+        child: ScaleTransition(scale: Tween<double>(begin: 0.9, end: 1).animate(anim), child: child),
+      ),
+      child: qty > 0
+          ? QtyStepper(
+              key: const ValueKey('stepper'),
+              quantity: qty,
+              loading: busy,
+              large: large,
+              onDecrement: () => AppActions.setQuantity(context, product.id, qty - 1),
+              onIncrement: () {
+                final item = cart.itemFor(product.id);
+                if (item != null && !item.canIncrement) return;
+                AppActions.setQuantity(context, product.id, qty + 1);
+              },
+            )
+          : SizedBox(
+              key: const ValueKey('add'),
+              height: large ? 48 : 34,
+              child: OutlinedButton(
+                onPressed: (!product.isInStock || busy) ? null : () => AppActions.addToCart(context, product),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: Size(large ? 120 : 64, large ? 48 : 34),
+                  padding: EdgeInsets.symmetric(horizontal: large ? 20 : 12),
+                  foregroundColor: scheme.primary,
+                  backgroundColor: scheme.primaryContainer.fade(context.isDark ? 0.25 : 0.45),
+                  side: BorderSide(color: scheme.primary.fade(0.6)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(large ? AppRadius.sm : AppRadius.xs + 2)),
+                  textStyle: TextStyle(fontWeight: FontWeight.w800, fontSize: large ? 15 : 13),
+                ),
+                child: busy
+                    ? SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: scheme.primary))
+                    : Text(context.tr(large ? 'add_to_cart' : 'add')),
+              ),
+            ),
+    );
+  }
+}
+
+class _FavoriteButton extends StatelessWidget {
+  final Product product;
+  const _FavoriteButton({required this.product});
+
+  @override
+  Widget build(BuildContext context) {
+    final isFav = context.select<WishlistProvider, bool>((w) => w.isFavorite(product.id));
+    final scheme = context.colors;
+    return Material(
+      color: scheme.surface.fade(0.9),
+      shape: const CircleBorder(),
+      elevation: 0,
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: () => AppActions.toggleWishlist(context, product),
+        child: Padding(
+          padding: const EdgeInsets.all(6),
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 220),
+            transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
+            child: Icon(
+              isFav ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+              key: ValueKey<bool>(isFav),
+              size: 18,
+              color: isFav ? const Color(0xFFE11D48) : scheme.onSurfaceVariant,
+            ),
+          ),
         ),
       ),
     );

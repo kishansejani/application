@@ -1,66 +1,96 @@
+import 'json_utils.dart';
+
 class Address {
   final int id;
   final int userId;
-  final String name;
-  final String phone;
-  final String type; // home, work, other
-  final String addressLine1;
-  final String? addressLine2;
+
+  /// Backend accepts `Home`, `Work` or `Other`.
+  final String type;
+  final String recipientName;
+  final String recipientPhone;
+  final String houseNo;
+  final String streetAddress;
+  final String? landmark;
   final String city;
   final String state;
   final String pincode;
   final double? latitude;
   final double? longitude;
+  final String? formattedAddress;
   final bool isDefault;
 
   Address({
     required this.id,
-    required this.userId,
-    required this.name,
-    required this.phone,
+    this.userId = 0,
     required this.type,
-    required this.addressLine1,
-    this.addressLine2,
+    required this.recipientName,
+    required this.recipientPhone,
+    required this.houseNo,
+    required this.streetAddress,
+    this.landmark,
     required this.city,
-    required this.state,
+    this.state = 'Gujarat',
     required this.pincode,
     this.latitude,
     this.longitude,
+    this.formattedAddress,
     this.isDefault = false,
   });
 
+  // Backwards compatible getters.
+  String get name => recipientName;
+  String get phone => recipientPhone;
+
   String get fullAddress {
-    String extra = addressLine2 != null && addressLine2!.isNotEmpty ? ', $addressLine2' : '';
-    return '$addressLine1$extra, $city, $state - $pincode';
+    if (formattedAddress != null && formattedAddress!.isNotEmpty) return formattedAddress!;
+    final parts = <String>[
+      houseNo,
+      streetAddress,
+      if (landmark != null && landmark!.isNotEmpty) 'Near $landmark',
+      city,
+      state,
+      pincode,
+    ].where((p) => p.trim().isNotEmpty).toList();
+    return parts.join(', ');
+  }
+
+  static String normalizeType(String type) {
+    final t = type.toLowerCase();
+    if (t == 'work' || t == 'office') return 'Work';
+    if (t == 'other') return 'Other';
+    return 'Home';
   }
 
   factory Address.fromJson(Map<String, dynamic> json) {
     return Address(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 0,
-      userId: json['user_id'] is int ? json['user_id'] : int.tryParse(json['user_id'].toString()) ?? 0,
-      name: json['name'] ?? '',
-      phone: json['phone'] ?? '',
-      type: json['type'] ?? 'home',
-      addressLine1: json['address_line_1'] ?? '',
-      addressLine2: json['address_line_2'],
-      city: json['city'] ?? '',
-      state: json['state'] ?? 'Gujarat',
-      pincode: json['pincode'] ?? '',
-      latitude: json['latitude'] != null ? double.tryParse(json['latitude'].toString()) : null,
-      longitude: json['longitude'] != null ? double.tryParse(json['longitude'].toString()) : null,
-      isDefault: json['is_default'] == true || json['is_default'] == 1,
+      id: asInt(json['id']),
+      userId: asInt(json['user_id']),
+      type: normalizeType(asString(json['type'], 'Home')),
+      recipientName: asString(json['recipient_name'] ?? json['name']),
+      recipientPhone: asString(json['recipient_phone'] ?? json['phone']),
+      houseNo: asString(json['house_no'] ?? json['address_line_1']),
+      streetAddress: asString(json['street_address'] ?? json['address_line_2']),
+      landmark: asStringOrNull(json['landmark']),
+      city: asString(json['city']),
+      state: asString(json['state'], 'Gujarat'),
+      pincode: asString(json['pincode']),
+      latitude: asDoubleOrNull(json['latitude']),
+      longitude: asDoubleOrNull(json['longitude']),
+      formattedAddress: asStringOrNull(json['formatted_address']),
+      isDefault: asBool(json['is_default']),
     );
   }
 
+  /// Body for `POST /addresses` and `PUT /addresses/{id}`.
   Map<String, dynamic> toJson() {
     return {
-      'name': name,
-      'phone': phone,
-      'type': type,
-      'address_line_1': addressLine1,
-      'address_line_2': addressLine2,
+      'type': normalizeType(type),
+      'recipient_name': recipientName,
+      'recipient_phone': recipientPhone,
+      'house_no': houseNo,
+      'street_address': streetAddress,
+      'landmark': landmark,
       'city': city,
-      'state': state,
       'pincode': pincode,
       'latitude': latitude,
       'longitude': longitude,

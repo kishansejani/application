@@ -34,7 +34,9 @@ class DashboardController extends Controller
         $lowStockProducts = Product::where('stock_quantity', '<=', DB::raw('low_stock_threshold'))->get();
         $outOfStockCount = Product::where('stock_quantity', '<=', 0)->count();
 
-        $totalCustomers = User::where('role', 'customer')->count();
+        $totalCustomers = User::where(function ($q) { $q->whereIn('role', ['customer', 'user'])->orWhereNull('role'); })->count();
+        $newCustomersWeek = User::where(function ($q) { $q->whereIn('role', ['customer', 'user'])->orWhereNull('role'); })
+            ->where('created_at', '>=', Carbon::today()->subDays(6))->count();
         $recentOrders = Order::with(['user', 'items'])->latest()->take(7)->get();
         $activeOffers = Offer::where('is_active', true)->count();
 
@@ -48,6 +50,26 @@ class DashboardController extends Controller
             $salesTrend['labels'][] = $date->format('d M');
             $salesTrend['data'][] = (float) $dayRevenue;
         }
+
+        // Week-over-week comparison & average order value
+        $weekRevenue = Order::where('order_status', '!=', 'cancelled')
+            ->where('created_at', '>=', Carbon::today()->subDays(6))->sum('total_amount');
+        $prevWeekRevenue = Order::where('order_status', '!=', 'cancelled')
+            ->whereBetween('created_at', [Carbon::today()->subDays(13), Carbon::today()->subDays(6)])->sum('total_amount');
+        $revenueChange = $prevWeekRevenue > 0 ? round((($weekRevenue - $prevWeekRevenue) / $prevWeekRevenue) * 100, 1) : null;
+        $nonCancelled = Order::where('order_status', '!=', 'cancelled');
+        $avgOrderValue = (clone $nonCancelled)->count() > 0 ? (float) (clone $nonCancelled)->avg('total_amount') : 0;
+        $expressOpen = Order::where('delivery_type', 'two_hours')->whereNotIn('order_status', ['delivered', 'cancelled'])->count();
+
+        // Top selling products (by quantity)
+        $topProducts = DB::table('order_items')
+            ->join('orders', 'orders.id', '=', 'order_items.order_id')
+            ->where('orders.order_status', '!=', 'cancelled')
+            ->select('order_items.product_id', 'order_items.product_name_en as name', DB::raw('SUM(order_items.quantity) as qty'), DB::raw('SUM(order_items.total_price) as revenue'))
+            ->groupBy('order_items.product_id', 'order_items.product_name_en')
+            ->orderByDesc('qty')
+            ->limit(5)
+            ->get();
 
         // Order Status counts
         $statusCounts = [
@@ -72,7 +94,13 @@ class DashboardController extends Controller
             'recentOrders',
             'activeOffers',
             'salesTrend',
-            'statusCounts'
+            'statusCounts',
+            'newCustomersWeek',
+            'weekRevenue',
+            'revenueChange',
+            'avgOrderValue',
+            'expressOpen',
+            'topProducts'
         ));
     }
 }

@@ -1,3 +1,5 @@
+import 'json_utils.dart';
+
 class User {
   final int id;
   final String name;
@@ -5,24 +7,37 @@ class User {
   final String phone;
   final String role;
   final String? preferredLanguage;
+  final int ordersCount;
+  final int addressesCount;
 
   User({
     required this.id,
     required this.name,
     this.email,
     required this.phone,
-    required this.role,
+    this.role = 'customer',
     this.preferredLanguage,
+    this.ordersCount = 0,
+    this.addressesCount = 0,
   });
+
+  String get initials {
+    final parts = name.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
+    if (parts.isEmpty) return '?';
+    if (parts.length == 1) return parts.first.substring(0, 1).toUpperCase();
+    return (parts.first.substring(0, 1) + parts.last.substring(0, 1)).toUpperCase();
+  }
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 0,
-      name: json['name'] ?? '',
-      email: json['email'],
-      phone: json['phone'] ?? '',
-      role: json['role'] ?? 'customer',
-      preferredLanguage: json['preferred_language'] ?? 'gu',
+      id: asInt(json['id']),
+      name: asString(json['name']),
+      email: asStringOrNull(json['email']),
+      phone: asString(json['phone']),
+      role: asString(json['role'], 'customer'),
+      preferredLanguage: asStringOrNull(json['language'] ?? json['preferred_language']),
+      ordersCount: asInt(json['orders_count']),
+      addressesCount: asInt(json['saved_addresses_count']),
     );
   }
 
@@ -33,7 +48,7 @@ class User {
       'email': email,
       'phone': phone,
       'role': role,
-      'preferred_language': preferredLanguage,
+      'language': preferredLanguage,
     };
   }
 }

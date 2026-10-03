@@ -3,388 +3,395 @@
 @section('title', __('messages.proceed_to_checkout') . ' - ' . __('messages.store_name'))
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+@php
+    $gu = app()->getLocale() === 'gu';
+    $isExpress = $deliverySlotInfo['type'] === 'two_hours';
+    $oldAddr = old('selected_address_id');
+    $useNew = $addresses->count() === 0 || ($oldAddr === null && old('house_no')) || $oldAddr === '';
+    $selectedId = $oldAddr ?: ($defaultAddress->id ?? $addresses->first()?->id);
+    $stepTitle = 'font-extrabold text-slate-900 dark:text-white text-[15px] flex items-center gap-2.5';
+    $stepNum = 'w-7 h-7 rounded-full bg-brand-600 text-white text-[12px] font-extrabold flex items-center justify-center shrink-0';
+@endphp
+<div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8">
 
-    <div>
-        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">{{ __('messages.proceed_to_checkout') }}</h1>
-        <p class="text-xs text-slate-500 mt-0.5">Confirm your delivery location, choose timing slot, and place order</p>
+    <div class="flex items-end justify-between gap-4 mb-5 sm:mb-6">
+        <div>
+            <nav class="flex items-center gap-1.5 text-[12px] font-semibold text-slate-400 mb-1" aria-label="{{ __('messages.breadcrumb') }}">
+                <a href="{{ route('cart.index') }}" class="hover:text-slate-700 dark:hover:text-slate-200">{{ __('messages.cart') }}</a>
+                <i class="ph-bold ph-caret-right text-[10px]"></i>
+                <span class="text-slate-700 dark:text-slate-200">{{ $gu ? 'ચેકઆઉટ' : 'Checkout' }}</span>
+            </nav>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">{{ __('messages.proceed_to_checkout') }}</h1>
+        </div>
+        <span class="hidden sm:inline-flex items-center gap-1.5 text-[12px] font-semibold text-slate-500 dark:text-slate-400"><i class="ph-fill ph-lock-simple text-emerald-500"></i>{{ $gu ? 'સુરક્ષિત ચેકઆઉટ' : 'Secure checkout' }}</span>
     </div>
 
-    <form id="checkoutForm" action="{{ route('checkout.place_order') }}" method="POST">
+    <form id="checkoutForm" action="{{ route('checkout.place_order') }}" method="POST" data-loading>
         @csrf
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-8 items-start">
+            <div class="lg:col-span-2 space-y-4 sm:space-y-5">
 
-            <!-- Left 2 Cols: Delivery Timing, Address Selector, Map Picker, Payment Method -->
-            <div class="lg:col-span-2 space-y-6">
-
-                <!-- 1. Delivery Timing Promise Banner (Rule: <12pm -> 2 hours vs Next Day) -->
-                <div class="p-6 rounded-3xl bg-gradient-to-r from-emerald-600 to-teal-700 text-white shadow-lg space-y-2">
-                    <div class="flex items-center justify-between">
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400 text-slate-950 font-extrabold text-[10px] uppercase tracking-wider">
-                            ⚡ {{ $deliverySlotInfo['type'] === 'two_hours' ? '2-HOUR EXPRESS DISPATCH' : 'NEXT-DAY MORNING DELIVERY' }}
+                <!-- Delivery slot banner (before 12 PM → 2 hours, else next day) -->
+                <div class="relative overflow-hidden rounded-3xl p-5 sm:p-6 text-white {{ $isExpress ? 'bg-gradient-to-br from-emerald-600 to-teal-700' : 'bg-gradient-to-br from-sky-600 to-indigo-700' }}">
+                    <i class="ph-duotone {{ $isExpress ? 'ph-lightning' : 'ph-moon-stars' }} absolute -right-4 -bottom-6 text-[9rem] opacity-15"></i>
+                    <div class="relative flex flex-wrap items-center justify-between gap-2">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-400 text-slate-950 font-extrabold text-[10px] uppercase tracking-wider">
+                            <i class="ph-fill {{ $isExpress ? 'ph-lightning' : 'ph-calendar-check' }}"></i>{{ $isExpress ? ($gu ? '૨ કલાક એક્સપ્રેસ' : '2-hour express dispatch') : ($gu ? 'આવતીકાલે સવારે ડિલિવરી' : 'Next-day morning delivery') }}
                         </span>
-                        <span class="text-xs text-emerald-200">Daily Cutoff: 12:00 PM</span>
+                        <span class="text-[11px] font-semibold text-white/75">{{ $gu ? 'દૈનિક કટઑફ: બપોરે ૧૨:૦૦' : 'Daily cutoff: 12:00 PM' }}</span>
                     </div>
-                    <h3 class="text-lg font-extrabold">{{ app()->getLocale() === 'gu' ? $deliverySlotInfo['slot_gu'] : $deliverySlotInfo['slot_en'] }}</h3>
-                    <p class="text-xs text-emerald-100">
-                        {{ $deliverySlotInfo['type'] === 'two_hours' 
-                            ? 'Your order is placed before 12:00 PM and will be delivered directly to your doorstep within 2 hours.'
-                            : 'Your order is placed after 12:00 PM and is scheduled for tomorrow morning delivery between 9:00 AM - 12:00 PM.'
-                        }}
+                    <h3 class="relative mt-3 text-lg sm:text-xl font-extrabold leading-snug">{{ $gu ? $deliverySlotInfo['slot_gu'] : $deliverySlotInfo['slot_en'] }}</h3>
+                    <p class="relative mt-1 text-[13px] text-white/80 max-w-xl">
+                        {{ $isExpress
+                            ? ($gu ? 'તમારો ઓર્ડર બપોરે ૧૨ પહેલાં છે — ૨ કલાકમાં તમારા દરવાજે પહોંચશે.' : 'You are ordering before 12:00 PM — your groceries reach your doorstep within 2 hours.')
+                            : ($gu ? 'બપોરે ૧૨ પછીના ઓર્ડર આવતીકાલે સવારે ૯ થી ૧૨ વચ્ચે ડિલિવર થાય છે.' : 'Orders after 12:00 PM are delivered tomorrow morning between 9:00 AM and 12:00 PM.') }}
                     </p>
                 </div>
 
-                <!-- 2. Customer Contact Details -->
-                <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-4">
-                    <h3 class="font-extrabold text-slate-900 text-sm flex items-center gap-2 pb-3 border-b border-slate-100">
-                        <i class="fa-solid fa-user text-brand-600"></i>
-                        <span>Customer Contact Information</span>
-                    </h3>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                <!-- 1. Contact -->
+                <section class="fx-card p-4 sm:p-6">
+                    <h3 class="{{ $stepTitle }} mb-4"><span class="{{ $stepNum }}">1</span>{{ $gu ? 'સંપર્ક વિગતો' : 'Contact details' }}</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block font-bold text-slate-700 uppercase mb-1">Full Name <span class="text-rose-500">*</span></label>
-                            <input type="text" name="customer_name" value="{{ old('customer_name', Auth::user()?->name) }}" required placeholder="e.g. Jignesh Patel" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            <label for="customer_name" class="fx-label">{{ $gu ? 'પૂરું નામ' : 'Full name' }} <span class="text-rose-500">*</span></label>
+                            <input type="text" id="customer_name" name="customer_name" value="{{ old('customer_name', Auth::user()?->name) }}" required autocomplete="name" placeholder="{{ __('messages.ph_name') }}" class="fx-input @error('customer_name') is-invalid @enderror">
+                            @error('customer_name')<p class="text-xs font-semibold text-rose-600 mt-1">{{ $message }}</p>@enderror
                         </div>
-
                         <div>
-                            <label class="block font-bold text-slate-700 uppercase mb-1">10-Digit Mobile Number <span class="text-rose-500">*</span></label>
-                            <input type="tel" name="customer_phone" value="{{ old('customer_phone', Auth::user()?->phone) }}" required pattern="[0-9]{10}" placeholder="9876543210" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-mono focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 3. Delivery Address Selector & Map Picker -->
-                <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
-                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                        <h3 class="font-extrabold text-slate-900 text-sm flex items-center gap-2">
-                            <i class="fa-solid fa-location-dot text-rose-500"></i>
-                            <span>{{ __('messages.select_delivery_address') }}</span>
-                        </h3>
-                        <button type="button" onclick="openMapModal()" class="px-3.5 py-1.5 bg-brand-50 hover:bg-brand-100 border border-brand-200 text-brand-700 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5">
-                            <i class="fa-solid fa-map-location-dot"></i>
-                            <span>{{ __('messages.pick_on_map') }}</span>
-                        </button>
-                    </div>
-
-                    <!-- Saved Addresses Cards (if logged in) -->
-                    @if($addresses->count() > 0)
-                        <div class="space-y-3">
-                            <label class="block text-xs font-bold uppercase text-slate-400">Choose from Saved Addresses:</label>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                @foreach($addresses as $addr)
-                                    <label class="p-4 rounded-2xl border-2 border-slate-200 has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50/30 cursor-pointer transition-all flex items-start gap-3">
-                                        <input type="radio" name="selected_address_id" value="{{ $addr->id }}" {{ ($defaultAddress && $defaultAddress->id == $addr->id) || $loop->first ? 'checked' : '' }} class="mt-1 text-brand-600 focus:ring-brand-500">
-                                        <div class="text-xs space-y-1">
-                                            <span class="font-bold text-slate-900 text-sm block">{{ $addr->type }} ({{ $addr->recipient_name }})</span>
-                                            <p class="text-slate-600 leading-relaxed">{{ $addr->full_address }}</p>
-                                            <p class="text-[11px] text-slate-400 font-mono">Ph: +91 {{ $addr->recipient_phone }}</p>
-                                        </div>
-                                    </label>
-                                @endforeach
+                            <label for="customer_phone" class="fx-label">{{ $gu ? '૧૦ અંકનો મોબાઇલ નંબર' : '10-digit mobile number' }} <span class="text-rose-500">*</span></label>
+                            <div class="relative">
+                                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[13px] font-bold text-slate-400">+91</span>
+                                <input type="tel" id="customer_phone" name="customer_phone" value="{{ old('customer_phone', Auth::user()?->phone) }}" required pattern="[0-9]{10}" inputmode="numeric" maxlength="10" autocomplete="tel-national" placeholder="9876543210" class="fx-input !pl-12 font-mono @error('customer_phone') is-invalid @enderror">
                             </div>
+                            @error('customer_phone')<p class="text-xs font-semibold text-rose-600 mt-1">{{ $message }}</p>@enderror
                         </div>
+                    </div>
+                </section>
 
-                        <div class="pt-2 text-center text-xs text-slate-400 font-semibold">
-                            --- OR ENTER / PIN NEW ADDRESS BELOW ---
-                        </div>
-                    @endif
+                <!-- 2. Address -->
+                <section class="fx-card p-4 sm:p-6">
+                    <div class="flex items-center justify-between gap-3 mb-4">
+                        <h3 class="{{ $stepTitle }}"><span class="{{ $stepNum }}">2</span>{{ __('messages.select_delivery_address') }}</h3>
+                        <button type="button" onclick="openMapModal()" class="fx-btn fx-btn-soft fx-btn-sm shrink-0"><i class="ph ph-map-trifold text-base"></i><span class="hidden xs:inline">{{ __('messages.pick_on_map') }}</span></button>
+                    </div>
 
-                    <!-- Manual / Map Populated Address Inputs -->
-                    <div id="manualAddressFields" class="space-y-4 pt-2">
-                        <!-- Hidden Map Coordinates -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        @foreach($addresses as $addr)
+                            <label class="relative p-4 rounded-2xl border-2 border-slate-200 dark:border-slate-700 has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50/50 dark:has-[:checked]:bg-brand-500/10 cursor-pointer transition-colors flex items-start gap-3">
+                                <input type="radio" name="selected_address_id" value="{{ $addr->id }}" {{ !$useNew && (string) $selectedId === (string) $addr->id ? 'checked' : '' }} class="mt-1 w-4 h-4 accent-emerald-600 shrink-0" data-addr-mode="saved">
+                                <span class="text-[13px] min-w-0">
+                                    <span class="flex items-center gap-2 font-bold text-slate-900 dark:text-white">
+                                        <i class="ph {{ $addr->type === 'Home' ? 'ph-house' : ($addr->type === 'Work' ? 'ph-briefcase' : 'ph-map-pin') }} text-brand-600"></i>{{ \Lang::has('messages.address_types.' . $addr->type) ? __('messages.address_types.' . $addr->type) : $addr->type }}
+                                        @if($addr->is_default)<span class="px-1.5 py-0.5 rounded-md bg-brand-100 dark:bg-brand-500/20 text-brand-700 dark:text-brand-300 text-[10px] uppercase">{{ __('messages.default_address') }}</span>@endif
+                                    </span>
+                                    <span class="block mt-1 text-slate-700 dark:text-slate-200 font-semibold">{{ $addr->recipient_name }}</span>
+                                    <span class="block text-slate-500 dark:text-slate-400 leading-relaxed">{{ $addr->full_address }}</span>
+                                    <span class="block text-[12px] text-slate-400 font-mono mt-0.5">+91 {{ $addr->recipient_phone }}</span>
+                                </span>
+                            </label>
+                        @endforeach
+                        @if($addresses->count() > 0)
+                            <label class="p-4 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-600 has-[:checked]:border-brand-600 has-[:checked]:border-solid has-[:checked]:bg-brand-50/50 dark:has-[:checked]:bg-brand-500/10 cursor-pointer transition-colors flex items-center gap-3">
+                                <input type="radio" name="selected_address_id" value="" id="addrNewRadio" {{ $useNew ? 'checked' : '' }} class="w-4 h-4 accent-emerald-600 shrink-0" data-addr-mode="new">
+                                <span class="flex items-center gap-2 text-[13px] font-bold text-slate-800 dark:text-slate-100"><i class="ph-bold ph-plus-circle text-brand-600 text-lg"></i>{{ $gu ? 'નવું સરનામું દાખલ કરો / પિન કરો' : 'Deliver to a new address' }}</span>
+                            </label>
+                        @endif
+                    </div>
+
+                    <!-- Manual / map-filled address -->
+                    <div id="manualAddressFields" class="{{ $useNew ? '' : 'hidden' }} {{ $addresses->count() ? 'mt-5 pt-5 border-t border-slate-100 dark:border-slate-800' : '' }}">
                         <input type="hidden" id="addrLat" name="latitude" value="{{ old('latitude', '23.030357') }}">
                         <input type="hidden" id="addrLng" name="longitude" value="{{ old('longitude', '72.507542') }}">
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="block font-bold text-slate-700 uppercase mb-1">{{ __('messages.house_no') }}</label>
-                                <input type="text" id="inputHouseNo" name="house_no" value="{{ old('house_no') }}" placeholder="e.g. Flat 402, Shivam Heights" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                                <label for="inputHouseNo" class="fx-label">{{ __('messages.house_no') }} <span class="text-rose-500">*</span></label>
+                                <input type="text" id="inputHouseNo" name="house_no" value="{{ old('house_no') }}" placeholder="{{ __('messages.ph_house') }}" class="fx-input" data-new-required>
                             </div>
-
                             <div>
-                                <label class="block font-bold text-slate-700 uppercase mb-1">{{ __('messages.street_address') }}</label>
-                                <input type="text" id="inputStreet" name="street_address" value="{{ old('street_address') }}" placeholder="e.g. Near SG Highway, Bodakdev" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                                <label for="inputStreet" class="fx-label">{{ __('messages.street_address') }} <span class="text-rose-500">*</span></label>
+                                <input type="text" id="inputStreet" name="street_address" value="{{ old('street_address') }}" placeholder="{{ __('messages.ph_street') }}" class="fx-input" data-new-required>
                             </div>
-
                             <div>
-                                <label class="block font-bold text-slate-700 uppercase mb-1">{{ __('messages.landmark') }}</label>
-                                <input type="text" id="inputLandmark" name="landmark" value="{{ old('landmark') }}" placeholder="e.g. Opp Iskcon Temple" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                                <label for="inputLandmark" class="fx-label">{{ __('messages.landmark') }}</label>
+                                <input type="text" id="inputLandmark" name="landmark" value="{{ old('landmark') }}" placeholder="{{ __('messages.ph_landmark') }}" class="fx-input">
                             </div>
-
                             <div>
-                                <label class="block font-bold text-slate-700 uppercase mb-1">{{ __('messages.city') }}</label>
-                                <input type="text" id="inputCity" name="city" value="{{ old('city', 'Ahmedabad') }}" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                                <label for="inputCity" class="fx-label">{{ __('messages.city') }} <span class="text-rose-500">*</span></label>
+                                <input type="text" id="inputCity" name="city" value="{{ old('city', 'Ahmedabad') }}" class="fx-input" data-new-required>
                             </div>
-
                             <div>
-                                <label class="block font-bold text-slate-700 uppercase mb-1">{{ __('messages.pincode') }}</label>
-                                <input type="text" id="inputPincode" name="pincode" value="{{ old('pincode', '380054') }}" pattern="[0-9]{6}" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-mono focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                                <label for="inputPincode" class="fx-label">{{ __('messages.pincode') }} <span class="text-rose-500">*</span></label>
+                                <input type="text" id="inputPincode" name="pincode" value="{{ old('pincode', '380054') }}" pattern="[0-9]{6}" inputmode="numeric" maxlength="6" class="fx-input font-mono" data-new-required>
                             </div>
-
                             <div>
-                                <label class="block font-bold text-slate-700 uppercase mb-1">{{ __('messages.address_type') }}</label>
-                                <select name="address_type" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                                    <option value="Home">Home</option>
-                                    <option value="Work">Work</option>
-                                    <option value="Other">Other</option>
+                                <label for="inputAddrType" class="fx-label">{{ __('messages.address_type') }}</label>
+                                <select id="inputAddrType" name="address_type" class="fx-input">
+                                    @foreach(['Home', 'Work', 'Other'] as $t)<option value="{{ $t }}" {{ old('address_type') === $t ? 'selected' : '' }}>{{ __('messages.address_types.' . $t) }}</option>@endforeach
                                 </select>
                             </div>
                         </div>
+                        <p id="mapPinNote" class="mt-3 text-[12px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5"><i class="ph ph-map-pin text-rose-500"></i><span>{{ $gu ? 'ચોક્કસ ડિલિવરી માટે નકશા પર પિન કરો.' : 'Tip: pin your doorstep on the map for precise delivery.' }}</span></p>
                     </div>
-                </div>
+                </section>
 
-                <!-- 4. Payment Method -->
-                <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-4">
-                    <h3 class="font-extrabold text-slate-900 text-sm flex items-center gap-2 pb-3 border-b border-slate-100">
-                        <i class="fa-solid fa-credit-card text-emerald-600"></i>
-                        <span>{{ __('messages.select_payment_method') }}</span>
-                    </h3>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <label class="p-4 rounded-2xl border-2 border-slate-200 has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50/30 cursor-pointer transition-all flex items-center gap-3">
-                            <input type="radio" name="payment_method" value="cod" checked class="text-brand-600 focus:ring-brand-500">
-                            <div>
-                                <span class="font-bold text-slate-900 text-xs sm:text-sm block">{{ __('messages.cash_on_delivery') }}</span>
-                                <span class="text-[11px] text-slate-500">Pay cash or UPI upon delivery at doorstep</span>
-                            </div>
-                        </label>
-
-                        <label class="p-4 rounded-2xl border-2 border-slate-200 has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50/30 cursor-pointer transition-all flex items-center gap-3">
-                            <input type="radio" name="payment_method" value="upi" class="text-brand-600 focus:ring-brand-500">
-                            <div>
-                                <span class="font-bold text-slate-900 text-xs sm:text-sm block">{{ __('messages.online_upi') }}</span>
-                                <span class="text-[11px] text-slate-500">Instant PhonePe / Google Pay / Paytm QR</span>
-                            </div>
-                        </label>
+                <!-- 3. Payment -->
+                <section class="fx-card p-4 sm:p-6">
+                    <h3 class="{{ $stepTitle }} mb-4"><span class="{{ $stepNum }}">3</span>{{ __('messages.select_payment_method') }}</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        @foreach([['cod', 'ph-money', __('messages.cash_on_delivery'), $gu ? 'ડિલિવરી વખતે રોકડ અથવા UPI થી ચૂકવો' : 'Pay by cash or UPI at your doorstep'], ['upi', 'ph-qr-code', __('messages.online_upi'), 'PhonePe · Google Pay · Paytm']] as [$val, $ic, $lbl, $sub])
+                            <label class="p-4 rounded-2xl border-2 border-slate-200 dark:border-slate-700 has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50/50 dark:has-[:checked]:bg-brand-500/10 cursor-pointer transition-colors flex items-center gap-3">
+                                <input type="radio" name="payment_method" value="{{ $val }}" {{ old('payment_method', 'cod') === $val ? 'checked' : '' }} class="w-4 h-4 accent-emerald-600 shrink-0">
+                                <span class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center justify-center text-xl shrink-0"><i class="ph-duotone {{ $ic }}"></i></span>
+                                <span class="min-w-0">
+                                    <span class="block font-bold text-[13px] text-slate-900 dark:text-white">{{ $lbl }}</span>
+                                    <span class="block text-[11px] text-slate-500 dark:text-slate-400">{{ $sub }}</span>
+                                </span>
+                            </label>
+                        @endforeach
                     </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Special Delivery Instructions (Optional)</label>
-                        <textarea name="notes" rows="2" placeholder="e.g. Ring bell twice, leave with security..." class="w-full px-4 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none"></textarea>
+                    <div class="mt-4">
+                        <label for="orderNotes" class="fx-label">{{ $gu ? 'ખાસ ડિલિવરી સૂચના (વૈકલ્પિક)' : 'Delivery instructions (optional)' }}</label>
+                        <textarea id="orderNotes" name="notes" rows="2" placeholder="{{ $gu ? 'દા.ત. બે વાર બેલ વગાડો' : 'e.g. Ring the bell twice, leave with security…' }}" class="fx-input">{{ old('notes') }}</textarea>
                     </div>
-                </div>
-
+                </section>
             </div>
 
-            <!-- Right 1 Col: Coupon Applicator, Cart Summary & Place Order Button -->
-            <div class="space-y-6">
-
-                <!-- Coupon Applicator Card -->
-                <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 space-y-4">
-                    <h4 class="font-extrabold text-slate-900 text-xs uppercase tracking-wider flex items-center gap-2">
-                        <i class="fa-solid fa-tag text-amber-500"></i>
-                        <span>{{ __('messages.apply_coupon') }}</span>
-                    </h4>
-
-                    <div class="flex items-center gap-2">
-                        <input type="text" id="couponCodeInput" value="{{ $appliedCoupon }}" placeholder="e.g. FRESH20, WELCOME50" class="flex-1 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold uppercase focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                        <button type="button" onclick="applyCouponCode()" class="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all">
-                            {{ __('messages.apply') }}
-                        </button>
+            <!-- Summary column -->
+            <aside class="space-y-4 lg:sticky lg:top-36">
+                <!-- Coupon -->
+                <div class="fx-card p-4 sm:p-5" id="couponBox" data-subtotal="{{ $subtotal }}" data-delivery="{{ $deliveryCharge }}">
+                    <h4 class="font-extrabold text-slate-900 dark:text-white text-[14px] flex items-center gap-2 mb-3"><i class="ph-fill ph-ticket text-amber-500 text-lg"></i>{{ __('messages.apply_coupon') }}</h4>
+                    <div id="couponApplied" class="{{ $appliedCoupon ? 'flex' : 'hidden' }} items-center gap-3 p-3 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-dashed border-emerald-300 dark:border-emerald-500/40">
+                        <i class="ph-fill ph-seal-check text-emerald-600 text-xl"></i>
+                        <div class="flex-1 min-w-0">
+                            <p class="font-mono font-extrabold text-[13px] text-emerald-800 dark:text-emerald-300" id="couponAppliedCode">{{ $appliedCoupon }}</p>
+                            <p class="text-[11px] text-emerald-700/80 dark:text-emerald-300/70">{{ $gu ? 'કૂપન લાગુ થયું' : 'Coupon applied' }}</p>
+                        </div>
+                        <button type="button" onclick="removeCouponCode(this)" class="fx-btn fx-btn-ghost fx-btn-sm !text-rose-600">{{ $gu ? 'દૂર કરો' : 'Remove' }}</button>
                     </div>
-                    <p id="couponMsg" class="text-xs font-semibold {{ $appliedCoupon ? 'text-emerald-600' : 'text-slate-400' }}">
-                        {{ $appliedCoupon ? "Coupon '{$appliedCoupon}' applied!" : "Try code: FRESH20 or WELCOME50" }}
-                    </p>
+                    <div id="couponForm" class="{{ $appliedCoupon ? 'hidden' : '' }}">
+                        <div class="flex items-center gap-2">
+                            <label class="flex-1"><span class="sr-only">{{ __('messages.enter_coupon_code') }}</span>
+                                <input type="text" id="couponCodeInput" value="{{ $appliedCoupon }}" placeholder="FRESH20" autocomplete="off" class="fx-input !py-2.5 font-mono font-bold uppercase" onkeydown="if(event.key==='Enter'){event.preventDefault();applyCouponCode(document.getElementById('couponApplyBtn'));}">
+                            </label>
+                            <button type="button" id="couponApplyBtn" onclick="applyCouponCode(this)" class="fx-btn fx-btn-dark !py-2.5">{{ __('messages.apply') }}</button>
+                        </div>
+                        <p id="couponMsg" class="mt-2 text-[12px] font-semibold text-slate-400">{{ $gu ? 'અજમાવો: FRESH20 અથવા WELCOME50' : 'Try code: FRESH20 or WELCOME50' }} · <a href="{{ route('pages.offers') }}" target="_blank" class="text-brand-700 dark:text-brand-400 hover:underline">{{ $gu ? 'બધી ઑફર' : 'All offers' }}</a></p>
+                    </div>
                 </div>
 
-                <!-- Order Final Summary Card -->
-                <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6 sticky top-28">
-                    <h3 class="font-extrabold text-slate-900 text-base pb-4 border-b border-slate-100">Review & Payment</h3>
-
-                    <div class="space-y-3 text-xs">
-                        <div class="flex justify-between text-slate-600">
-                            <span>{{ __('messages.item_total') }}</span>
-                            <span class="font-bold text-slate-900">₹{{ number_format($subtotal, 2) }}</span>
+                <!-- Summary -->
+                <div class="fx-card p-4 sm:p-5">
+                    <h3 class="font-extrabold text-slate-900 dark:text-white text-[15px] mb-3">{{ $gu ? 'ઓર્ડર સારાંશ' : 'Order summary' }}</h3>
+                    <details class="group mb-4" {{ $cartItems->count() <= 3 ? 'open' : '' }}>
+                        <summary class="list-none cursor-pointer flex items-center justify-between text-[13px] font-semibold text-slate-600 dark:text-slate-300">
+                            <span>{{ $cartItems->sum('quantity') }} {{ $gu ? 'વસ્તુઓ' : 'items' }}</span>
+                            <i class="ph-bold ph-caret-down text-slate-400 group-open:rotate-180 transition-transform"></i>
+                        </summary>
+                        <ul class="mt-3 space-y-2.5 max-h-60 overflow-y-auto pr-1">
+                            @foreach($cartItems as $ci)
+                                <li class="flex items-center gap-3">
+                                    <span class="relative shrink-0">
+                                        <img src="{{ $ci->product->thumbnail_url }}" alt="" class="w-11 h-11 rounded-lg object-cover bg-slate-100 dark:bg-slate-800">
+                                        <span class="absolute -top-1.5 -right-1.5 min-w-[1.1rem] h-[1.1rem] px-1 rounded-full bg-slate-700 text-white text-[10px] font-bold flex items-center justify-center">{{ $ci->quantity }}</span>
+                                    </span>
+                                    <span class="flex-1 min-w-0 text-[12px] font-semibold text-slate-700 dark:text-slate-200 line-clamp-2">{{ $ci->product->localized_name }}</span>
+                                    <span class="text-[12px] font-bold text-slate-900 dark:text-white">₹{{ number_format($ci->subtotal, 2) }}</span>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </details>
+                    <dl class="space-y-2.5 text-[13px] pt-3 border-t border-slate-100 dark:border-slate-800">
+                        <div class="flex justify-between text-slate-600 dark:text-slate-300"><dt>{{ __('messages.item_total') }}</dt><dd class="font-bold text-slate-900 dark:text-white">₹{{ number_format($subtotal, 2) }}</dd></div>
+                        <div id="discountRow" class="flex justify-between text-emerald-700 dark:text-emerald-400 font-semibold {{ $discount > 0 ? '' : 'hidden' }}"><dt>{{ __('messages.discount') }}</dt><dd id="discountVal" class="font-bold">-₹{{ number_format($discount, 2) }}</dd></div>
+                        <div class="flex justify-between text-slate-600 dark:text-slate-300"><dt>{{ __('messages.delivery_fee') }}</dt>
+                            <dd class="font-bold">@if($deliveryCharge == 0)<span class="text-emerald-600 dark:text-emerald-400 uppercase">{{ __('messages.free') }}</span>@else<span class="text-slate-900 dark:text-white">₹{{ number_format($deliveryCharge, 2) }}</span>@endif</dd></div>
+                        <div class="flex justify-between items-baseline pt-3 border-t border-dashed border-slate-200 dark:border-slate-700">
+                            <dt class="font-extrabold text-slate-900 dark:text-white">{{ __('messages.grand_total') }}</dt>
+                            <dd id="grandTotalVal" class="text-xl font-extrabold text-slate-900 dark:text-white">₹{{ number_format($total, 2) }}</dd>
                         </div>
-
-                        <div id="discountRow" class="flex justify-between text-emerald-600 font-bold {{ $discount > 0 ? '' : 'hidden' }}">
-                            <span>{{ __('messages.discount') }}</span>
-                            <span id="discountVal">-₹{{ number_format($discount, 2) }}</span>
-                        </div>
-
-                        <div class="flex justify-between text-slate-600">
-                            <span>{{ __('messages.delivery_fee') }}</span>
-                            <span class="font-bold text-slate-900">
-                                @if($deliveryCharge == 0)
-                                    <span class="text-emerald-600 uppercase font-extrabold">{{ __('messages.free') }}</span>
-                                @else
-                                    <span>₹40.00</span>
-                                @endif
-                            </span>
-                        </div>
-
-                        <div class="flex justify-between text-slate-900 font-extrabold text-lg pt-4 border-t border-slate-200">
-                            <span>{{ __('messages.grand_total') }}</span>
-                            <span id="grandTotalVal" class="text-brand-700">₹{{ number_format($total, 2) }}</span>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="w-full py-4 bg-brand-600 hover:bg-brand-700 text-white rounded-2xl text-xs font-extrabold shadow-xl shadow-brand-500/25 transition-all text-center flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-lock"></i>
-                        <span>{{ __('messages.place_order') }}</span>
+                    </dl>
+                    <button type="submit" id="placeOrderBtn" class="hidden lg:flex fx-btn fx-btn-primary fx-btn-lg w-full mt-5">
+                        <i class="ph-fill ph-lock-simple"></i><span>{{ __('messages.place_order') }}</span>
                     </button>
+                    <p class="mt-3 text-[11px] text-slate-400 text-center">{{ $gu ? 'ઓર્ડર આપીને તમે અમારી શરતો સ્વીકારો છો.' : 'By placing the order you agree to our terms.' }}</p>
                 </div>
+            </aside>
+        </div>
 
+        <!-- Mobile place-order bar -->
+        <div class="lg:hidden h-20"></div>
+        <div class="lg:hidden fixed inset-x-0 z-40 fx-above-tabbar">
+            <div class="mx-3 mb-2 p-2.5 pl-4 rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur border border-slate-200 dark:border-slate-700 shadow-2xl flex items-center gap-3">
+                <div class="flex-1 min-w-0">
+                    <p class="text-[11px] font-semibold text-slate-500 dark:text-slate-400">{{ __('messages.grand_total') }}</p>
+                    <p class="text-lg font-extrabold text-slate-900 dark:text-white leading-tight" data-grand-total-mirror>₹{{ number_format($total, 2) }}</p>
+                </div>
+                <button type="submit" class="fx-btn fx-btn-primary !h-11 shrink-0"><i class="ph-fill ph-lock-simple"></i><span>{{ __('messages.place_order') }}</span></button>
             </div>
-
         </div>
     </form>
-
 </div>
 
-<!-- Interactive Leaflet Map Modal -->
-<div id="mapPickerModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
-    <div onclick="closeMapModal()" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm"></div>
-
-    <div class="relative bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl z-10 space-y-4">
-        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-            <h3 class="font-extrabold text-slate-900 text-sm flex items-center gap-2">
-                <i class="fa-solid fa-map-pin text-rose-500"></i>
-                <span>Pin Exact Delivery Doorstep on Map</span>
-            </h3>
-            <button onclick="closeMapModal()" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
+<!-- Leaflet map picker -->
+<div id="mapPickerModal" class="fx-overlay" aria-hidden="true">
+    <div class="fx-backdrop" onclick="closeMapModal()"></div>
+    <div class="fx-panel fx-panel-center fx-sheet-mobile outline-none" style="--fx-modal-w: 720px" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="mapModalTitle">
+        <div class="flex items-center justify-between px-5 h-14 border-b border-slate-100 dark:border-slate-800 shrink-0">
+            <h3 id="mapModalTitle" class="font-extrabold text-slate-900 dark:text-white text-[15px] flex items-center gap-2"><i class="ph-fill ph-map-pin text-rose-500"></i>{{ $gu ? 'નકશા પર ડિલિવરી સ્થાન પિન કરો' : 'Pin your doorstep on the map' }}</h3>
+            <button type="button" onclick="closeMapModal()" class="fx-icon-btn" aria-label="{{ __('messages.close') }}"><i class="ph ph-x text-xl"></i></button>
         </div>
-
-        <div class="flex items-center gap-2">
-            <input type="text" id="mapSearchInput" placeholder="Search locality, landmark, or area..." class="flex-1 px-3 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none">
-            <button type="button" onclick="searchLocation()" class="px-3 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold">Search</button>
-            <button type="button" onclick="useCurrentLocation()" class="px-3 py-2 bg-brand-50 text-brand-700 border border-brand-200 rounded-xl text-xs font-bold flex items-center gap-1">
-                <i class="fa-solid fa-crosshairs"></i>
-                <span>GPS</span>
-            </button>
-        </div>
-
-        <!-- Leaflet Map Canvas -->
-        <div id="mapPickerContainer" class="border border-slate-200"></div>
-
-        <p class="text-[11px] text-slate-500 italic">
-            {{ __('messages.drag_pin_hint') }}
-        </p>
-
-        <div class="flex items-center justify-between pt-3 border-t border-slate-100">
-            <div class="text-xs text-slate-600 truncate max-w-sm" id="selectedAddressPreview">
-                Pin moved to: Ahmedabad, Gujarat
+        <div class="p-4 sm:p-5 space-y-3 overflow-y-auto">
+            <div class="flex items-center gap-2">
+                <label class="flex-1 relative"><span class="sr-only">{{ __('messages.search') }}</span>
+                    <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" id="mapSearchInput" placeholder="{{ $gu ? 'વિસ્તાર, લેન્ડમાર્ક શોધો…' : 'Search locality, landmark or area…' }}" class="fx-input !py-2.5 !pl-9" onkeydown="if(event.key==='Enter'){event.preventDefault();searchLocation();}">
+                </label>
+                <button type="button" onclick="searchLocation()" class="fx-btn fx-btn-dark !py-2.5">{{ $gu ? 'શોધો' : 'Search' }}</button>
+                <button type="button" onclick="useCurrentLocation()" class="fx-btn fx-btn-soft !py-2.5" title="{{ __('messages.use_current_location') }}"><i class="ph-bold ph-crosshair"></i><span class="hidden sm:inline">GPS</span></button>
             </div>
-            <button type="button" onclick="confirmMapAddress()" class="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-md shadow-brand-500/20">
-                Confirm This Location
-            </button>
+            <div id="mapPickerContainer" class="border border-slate-200 dark:border-slate-700"></div>
+            <p class="text-[12px] text-slate-500 dark:text-slate-400">{{ __('messages.drag_pin_hint') }}</p>
+        </div>
+        <div class="px-4 sm:px-5 py-3 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
+            <div class="text-[12px] text-slate-600 dark:text-slate-300 truncate flex items-center gap-1.5 min-w-0"><i class="ph-fill ph-map-pin text-rose-500 shrink-0"></i><span id="selectedAddressPreview" class="truncate">Ahmedabad, Gujarat</span></div>
+            <button type="button" onclick="confirmMapAddress()" class="fx-btn fx-btn-primary shrink-0">{{ $gu ? 'આ સ્થાન કન્ફર્મ કરો' : 'Confirm this location' }}</button>
         </div>
     </div>
 </div>
 @endsection
 
 @push('scripts')
+@php
+    $ckT = $gu
+        ? ['enter' => 'કૃપા કરીને કૂપન કોડ દાખલ કરો', 'invalid' => 'અમાન્ય કૂપન કોડ', 'removed' => 'કૂપન દૂર કર્યું', 'not_found' => 'નકશા પર સ્થાન મળ્યું નહીં', 'gps' => 'GPS સ્થાન પિન થયું!', 'gps_fail' => 'સ્થાન મેળવી શકાયું નહીં', 'confirmed' => 'સ્થાન કન્ફર્મ થયું અને સરનામું અપડેટ થયું!']
+        : ['enter' => 'Please enter a coupon code', 'invalid' => 'Invalid coupon code', 'removed' => 'Coupon removed', 'not_found' => 'Location not found on map', 'gps' => 'GPS location pinned!', 'gps_fail' => 'Could not get your location', 'confirmed' => 'Map location confirmed & address updated!'];
+@endphp
 <script>
-    // Coupon Applicator
-    function applyCouponCode() {
-        const code = $('#couponCodeInput').val();
-        if (!code) {
-            toastr.warning('Please enter a coupon code');
-            return;
-        }
+    const CK_T = @json($ckT);
 
-        $.ajax({
-            url: '{{ route("checkout.coupon.apply") }}',
-            type: 'POST',
-            data: { coupon_code: code },
-            success: function(res) {
-                if (res.success) {
-                    $('#discountRow').removeClass('hidden');
-                    $('#discountVal').text('-' + res.discount_formatted);
-                    $('#grandTotalVal').text(res.total_formatted);
-                    $('#couponMsg').removeClass('text-slate-400 text-rose-600').addClass('text-emerald-600').text(res.message);
-                    toastr.success(res.message);
-                }
-            },
-            error: function(xhr) {
-                const msg = xhr.responseJSON?.message || 'Invalid coupon code';
-                $('#couponMsg').removeClass('text-emerald-600 text-slate-400').addClass('text-rose-600').text(msg);
+    // ---------- Address mode (saved vs new) ----------
+    function syncAddressMode() {
+        const isNew = !document.querySelector('input[name="selected_address_id"]:checked') || document.querySelector('input[name="selected_address_id"]:checked').value === '';
+        $('#manualAddressFields').toggleClass('hidden', !isNew);
+        $('[data-new-required]').prop('required', isNew);
+    }
+    $(document).on('change', 'input[name="selected_address_id"]', syncAddressMode);
+    syncAddressMode();
+
+    // ---------- Coupon ----------
+    function setGrandTotal(text) { $('#grandTotalVal').text(text); $('[data-grand-total-mirror]').text(text); }
+
+    function applyCouponCode(btn) {
+        const code = ($('#couponCodeInput').val() || '').trim();
+        if (!code) { toastr.warning(CK_T.enter); $('#couponCodeInput').focus(); return; }
+        FX.busy(btn, true);
+        $.ajax({ url: @json(route('checkout.coupon.apply')), type: 'POST', data: { coupon_code: code } })
+            .done(function (res) {
+                if (!res.success) return;
+                $('#discountRow').removeClass('hidden');
+                $('#discountVal').text('-' + res.discount_formatted);
+                setGrandTotal(res.total_formatted);
+                $('#couponAppliedCode').text(res.coupon_code || code.toUpperCase());
+                $('#couponApplied').removeClass('hidden').addClass('flex');
+                $('#couponForm').addClass('hidden');
+                $('#couponMsg').removeClass('text-rose-600').addClass('text-slate-400');
+                toastr.success(res.message);
+            })
+            .fail(function (xhr) {
+                const msg = (xhr.responseJSON && xhr.responseJSON.message) || CK_T.invalid;
+                $('#couponMsg').removeClass('text-slate-400').addClass('text-rose-600').text(msg);
+                $('#couponCodeInput').addClass('is-invalid');
                 toastr.error(msg);
-            }
-        });
+            })
+            .always(() => FX.busy(btn, false));
+    }
+    $('#couponCodeInput').on('input', function () { $(this).removeClass('is-invalid'); });
+
+    function removeCouponCode(btn) {
+        FX.busy(btn, true);
+        $.post(@json(route('checkout.coupon.remove')))
+            .done(function (res) {
+                const box = document.getElementById('couponBox');
+                const total = parseFloat(box.dataset.subtotal) + parseFloat(box.dataset.delivery);
+                $('#discountRow').addClass('hidden');
+                setGrandTotal(FX.money(total));
+                $('#couponApplied').addClass('hidden').removeClass('flex');
+                $('#couponForm').removeClass('hidden');
+                $('#couponCodeInput').val('');
+                toastr.info(res.message || CK_T.removed);
+            })
+            .fail(() => toastr.error(CK_T.invalid))
+            .always(() => FX.busy(btn, false));
     }
 
-    // Leaflet Interactive Map Logic
+    // ---------- Leaflet map picker ----------
     let leafletMap = null;
     let marker = null;
-    let currentLat = 23.030357;
-    let currentLng = 72.507542;
+    let currentLat = parseFloat($('#addrLat').val()) || 23.030357;
+    let currentLng = parseFloat($('#addrLng').val()) || 72.507542;
 
     function openMapModal() {
-        $('#mapPickerModal').removeClass('hidden');
+        // picking on the map means delivering to a new address
+        const nr = document.getElementById('addrNewRadio');
+        if (nr && !nr.checked) { nr.checked = true; syncAddressMode(); }
+        FX.open('mapPickerModal');
         setTimeout(() => {
+            if (typeof L === 'undefined') return;
             if (!leafletMap) {
                 leafletMap = L.map('mapPickerContainer').setView([currentLat, currentLng], 14);
-
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    maxZoom: 19,
-                    attribution: '© OpenStreetMap'
-                }).addTo(leafletMap);
-
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(leafletMap);
                 marker = L.marker([currentLat, currentLng], { draggable: true }).addTo(leafletMap);
-
-                marker.on('dragend', function (e) {
+                marker.on('dragend', function () {
                     const pos = marker.getLatLng();
-                    currentLat = pos.lat;
-                    currentLng = pos.lng;
+                    currentLat = pos.lat; currentLng = pos.lng;
                     reverseGeocode(pos.lat, pos.lng);
                 });
-
-                leafletMap.on('click', function(e) {
+                leafletMap.on('click', function (e) {
                     marker.setLatLng(e.latlng);
-                    currentLat = e.latlng.lat;
-                    currentLng = e.latlng.lng;
+                    currentLat = e.latlng.lat; currentLng = e.latlng.lng;
                     reverseGeocode(e.latlng.lat, e.latlng.lng);
                 });
             } else {
                 leafletMap.invalidateSize();
             }
-        }, 200);
+        }, 260);
     }
 
-    function closeMapModal() {
-        $('#mapPickerModal').addClass('hidden');
-    }
+    function closeMapModal() { FX.close('mapPickerModal'); }
 
     function searchLocation() {
         const query = $('#mapSearchInput').val();
-        if (!query) return;
-
+        if (!query || !leafletMap) return;
         fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', Gujarat')}`)
             .then(res => res.json())
             .then(data => {
                 if (data && data.length > 0) {
-                    const lat = parseFloat(data[0].lat);
-                    const lon = parseFloat(data[0].lon);
-                    currentLat = lat;
-                    currentLng = lon;
+                    const lat = parseFloat(data[0].lat), lon = parseFloat(data[0].lon);
+                    currentLat = lat; currentLng = lon;
                     leafletMap.setView([lat, lon], 15);
                     marker.setLatLng([lat, lon]);
                     reverseGeocode(lat, lon);
                 } else {
-                    toastr.warning('Location not found on map');
+                    toastr.warning(CK_T.not_found);
                 }
-            });
+            }).catch(() => toastr.warning(CK_T.not_found));
     }
 
     function useCurrentLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(pos) {
-                currentLat = pos.coords.latitude;
-                currentLng = pos.coords.longitude;
-                leafletMap.setView([currentLat, currentLng], 16);
-                marker.setLatLng([currentLat, currentLng]);
-                reverseGeocode(currentLat, currentLng);
-                toastr.success('GPS Location pinned!');
-            });
-        }
+        if (!navigator.geolocation || !leafletMap) return;
+        navigator.geolocation.getCurrentPosition(function (pos) {
+            currentLat = pos.coords.latitude; currentLng = pos.coords.longitude;
+            leafletMap.setView([currentLat, currentLng], 16);
+            marker.setLatLng([currentLat, currentLng]);
+            reverseGeocode(currentLat, currentLng);
+            toastr.success(CK_T.gps);
+        }, () => toastr.error(CK_T.gps_fail));
     }
 
     function reverseGeocode(lat, lng) {
+        $('#selectedAddressPreview').text(lat.toFixed(5) + ', ' + lng.toFixed(5));
         fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
             .then(res => res.json())
             .then(data => {
@@ -392,20 +399,21 @@
                     const road = data.address.road || data.address.suburb || data.address.neighbourhood || '';
                     const city = data.address.city || data.address.town || data.address.state_district || 'Ahmedabad';
                     const pincode = data.address.postcode || '380054';
-
                     $('#selectedAddressPreview').text(`${road}, ${city} - ${pincode}`);
                     $('#inputStreet').val(road);
                     $('#inputCity').val(city);
                     $('#inputPincode').val(pincode);
                 }
-            });
+            }).catch(() => {});
     }
 
     function confirmMapAddress() {
         $('#addrLat').val(currentLat);
         $('#addrLng').val(currentLng);
-        toastr.success('Map location confirmed & address updated!');
+        $('#mapPinNote span').text(Number(currentLat).toFixed(5) + ', ' + Number(currentLng).toFixed(5));
+        toastr.success(CK_T.confirmed);
         closeMapModal();
+        $('#inputHouseNo').trigger('focus');
     }
 </script>
 @endpush

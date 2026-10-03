@@ -54,6 +54,10 @@ class User extends Authenticatable
         if ($this->roleModel && in_array($this->roleModel->name, ['admin', 'super_admin'])) {
             return true;
         }
+        // Custom staff roles (e.g. "manager", "packer") get panel access when they carry at least one permission
+        if ($this->roleModel && !in_array($this->roleModel->name, ['user', 'customer'])) {
+            return $this->roleModel->permissions()->exists();
+        }
         return false;
     }
 

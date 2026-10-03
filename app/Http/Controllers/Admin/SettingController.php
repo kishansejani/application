@@ -31,6 +31,7 @@ class SettingController extends Controller
             'footer_creator_name' => 'nullable|string|max:100',
             'footer_creator_url' => 'nullable|url|max:255',
             'theme_mode' => 'nullable|in:light,dark,system',
+            'store_name' => 'nullable|string|max:60',
         ]);
 
         Setting::set('theme_primary_color', $request->theme_primary_color, 'theme');
@@ -47,6 +48,8 @@ class SettingController extends Controller
         Setting::set('footer_creator_name', $request->footer_creator_name ?? 'Decent Infoways', 'footer');
         Setting::set('footer_creator_url', $request->footer_creator_url ?? 'https://decentinfoways.com', 'footer');
         
+        Setting::set('store_name', $request->store_name ?: 'Fresh Express', 'general');
+
         if ($request->filled('theme_mode')) {
             Setting::set('theme_mode', $request->theme_mode, 'theme');
         }
@@ -70,6 +73,7 @@ class SettingController extends Controller
         Setting::set('footer_creator_name', 'Decent Infoways', 'footer');
         Setting::set('footer_creator_url', 'https://decentinfoways.com', 'footer');
         Setting::set('theme_mode', 'system', 'theme');
+        Setting::set('store_name', 'Fresh Express', 'general');
 
         return redirect()->route('admin.settings.index')->with('success', 'Settings and button colors have been reset to default values!');
     }

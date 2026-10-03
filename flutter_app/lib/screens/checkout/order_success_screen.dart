@@ -1,128 +1,251 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../constants/app_colors.dart';
 import '../../l10n/app_localizations.dart';
-import '../../widgets/custom_button.dart';
+import '../../theme/app_theme.dart';
+import '../../utils/app_actions.dart';
+import '../../utils/formatters.dart';
+import '../../utils/responsive.dart';
+import '../../widgets/app_card.dart';
 import '../main_navigation_screen.dart';
-import '../orders/orders_screen.dart';
+import '../orders/order_track_screen.dart';
 
-class OrderSuccessScreen extends StatelessWidget {
+class OrderSuccessScreen extends StatefulWidget {
   final String orderNumber;
-  final String deliverySlot;
-  final String slotTime;
+  final double totalAmount;
+  final String? deliverySlot;
+  final String deliveryType;
+  final String paymentMethod;
 
   const OrderSuccessScreen({
-    Key? key,
+    super.key,
     required this.orderNumber,
-    required this.deliverySlot,
-    required this.slotTime,
-  }) : super(key: key);
+    required this.totalAmount,
+    this.deliverySlot,
+    this.deliveryType = 'two_hours',
+    this.paymentMethod = 'cod',
+  });
+
+  @override
+  State<OrderSuccessScreen> createState() => _OrderSuccessScreenState();
+}
+
+class _OrderSuccessScreenState extends State<OrderSuccessScreen> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _circle;
+  late final Animation<double> _check;
+  late final Animation<double> _ripple;
+  late final Animation<double> _content;
+
+  @override
+  void initState() {
+    super.initState();
+    HapticFeedback.mediumImpact();
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 1600));
+    _circle = CurvedAnimation(parent: _controller, curve: const Interval(0, 0.45, curve: Curves.elasticOut));
+    _check = CurvedAnimation(parent: _controller, curve: const Interval(0.3, 0.6, curve: Curves.easeOutBack));
+    _ripple = CurvedAnimation(parent: _controller, curve: const Interval(0.2, 1, curve: Curves.easeOut));
+    _content = CurvedAnimation(parent: _controller, curve: const Interval(0.45, 1, curve: Curves.easeOut));
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _goHome() => MainNavigationScreen.goToTab(context, MainNavigationScreen.homeTab);
 
   @override
   Widget build(BuildContext context) {
-    final is2Hours = deliverySlot == '2_hours';
+    final scheme = context.colors;
+    final express = widget.deliveryType == 'two_hours' || widget.deliveryType == '2_hours';
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 90,
-                height: 90,
-                decoration: BoxDecoration(
-                  color: AppColors.primaryLight,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.check_circle_rounded, size: 54, color: AppColors.primary),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                context.tr('order_success'),
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Order ID: $orderNumber',
-                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.primaryDark),
-              ),
-              const SizedBox(height: 20),
-
-              // Delivery Commitment Badge
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: AppColors.borderLight),
-                  boxShadow: [
-                    BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      is2Hours ? Icons.electric_bolt_rounded : Icons.wb_sunny_rounded,
-                      color: is2Hours ? AppColors.primary : AppColors.accent,
-                      size: 28,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            is2Hours ? context.tr('delivery_within_2_hours') : context.tr('delivery_next_day'),
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                          ),
-                          if (slotTime.isNotEmpty)
-                            Text(
-                              'Expected: $slotTime',
-                              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+    return PopScope<Object?>(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _goHome();
+      },
+      child: Scaffold(
+        body: SafeArea(
+          child: MaxWidthBox(
+            maxWidth: 520,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(AppSpacing.xl),
+              child: Column(
+                children: [
+                  const SizedBox(height: AppSpacing.xxl),
+                  SizedBox(
+                    width: 180,
+                    height: 180,
+                    child: AnimatedBuilder(
+                      animation: _controller,
+                      builder: (context, _) {
+                        return Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Transform.scale(
+                              scale: 0.6 + _ripple.value * 0.4,
+                              child: Container(
+                                width: 180,
+                                height: 180,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: AppColors.success.fade(0.12 * (1 - _ripple.value) + 0.04),
+                                ),
+                              ),
                             ),
-                        ],
-                      ),
+                            Transform.scale(
+                              scale: _circle.value,
+                              child: Container(
+                                width: 112,
+                                height: 112,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: const LinearGradient(
+                                    colors: [AppColors.primary, AppColors.primaryDark],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(color: AppColors.primary.fade(0.35), blurRadius: 24, offset: const Offset(0, 10)),
+                                  ],
+                                ),
+                                child: Transform.scale(
+                                  scale: _check.value.clamp(0.0, 1.2).toDouble(),
+                                  child: const Icon(Icons.check_rounded, color: Colors.white, size: 64),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: AppSpacing.xl),
+                  FadeTransition(
+                    opacity: _content,
+                    child: Column(
+                      children: [
+                        Text(
+                          context.tr('order_success'),
+                          textAlign: TextAlign.center,
+                          style: context.textStyles.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Text(
+                          context.tr('order_success_msg'),
+                          textAlign: TextAlign.center,
+                          style: context.textStyles.bodyMedium?.copyWith(color: scheme.onSurfaceVariant, height: 1.5),
+                        ),
+                        const SizedBox(height: AppSpacing.xl),
+                        AppCard(
+                          child: Column(
+                            children: [
+                              _InfoRow(
+                                icon: Icons.tag_rounded,
+                                label: context.tr('order_number'),
+                                value: widget.orderNumber,
+                                onCopy: () => AppActions.copyToClipboard(context, widget.orderNumber),
+                              ),
+                              const Divider(height: AppSpacing.xl),
+                              _InfoRow(
+                                icon: Icons.account_balance_wallet_rounded,
+                                label: context.tr('amount'),
+                                value: Fmt.price(widget.totalAmount),
+                              ),
+                              const Divider(height: AppSpacing.xl),
+                              _InfoRow(
+                                icon: Icons.payments_rounded,
+                                label: context.tr('payment_method'),
+                                value: context.tr(widget.paymentMethod),
+                              ),
+                              const Divider(height: AppSpacing.xl),
+                              _InfoRow(
+                                icon: express ? Icons.bolt_rounded : Icons.schedule_rounded,
+                                label: context.tr(express ? 'delivery_within_2_hours' : 'delivery_next_day'),
+                                value: widget.deliverySlot ?? '',
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.xl),
+                        SizedBox(
+                          width: double.infinity,
+                          child: FilledButton.icon(
+                            onPressed: () => Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(builder: (_) => OrderTrackScreen(orderNumber: widget.orderNumber)),
+                            ),
+                            icon: const Icon(Icons.local_shipping_rounded),
+                            label: Text(context.tr('track_order')),
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: () => AppActions.openInvoice(context, widget.orderNumber),
+                                icon: const Icon(Icons.receipt_long_rounded),
+                                label: Text(context.tr('download_invoice')),
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacing.md),
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: _goHome,
+                                icon: const Icon(Icons.storefront_rounded),
+                                label: Text(context.tr('continue_shopping')),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-
-              const SizedBox(height: 32),
-
-              CustomButton(
-                text: context.tr('track_order'),
-                icon: Icons.map_outlined,
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => const OrdersScreen()),
-                  );
-                },
-              ),
-
-              const SizedBox(height: 12),
-
-              OutlinedButton(
-                onPressed: () {
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
-                    (route) => false,
-                  );
-                },
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 50),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                ),
-                child: const Text('Continue Shopping', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
-              ),
-            ],
+            ),
           ),
         ),
       ),
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final VoidCallback? onCopy;
+
+  const _InfoRow({required this.icon, required this.label, required this.value, this.onCopy});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = context.colors;
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: scheme.primary),
+        const SizedBox(width: AppSpacing.md),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label, style: context.textStyles.labelMedium?.copyWith(color: scheme.onSurfaceVariant)),
+              if (value.isNotEmpty)
+                Text(value, style: context.textStyles.bodyLarge?.copyWith(fontWeight: FontWeight.w700)),
+            ],
+          ),
+        ),
+        if (onCopy != null)
+          IconButton(
+            tooltip: context.tr('copy'),
+            icon: const Icon(Icons.content_copy_rounded, size: 20),
+            onPressed: onCopy,
+          ),
+      ],
     );
   }
 }

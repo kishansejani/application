@@ -20,10 +20,17 @@ use App\Http\Controllers\Api\OfferController;
 */
 
 // Public Endpoints
-Route::post('/auth/otp/send', [AuthController::class, 'sendOtp']);
-Route::post('/auth/otp/verify', [AuthController::class, 'verifyOtp']);
-Route::post('/auth/forgot-password/send-otp', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'apiSendOtp']);
-Route::post('/auth/forgot-password/reset', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'apiResetPassword']);
+// OTP auth: login, sign-up, resend (rate limited per IP; per-phone limits live in OtpService)
+Route::middleware('throttle:20,1,api-otp-send')->group(function () {
+    Route::post('/auth/otp/send', [AuthController::class, 'sendOtp']);
+    Route::post('/auth/otp/resend', [AuthController::class, 'resendOtp']);
+    Route::post('/auth/register', [AuthController::class, 'register']);
+    Route::post('/auth/forgot-password/send-otp', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'apiSendOtp']);
+});
+Route::middleware('throttle:40,1,api-otp-verify')->group(function () {
+    Route::post('/auth/otp/verify', [AuthController::class, 'verifyOtp']);
+    Route::post('/auth/forgot-password/reset', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'apiResetPassword']);
+});
 
 Route::get('/home', [HomeController::class, 'index']);
 Route::get('/settings', function() {

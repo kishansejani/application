@@ -3,214 +3,220 @@
 @section('title', $product->localized_name . ' - ' . __('messages.store_name'))
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+@php
+    $gu = app()->getLocale() === 'gu';
+    $inWish = Auth::check() && Auth::user()->wishlists()->where('product_id', $product->id)->exists();
+    $gallery = collect([$product->thumbnail_url])->merge($product->images->map(fn($i) => $i->image_url))->unique()->values();
+@endphp
+<div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-10 sm:space-y-14">
 
     <!-- Breadcrumb -->
-    <nav class="flex items-center gap-2 text-xs font-semibold text-slate-400">
-        <a href="{{ route('home') }}" class="hover:text-slate-700">{{ __('messages.home') }}</a>
-        <span>/</span>
-        <a href="{{ route('categories.show', $product->category->slug) }}" class="hover:text-slate-700">{{ $product->category->localized_name }}</a>
-        @if($product->subCategory)
-            <span>/</span>
-            <a href="{{ route('subcategories.show', $product->subCategory->slug) }}" class="hover:text-slate-700">{{ $product->subCategory->localized_name }}</a>
+    <nav class="flex items-center gap-1.5 text-[12px] font-semibold text-slate-400 overflow-x-auto no-scrollbar whitespace-nowrap" aria-label="{{ __('messages.breadcrumb') }}">
+        <a href="{{ route('home') }}" class="hover:text-slate-700 dark:hover:text-slate-200">{{ __('messages.home') }}</a>
+        @if($product->category)
+            <i class="ph-bold ph-caret-right text-[10px]"></i>
+            <a href="{{ route('categories.show', $product->category->slug) }}" class="hover:text-slate-700 dark:hover:text-slate-200">{{ $product->category->localized_name }}</a>
         @endif
-        <span>/</span>
-        <span class="text-slate-900 font-bold truncate max-w-xs">{{ $product->localized_name }}</span>
+        @if($product->subCategory)
+            <i class="ph-bold ph-caret-right text-[10px]"></i>
+            <a href="{{ route('subcategories.show', $product->subCategory->slug) }}" class="hover:text-slate-700 dark:hover:text-slate-200">{{ $product->subCategory->localized_name }}</a>
+        @endif
+        <i class="ph-bold ph-caret-right text-[10px]"></i>
+        <span class="text-slate-700 dark:text-slate-200 truncate">{{ $product->localized_name }}</span>
     </nav>
 
-    <!-- Main Product Card -->
-    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-10">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-
-            <!-- Left: Image Gallery -->
-            <div class="space-y-4">
-                <div class="relative w-full h-80 sm:h-96 rounded-3xl overflow-hidden border border-slate-200 bg-slate-50 shadow-inner">
-                    <img id="mainProductImage" src="{{ $product->thumbnail_url }}" alt="{{ $product->localized_name }}" class="w-full h-full object-cover">
-                    @if($product->has_discount)
-                        <span class="absolute top-4 left-4 px-3 py-1 bg-emerald-600 text-white font-extrabold text-xs rounded-full shadow">
-                            {{ $product->discount_percent }}% OFF
-                        </span>
-                    @endif
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12 -mt-6 sm:-mt-8">
+        <!-- Gallery -->
+        <div class="space-y-3 lg:sticky lg:top-36 self-start">
+            <div class="relative aspect-square rounded-3xl overflow-hidden fx-card !rounded-3xl bg-slate-50 dark:bg-slate-800/60">
+                <img id="mainProductImage" src="{{ $product->thumbnail_url }}" alt="{{ $product->localized_name }}" class="w-full h-full object-cover transition-opacity duration-200">
+                @if($product->has_discount)
+                    <span class="absolute top-4 left-4 inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-600 text-white font-extrabold text-xs shadow">
+                        <i class="ph-fill ph-seal-percent"></i>{{ $product->discount_percent }}% {{ __('messages.off') }}
+                    </span>
+                @endif
+            </div>
+            @if($gallery->count() > 1)
+                <div class="flex items-center gap-2.5 overflow-x-auto no-scrollbar pb-1" role="list">
+                    @foreach($gallery as $img)
+                        <button type="button" onclick="swapMainImage(@js($img), this)" role="listitem"
+                                class="fx-thumb w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden shrink-0 border-2 {{ $loop->first ? 'border-brand-600' : 'border-transparent opacity-70 hover:opacity-100' }} bg-slate-100 dark:bg-slate-800 transition">
+                            <img src="{{ $img }}" alt="" class="w-full h-full object-cover" loading="lazy">
+                        </button>
+                    @endforeach
                 </div>
+            @endif
+        </div>
 
-                <!-- Gallery Thumbnails -->
-                @if($product->images->count() > 0)
-                    <div class="flex items-center gap-3 overflow-x-auto pb-2">
-                        <div onclick="swapMainImage('{{ $product->thumbnail_url }}')" class="w-16 h-16 rounded-xl overflow-hidden border-2 border-brand-600 cursor-pointer shrink-0">
-                            <img src="{{ $product->thumbnail_url }}" class="w-full h-full object-cover">
-                        </div>
-                        @foreach($product->images as $img)
-                            <div onclick="swapMainImage('{{ $img->image_url }}')" class="w-16 h-16 rounded-xl overflow-hidden border border-slate-200 hover:border-brand-600 cursor-pointer shrink-0 transition-colors">
-                                <img src="{{ $img->image_url }}" class="w-full h-full object-cover">
-                            </div>
-                        @endforeach
-                    </div>
+        <!-- Details -->
+        <div class="space-y-5">
+            <div class="space-y-2">
+                <div class="flex items-center justify-between gap-3">
+                    @if($product->category)
+                        <a href="{{ route('categories.show', $product->category->slug) }}" class="px-2.5 py-1 rounded-lg bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-300 font-bold text-[11px] uppercase tracking-wider">{{ $product->category->localized_name }}</a>
+                    @endif
+                    @if($product->sku)<span class="text-[11px] text-slate-400 font-mono">SKU {{ $product->sku }}</span>@endif
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">{{ $product->localized_name }}</h1>
+                <p class="text-[13px] font-semibold text-slate-500 dark:text-slate-400">{{ __('messages.unit') }}: <span class="text-slate-800 dark:text-slate-200">{{ $product->unit }}</span></p>
+            </div>
+
+            <div class="flex items-baseline flex-wrap gap-x-3 gap-y-1">
+                <span class="text-3xl font-extrabold text-slate-900 dark:text-white">₹{{ number_format($product->effective_price, 2) }}</span>
+                @if($product->has_discount)
+                    <span class="text-base text-slate-400 line-through">{{ __('messages.mrp') }} ₹{{ number_format($product->price, 2) }}</span>
+                    <span class="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 font-extrabold text-xs">
+                        {{ __('messages.save') }} ₹{{ number_format($product->price - $product->discount_price, 2) }}
+                    </span>
+                @endif
+                <span class="basis-full text-[11px] text-slate-400">{{ $gu ? 'બધા કર સહિત' : 'Inclusive of all taxes' }}</span>
+            </div>
+
+            <!-- Stock -->
+            <div class="text-[13px] font-bold">
+                @if($product->stock_quantity <= 0)
+                    <span class="inline-flex items-center gap-1.5 text-rose-600 dark:text-rose-400"><i class="ph-fill ph-x-circle"></i>{{ __('messages.out_of_stock') }}</span>
+                @elseif($product->is_low_stock)
+                    <span class="inline-flex items-center gap-1.5 text-amber-600 dark:text-amber-400"><i class="ph-fill ph-warning"></i>{{ __('messages.low_stock', ['count' => $product->stock_quantity]) }}</span>
+                @else
+                    <span class="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400"><i class="ph-fill ph-check-circle"></i>{{ __('messages.in_stock') }} <span class="font-semibold text-slate-400">· {{ $product->stock_quantity }} {{ $gu ? 'ઉપલબ્ધ' : 'available' }}</span></span>
                 @endif
             </div>
 
-            <!-- Right: Product Details & Purchase Box -->
-            <div class="space-y-6 flex flex-col justify-between">
-                <div class="space-y-3">
-                    <div class="flex items-center justify-between">
-                        <span class="px-3 py-1 bg-brand-50 text-brand-700 font-bold text-xs uppercase tracking-wider rounded-lg">
-                            {{ $product->category->localized_name }}
-                        </span>
-                        <span class="text-xs text-slate-400 font-mono">{{ $product->sku }}</span>
+            <!-- Purchase -->
+            <div id="mainPurchase" class="flex items-stretch gap-3">
+                @if($product->is_in_stock)
+                    <div class="flex items-center h-12 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+                        <button type="button" onclick="adjustQty(-1)" class="w-11 h-full text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white" aria-label="{{ $gu ? 'ઘટાડો' : 'Decrease' }}"><i class="ph-bold ph-minus"></i></button>
+                        <input type="number" id="detailQtyInput" value="1" min="1" max="{{ $product->stock_quantity }}" class="fx-noarrows w-10 h-full bg-transparent text-center font-extrabold text-slate-900 dark:text-white outline-none" aria-label="{{ $gu ? 'જથ્થો' : 'Quantity' }}">
+                        <button type="button" onclick="adjustQty(1)" class="w-11 h-full text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white" aria-label="{{ $gu ? 'વધારો' : 'Increase' }}"><i class="ph-bold ph-plus"></i></button>
                     </div>
-
-                    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
-                        {{ $product->localized_name }}
-                    </h1>
-
-                    <p class="text-xs font-semibold text-slate-500">
-                        {{ __('messages.unit') }}: <strong class="text-slate-800">{{ $product->unit }}</strong>
-                    </p>
-
-                    <!-- Pricing Display -->
-                    <div class="flex items-baseline gap-3 pt-2">
-                        <span class="text-3xl font-extrabold text-slate-900">
-                            ₹{{ number_format($product->effective_price, 2) }}
-                        </span>
-                        @if($product->has_discount)
-                            <span class="text-base text-slate-400 line-through">
-                                ₹{{ number_format($product->price, 2) }}
-                            </span>
-                            <span class="px-2.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 font-extrabold text-xs">
-                                {{ __('messages.save') }} ₹{{ number_format($product->price - $product->discount_price, 2) }} ({{ $product->discount_percent }}% {{ __('messages.off') }})
-                            </span>
-                        @endif
-                    </div>
-
-                    <!-- Short Description -->
-                    @if($product->localized_short_description)
-                        <p class="text-xs text-slate-600 leading-relaxed pt-2">
-                            {{ $product->localized_short_description }}
-                        </p>
-                    @endif
-
-                    <!-- 2-Hour Express Delivery Box -->
-                    <div class="p-4 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50/50 border border-emerald-200 text-emerald-900 text-xs space-y-1.5 my-4">
-                        <div class="flex items-center gap-2 font-extrabold text-sm text-emerald-800">
-                            <i class="fa-solid fa-bolt text-amber-500"></i>
-                            <span>{{ __('messages.delivery_promise_title') }}</span>
-                        </div>
-                        <p class="text-[11px] text-emerald-700">
-                            {{ __('messages.delivery_promise_desc') }}
-                        </p>
-                        <div class="text-xs font-bold pt-1 text-slate-900">
-                            {{ __('messages.est_delivery') }}: <span class="text-brand-700 underline">{{ app()->getLocale() === 'gu' ? $deliverySlotInfo['slot_gu'] : $deliverySlotInfo['slot_en'] }}</span>
-                        </div>
-                    </div>
-
-                    <!-- Stock indicator -->
-                    <div class="text-xs font-bold">
-                        @if($product->stock_quantity <= 0)
-                            <span class="text-rose-600 flex items-center gap-1.5">
-                                <i class="fa-solid fa-circle-xmark"></i> {{ __('messages.out_of_stock') }}
-                            </span>
-                        @elseif($product->is_low_stock)
-                            <span class="text-amber-600 flex items-center gap-1.5">
-                                <i class="fa-solid fa-triangle-exclamation"></i> {{ __('messages.low_stock', ['count' => $product->stock_quantity]) }}
-                            </span>
-                        @else
-                            <span class="text-emerald-600 flex items-center gap-1.5">
-                                <i class="fa-solid fa-circle-check"></i> {{ __('messages.in_stock') }} ({{ $product->stock_quantity }} available)
-                            </span>
-                        @endif
-                    </div>
-                </div>
-
-                <!-- Purchase Controls -->
-                <div class="pt-6 border-t border-slate-100 flex items-center gap-4">
-                    @if($product->is_in_stock)
-                        <div class="flex items-center border border-slate-200 rounded-2xl p-1 bg-slate-50">
-                            <button type="button" onclick="adjustQty(-1)" class="w-9 h-9 rounded-xl bg-white text-slate-700 font-bold hover:bg-slate-200 transition-colors flex items-center justify-center">-</button>
-                            <input type="number" id="detailQtyInput" value="1" min="1" max="{{ $product->stock_quantity }}" class="w-12 bg-transparent text-center font-bold text-sm focus:outline-none">
-                            <button type="button" onclick="adjustQty(1)" class="w-9 h-9 rounded-xl bg-white text-slate-700 font-bold hover:bg-slate-200 transition-colors flex items-center justify-center">+</button>
-                        </div>
-
-                        <button onclick="addToCart({{ $product->id }}, parseInt(document.getElementById('detailQtyInput').value))" class="flex-1 py-3.5 bg-brand-600 hover:bg-brand-700 text-white rounded-2xl text-xs font-extrabold shadow-lg shadow-brand-500/25 transition-all flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-cart-plus"></i>
-                            <span>{{ __('messages.add_to_cart') }}</span>
-                        </button>
-                    @else
-                        <button disabled class="flex-1 py-3.5 bg-slate-200 text-slate-400 rounded-2xl text-xs font-bold cursor-not-allowed">
-                            {{ __('messages.out_of_stock') }}
-                        </button>
-                    @endif
-
-                    <button onclick="toggleWishlist({{ $product->id }}, this)" class="p-3.5 rounded-2xl border border-slate-200 hover:bg-rose-50 text-slate-400 hover:text-rose-500 transition-colors" title="{{ __('messages.wishlist') }}">
-                        <i class="fa-solid fa-heart text-base {{ Auth::check() && Auth::user()->wishlists()->where('product_id', $product->id)->exists() ? 'heart-active text-rose-600' : '' }}"></i>
+                    <button type="button" id="detailAddBtn" onclick="addToCart({{ $product->id }}, parseInt(document.getElementById('detailQtyInput').value), { button: this })" class="fx-btn fx-btn-primary fx-btn-lg flex-1 !h-12">
+                        <i class="ph-bold ph-shopping-cart-simple text-lg"></i><span>{{ __('messages.add_to_cart') }}</span>
                     </button>
+                @else
+                    <button type="button" disabled class="fx-btn flex-1 !h-12 bg-slate-100 dark:bg-slate-800 text-slate-400">{{ __('messages.out_of_stock') }}</button>
+                @endif
+                <button type="button" onclick="toggleWishlist({{ $product->id }}, this)" data-wishlist-btn="{{ $product->id }}" aria-pressed="{{ $inWish ? 'true' : 'false' }}"
+                        class="w-12 h-12 shrink-0 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-500 hover:text-rose-500 hover:border-rose-200 flex items-center justify-center transition-colors relative" title="{{ __('messages.wishlist') }}" aria-label="{{ __('messages.wishlist') }}">
+                    <i class="fx-heart {{ $inWish ? 'ph-fill heart-active text-rose-600' : 'ph' }} ph-heart text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Delivery -->
+            <div class="rounded-2xl border border-emerald-200 dark:border-emerald-500/25 bg-gradient-to-br from-emerald-50 to-teal-50/50 dark:from-emerald-500/10 dark:to-teal-500/5 p-4 flex gap-3">
+                <span class="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 text-amber-500 flex items-center justify-center text-xl shrink-0 shadow-sm"><i class="ph-fill ph-lightning"></i></span>
+                <div class="text-[13px]">
+                    <p class="font-extrabold text-emerald-900 dark:text-emerald-200">{{ trim(str_replace('⚡', '', __('messages.delivery_promise_title'))) }}</p>
+                    <p class="text-emerald-800/80 dark:text-emerald-200/70 text-[12px]">{{ __('messages.delivery_promise_desc') }}</p>
+                    <p class="mt-1.5 font-bold text-slate-900 dark:text-white">{{ __('messages.est_delivery') }}: <span class="text-brand-700 dark:text-brand-400">{{ $gu ? $deliverySlotInfo['slot_gu'] : $deliverySlotInfo['slot_en'] }}</span></p>
                 </div>
             </div>
 
-        </div>
-
-        <!-- Full Detailed Description & Nutritional/Usage notes -->
-        @if($product->localized_description)
-            <div class="mt-12 pt-8 border-t border-slate-100">
-                <h3 class="text-lg font-extrabold text-slate-900 mb-4">{{ __('messages.view_details') }}</h3>
-                <div class="text-xs sm:text-sm text-slate-600 leading-relaxed space-y-3 prose prose-sm max-w-none">
-                    {!! nl2br(e($product->localized_description)) !!}
-                </div>
-            </div>
-        @endif
-    </div>
-
-    <!-- Related Products -->
-    @if($relatedProducts->count() > 0)
-        <div class="space-y-6">
-            <h3 class="text-xl font-extrabold text-slate-900 tracking-tight">{{ __('messages.related_products') }}</h3>
-
-            <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-                @foreach($relatedProducts as $rel)
-                    <div class="group bg-white rounded-3xl border border-slate-200 hover:border-brand-400 p-4 shadow-sm hover:shadow-xl transition-all flex flex-col justify-between relative">
-                        @if($rel->has_discount)
-                            <span class="absolute top-3 left-3 px-2 py-0.5 rounded-full bg-emerald-600 text-white font-extrabold text-[10px] shadow z-10">
-                                {{ $rel->discount_percent }}% OFF
-                            </span>
-                        @endif
-
-                        <div class="relative w-full h-36 rounded-2xl overflow-hidden bg-slate-50 mb-3">
-                            <a href="{{ route('products.show', $rel->slug) }}" class="block w-full h-full">
-                                <img src="{{ $rel->thumbnail_url }}" alt="{{ $rel->localized_name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                            </a>
-                        </div>
-
-                        <div class="space-y-1 mb-2">
-                            <a href="{{ route('products.show', $rel->slug) }}" class="block font-bold text-slate-900 text-xs hover:text-brand-600 line-clamp-1">
-                                {{ $rel->localized_name }}
-                            </a>
-                            <span class="text-[10px] text-slate-500 font-semibold">{{ $rel->unit }}</span>
-                        </div>
-
-                        <div class="flex items-center justify-between pt-2 border-t border-slate-100">
-                            <span class="font-extrabold text-slate-900 text-sm">₹{{ number_format($rel->effective_price, 2) }}</span>
-                            <button onclick="addToCart({{ $rel->id }})" class="p-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold transition-all">
-                                <i class="fa-solid fa-plus"></i>
-                            </button>
-                        </div>
+            <div class="grid grid-cols-3 gap-2 text-center">
+                @foreach([['ph-plant', $gu ? 'તાજું' : 'Farm fresh'], ['ph-arrow-counter-clockwise', $gu ? 'સરળ રિટર્ન' : 'Easy returns'], ['ph-money', $gu ? 'COD ઉપલબ્ધ' : 'COD available']] as [$ic, $lbl])
+                    <div class="fx-card !rounded-2xl py-3 px-2">
+                        <i class="ph-duotone {{ $ic }} text-xl text-brand-600 dark:text-brand-400"></i>
+                        <p class="text-[11px] font-bold text-slate-700 dark:text-slate-300 mt-1">{{ $lbl }}</p>
                     </div>
                 @endforeach
             </div>
+
+            @if($product->localized_short_description)
+                <p class="text-[14px] text-slate-600 dark:text-slate-300 leading-relaxed">{{ $product->localized_short_description }}</p>
+            @endif
+
+            @if($product->localized_description)
+                <details class="fx-card group" open>
+                    <summary class="flex items-center justify-between cursor-pointer list-none p-4 font-extrabold text-slate-900 dark:text-white">
+                        {{ __('messages.view_details') }}
+                        <i class="ph-bold ph-caret-down text-slate-400 group-open:rotate-180 transition-transform"></i>
+                    </summary>
+                    <div class="px-4 pb-4 text-[14px] text-slate-600 dark:text-slate-300 leading-relaxed">
+                        {!! nl2br(e($product->localized_description)) !!}
+                    </div>
+                </details>
+            @endif
         </div>
+    </div>
+
+    <!-- Related -->
+    @if($relatedProducts->count() > 0)
+        <section aria-labelledby="relatedTitle">
+            <h2 id="relatedTitle" class="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-4">{{ __('messages.related_products') }}</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
+                @foreach($relatedProducts as $rel)
+                    @include('frontend.partials.product-card', ['product' => $rel, 'showCategory' => false])
+                @endforeach
+            </div>
+        </section>
     @endif
 
+    <!-- Recently viewed -->
+    <section class="hidden" data-recently-viewed data-exclude="{{ $product->id }}" aria-labelledby="rvTitle">
+        <div class="flex items-end justify-between gap-4 mb-4">
+            <h2 id="rvTitle" class="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">{{ $gu ? 'તાજેતરમાં જોયેલા' : 'Recently viewed' }}</h2>
+            <button type="button" data-rv-clear class="text-[12px] font-bold text-slate-500 hover:text-rose-600">{{ $gu ? 'સાફ કરો' : 'Clear' }}</button>
+        </div>
+        <div class="fx-rail" data-rv-rail></div>
+    </section>
 </div>
+
+<!-- Sticky add-to-cart (mobile/tablet) -->
+@if($product->is_in_stock)
+    <div id="stickyBuy" class="lg:hidden fixed inset-x-0 z-40 fx-above-tabbar translate-y-[140%] transition-transform duration-300" aria-hidden="true">
+        <div class="mx-3 mb-2 p-2.5 pl-3 rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur border border-slate-200 dark:border-slate-700 shadow-2xl flex items-center gap-3">
+            <img src="{{ $product->thumbnail_url }}" alt="" class="w-11 h-11 rounded-xl object-cover bg-slate-100 dark:bg-slate-800">
+            <div class="min-w-0 flex-1">
+                <p class="text-[12px] font-bold text-slate-900 dark:text-white truncate">{{ $product->localized_name }}</p>
+                <p class="text-sm font-extrabold text-slate-900 dark:text-white">₹{{ number_format($product->effective_price, 2) }} <span class="text-[11px] font-semibold text-slate-400">/ {{ $product->unit }}</span></p>
+            </div>
+            <button type="button" onclick="addToCart({{ $product->id }}, parseInt(document.getElementById('detailQtyInput').value), { button: this })" class="fx-btn fx-btn-primary !h-11 shrink-0">
+                <i class="ph-bold ph-shopping-cart-simple"></i><span>{{ $gu ? 'ઉમેરો' : 'Add' }}</span>
+            </button>
+        </div>
+    </div>
+@endif
 @endsection
 
 @push('scripts')
 <script>
-    function swapMainImage(url) {
-        $('#mainProductImage').attr('src', url);
+    function swapMainImage(url, btn) {
+        const img = document.getElementById('mainProductImage');
+        img.style.opacity = .3;
+        setTimeout(() => { img.src = url; img.style.opacity = 1; }, 120);
+        if (btn) {
+            document.querySelectorAll('.fx-thumb').forEach(t => { t.classList.remove('border-brand-600'); t.classList.add('border-transparent', 'opacity-70'); });
+            btn.classList.add('border-brand-600'); btn.classList.remove('border-transparent', 'opacity-70');
+        }
     }
 
     function adjustQty(delta) {
         const input = document.getElementById('detailQtyInput');
         let val = parseInt(input.value) || 1;
-        val = Math.max(1, Math.min({{ $product->stock_quantity }}, val + delta));
+        val = Math.max(1, Math.min({{ (int) $product->stock_quantity }}, val + delta));
         input.value = val;
     }
+
+    // Remember this product in "recently viewed" (this browser only)
+    FX.recent.push({
+        id: {{ $product->id }},
+        url: @js(route('products.show', $product->slug)),
+        name: @js($product->localized_name),
+        img: @js($product->thumbnail_url),
+        unit: @js($product->unit),
+        price: @js('₹' . number_format($product->effective_price, 2))
+    });
+
+    // Sticky mobile buy bar appears once the main purchase row scrolls away
+    (function () {
+        const bar = document.getElementById('stickyBuy'), target = document.getElementById('mainPurchase');
+        if (!bar || !target || !('IntersectionObserver' in window)) return;
+        new IntersectionObserver(([e]) => {
+            const show = !e.isIntersecting && e.boundingClientRect.top < 0;
+            bar.classList.toggle('translate-y-[140%]', !show);
+            bar.setAttribute('aria-hidden', show ? 'false' : 'true');
+        }).observe(target);
+    })();
 </script>
 @endpush

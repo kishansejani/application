@@ -3,103 +3,58 @@
 @section('title', 'Track Order Delivery - ' . __('messages.store_name'))
 
 @section('content')
-<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+@php $gu = app()->getLocale() === 'gu'; @endphp
+<div class="max-w-3xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-12 space-y-5">
 
-    <div class="text-center space-y-2">
-        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Live Order Delivery Tracking</h1>
-        <p class="text-xs text-slate-500">Enter your order reference number to view real-time fulfillment updates</p>
+    <div class="text-center">
+        <span class="w-14 h-14 rounded-2xl bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-brand-400 flex items-center justify-center text-3xl mx-auto mb-3"><i class="ph-duotone ph-truck"></i></span>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">{{ $gu ? 'ઓર્ડર ડિલિવરી ટ્રેક કરો' : 'Track your order' }}</h1>
+        <p class="text-[13px] text-slate-500 dark:text-slate-400 mt-1">{{ $gu ? 'લાઇવ અપડેટ જોવા માટે ઓર્ડર નંબર દાખલ કરો' : 'Enter your order number to see live fulfilment updates' }}</p>
     </div>
 
-    <!-- Search Box -->
-    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8">
-        <form action="{{ route('order.track') }}" method="GET" class="flex flex-col sm:flex-row items-center gap-3">
-            <input type="text" name="order_number" value="{{ request('order_number') }}" required placeholder="Enter Order Number (e.g. ORD-68DF09A)" class="w-full sm:flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs sm:text-sm font-mono uppercase font-bold focus:outline-none focus:ring-2 focus:ring-brand-500">
-            <button type="submit" class="w-full sm:w-auto px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-2xl text-xs font-extrabold shadow-md shadow-brand-500/20 transition-all flex items-center justify-center gap-2">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <span>Track Status</span>
-            </button>
-        </form>
-    </div>
+    <form action="{{ route('order.track') }}" method="GET" class="fx-card p-3 sm:p-4 flex flex-col sm:flex-row gap-2.5" data-loading>
+        <label class="relative flex-1">
+            <span class="sr-only">{{ __('messages.order_number') }}</span>
+            <i class="ph ph-hash absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></i>
+            <input type="text" name="order_number" value="{{ request('order_number') }}" required placeholder="ORD-68DF09A…" autocomplete="off" class="fx-input !pl-10 !h-12 font-mono font-bold uppercase">
+        </label>
+        <button type="submit" class="fx-btn fx-btn-primary !h-12 sm:!px-6"><i class="ph-bold ph-magnifying-glass"></i><span>{{ $gu ? 'સ્થિતિ જુઓ' : 'Track status' }}</span></button>
+    </form>
 
     @if($order)
-        <!-- Live Status Timeline Result -->
-        <div class="bg-white rounded-3xl border border-slate-200 shadow-xl p-6 sm:p-8 space-y-6 animate-fade-in">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 text-xs">
-                <div>
-                    <span class="font-extrabold text-brand-700 text-sm">#{{ $order->order_number }}</span>
-                    <span class="text-slate-400 block text-[11px] mt-0.5">{{ $order->created_at->format('d M Y, h:i A') }}</span>
+        <div class="fx-card p-4 sm:p-6 space-y-6">
+            <div class="flex flex-wrap items-start justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
+                <div class="min-w-0">
+                    <p class="font-extrabold text-[15px] text-slate-900 dark:text-white break-all">#{{ $order->order_number }}</p>
+                    <p class="text-[12px] text-slate-500 dark:text-slate-400">{{ $order->created_at->format('d M Y, h:i A') }}</p>
                 </div>
-
-                <div class="flex items-center gap-2">
-                    @if($order->delivery_type === 'two_hours')
-                        <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-amber-100 text-amber-900 border border-amber-300">
-                            ⚡ 2-Hour Express
-                        </span>
-                    @else
-                        <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-blue-100 text-blue-900 border border-blue-300">
-                            📅 Next Day
-                        </span>
-                    @endif
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold {{ $order->delivery_type === 'two_hours' ? 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300' : 'bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-300' }}">
+                        <i class="ph-fill {{ $order->delivery_type === 'two_hours' ? 'ph-lightning' : 'ph-calendar-check' }}"></i>{{ $order->delivery_type === 'two_hours' ? ($gu ? '૨ કલાક' : '2-hour express') : ($gu ? 'આગલા દિવસે' : 'Next day') }}
+                    </span>
+                    @include('frontend.partials.status-pill', ['order' => $order])
                 </div>
             </div>
 
-            <!-- Visual Stepper -->
-            @php
-                $statuses = ['pending', 'confirmed', 'processing', 'out_for_delivery', 'delivered'];
-                $currentIndex = array_search($order->order_status, $statuses);
-                if ($order->order_status === 'cancelled') $currentIndex = -1;
-            @endphp
+            @include('frontend.partials.order-timeline', ['order' => $order])
 
-            @if($order->order_status === 'cancelled')
-                <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-3">
-                    <i class="fa-solid fa-ban text-2xl text-rose-500"></i>
-                    <div>
-                        <h5 class="font-bold text-sm">Order Cancelled</h5>
-                        <p class="text-xs text-rose-600 mt-0.5">{{ $order->cancellation_reason ?: 'Cancelled' }}</p>
-                    </div>
-                </div>
-            @else
-                <div class="grid grid-cols-5 gap-2 text-center py-4">
-                    @foreach($statuses as $idx => $st)
-                        @php $isPassed = $currentIndex !== false && $idx <= $currentIndex; @endphp
-                        <div class="flex flex-col items-center">
-                            <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs mb-2 transition-all {{ $isPassed ? 'bg-brand-600 text-white ring-4 ring-brand-100 shadow-md' : 'bg-slate-100 text-slate-400' }}">
-                                @if($idx < $currentIndex)
-                                    <i class="fa-solid fa-check"></i>
-                                @else
-                                    {{ $idx + 1 }}
-                                @endif
-                            </div>
-                            <span class="text-[11px] font-bold {{ $isPassed ? 'text-slate-900' : 'text-slate-400' }}">
-                                {{ ucfirst(str_replace('_', ' ', $st)) }}
-                            </span>
-                        </div>
-                    @endforeach
-                </div>
-            @endif
+            <dl class="rounded-2xl bg-slate-50 dark:bg-slate-800/50 p-4 text-[13px] space-y-2.5">
+                <div class="flex flex-col sm:flex-row sm:justify-between gap-0.5 sm:gap-4"><dt class="text-slate-500 dark:text-slate-400 shrink-0">{{ $gu ? 'ડિલિવરી સ્લોટ' : 'Delivery slot' }}</dt><dd class="font-bold text-slate-900 dark:text-white sm:text-right">@include('frontend.partials.slot-text', ['order' => $order])</dd></div>
+                <div class="flex flex-col sm:flex-row sm:justify-between gap-0.5 sm:gap-4"><dt class="text-slate-500 dark:text-slate-400 shrink-0">{{ $gu ? 'પ્રાપ્તકર્તા' : 'Recipient' }}</dt><dd class="font-bold text-slate-900 dark:text-white sm:text-right">{{ $order->customer_name }}</dd></div>
+                <div class="flex flex-col sm:flex-row sm:justify-between gap-0.5 sm:gap-4"><dt class="text-slate-500 dark:text-slate-400 shrink-0">{{ $gu ? 'સરનામું' : 'Address' }}</dt><dd class="font-medium text-slate-700 dark:text-slate-200 sm:text-right">{{ $order->delivery_address }}</dd></div>
+            </dl>
 
-            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-xs space-y-2">
-                <div class="flex justify-between">
-                    <span class="text-slate-400">Target Delivery Slot:</span>
-                    <span class="font-bold text-slate-900">{{ $order->delivery_slot }}</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-slate-400">Recipient Name:</span>
-                    <span class="font-bold text-slate-900">{{ $order->customer_name }}</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-slate-400">Delivery Address:</span>
-                    <span class="font-medium text-slate-700 truncate max-w-xs">{{ $order->delivery_address }}</span>
-                </div>
-            </div>
-
-            <div class="pt-2 flex justify-end">
-                <a href="{{ route('order.show', $order->order_number) }}" class="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold text-xs shadow transition-all">
-                    View Full Order Details &rarr;
-                </a>
+            <div class="flex flex-col sm:flex-row sm:justify-end gap-2">
+                <a href="{{ route('order.invoice', $order->order_number) }}" target="_blank" class="fx-btn fx-btn-outline"><i class="ph ph-receipt text-lg"></i>{{ $gu ? 'ઇન્વૉઇસ' : 'Invoice' }}</a>
+                <a href="{{ route('order.show', $order->order_number) }}" class="fx-btn fx-btn-primary">{{ $gu ? 'સંપૂર્ણ વિગતો જુઓ' : 'View full order details' }}<i class="ph-bold ph-arrow-right"></i></a>
             </div>
         </div>
+    @elseif(request('order_number'))
+        <div class="fx-card p-6 text-center">
+            <span class="w-14 h-14 rounded-full bg-rose-50 dark:bg-rose-500/10 text-rose-500 flex items-center justify-center text-2xl mx-auto mb-3"><i class="ph-duotone ph-magnifying-glass"></i></span>
+            <p class="font-extrabold text-slate-900 dark:text-white">{{ $gu ? 'ઓર્ડર મળ્યો નથી' : 'No order found' }}</p>
+            <p class="text-[13px] text-slate-500 dark:text-slate-400 mt-1">{{ $gu ? 'કૃપા કરીને ઓર્ડર નંબર તપાસો.' : 'Please double-check the order number and try again.' }}</p>
+        </div>
     @endif
-
 </div>
 @endsection

@@ -3,143 +3,91 @@
 @section('title', 'Order #' . $order->order_number . ' - ' . __('messages.store_name'))
 
 @section('content')
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+@php $gu = app()->getLocale() === 'gu'; @endphp
+<div class="max-w-4xl mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8 space-y-4 sm:space-y-5">
 
-    <div class="flex items-center justify-between pb-4 border-b border-slate-200">
-        <div>
-            <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Order #{{ $order->order_number }}</h1>
-            <p class="text-xs text-slate-500 mt-0.5">Placed on {{ $order->created_at->format('d M Y, h:i A') }}</p>
+    <div>
+        <a href="{{ route('orders.index') }}" class="inline-flex items-center gap-1 text-[12px] font-bold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 mb-2"><i class="ph-bold ph-arrow-left"></i>{{ __('messages.order_history') }}</a>
+        <div class="flex flex-wrap items-end justify-between gap-3">
+            <div class="min-w-0">
+                <div class="flex flex-wrap items-center gap-2">
+                    <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight break-all">#{{ $order->order_number }}</h1>
+                    @include('frontend.partials.status-pill', ['order' => $order])
+                </div>
+                <p class="text-[13px] text-slate-500 dark:text-slate-400 mt-1">{{ $gu ? 'ઓર્ડર તારીખ' : 'Placed on' }} {{ $order->created_at->format('d M Y, h:i A') }}</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="{{ route('order.track', ['order_number' => $order->order_number]) }}" class="fx-btn fx-btn-outline fx-btn-sm"><i class="ph ph-crosshair text-base"></i>{{ $gu ? 'ટ્રેક' : 'Track' }}</a>
+                <a href="{{ route('order.invoice', $order->order_number) }}" target="_blank" class="fx-btn fx-btn-primary fx-btn-sm"><i class="ph ph-receipt text-base"></i>{{ __('messages.download_invoice') }}</a>
+            </div>
         </div>
-        <a href="{{ route('order.invoice', $order->order_number) }}" target="_blank" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-1.5">
-            <i class="fa-solid fa-receipt"></i>
-            <span>{{ __('messages.download_invoice') }}</span>
-        </a>
     </div>
 
-    <!-- Live Status Tracker Card -->
-    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
-        <h3 class="font-extrabold text-slate-900 text-sm">Delivery Status Timeline</h3>
-
-        @php
-            $statuses = ['pending', 'confirmed', 'processing', 'out_for_delivery', 'delivered'];
-            $currentIndex = array_search($order->order_status, $statuses);
-            if ($order->order_status === 'cancelled') $currentIndex = -1;
-        @endphp
-
-        @if($order->order_status === 'cancelled')
-            <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-3">
-                <i class="fa-solid fa-ban text-2xl text-rose-500"></i>
-                <div>
-                    <h5 class="font-bold text-sm">This order has been cancelled</h5>
-                    <p class="text-slate-600 mt-0.5">Reason: {{ $order->cancellation_reason ?: 'Order cancelled upon request' }}</p>
-                </div>
-            </div>
-        @else
-            <div class="grid grid-cols-5 gap-2 text-center">
-                @foreach($statuses as $idx => $st)
-                    @php $isPassed = $currentIndex !== false && $idx <= $currentIndex; @endphp
-                    <div class="flex flex-col items-center">
-                        <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs mb-2 transition-all {{ $isPassed ? 'bg-brand-600 text-white ring-4 ring-brand-100 shadow-md' : 'bg-slate-100 text-slate-400' }}">
-                            @if($idx < $currentIndex)
-                                <i class="fa-solid fa-check"></i>
-                            @else
-                                {{ $idx + 1 }}
-                            @endif
-                        </div>
-                        <span class="text-[11px] font-bold {{ $isPassed ? 'text-slate-900' : 'text-slate-400' }}">
-                            {{ ucfirst(str_replace('_', ' ', $st)) }}
-                        </span>
-                    </div>
-                @endforeach
-            </div>
-        @endif
-
-        <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center gap-3">
-            <i class="fa-solid fa-bolt text-amber-500 text-lg"></i>
+    <section class="fx-card p-4 sm:p-6 space-y-5">
+        <h3 class="font-extrabold text-slate-900 dark:text-white text-[15px]">{{ $gu ? 'ડિલિવરી સ્થિતિ' : 'Delivery status' }}</h3>
+        @include('frontend.partials.order-timeline', ['order' => $order])
+        <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 text-[13px]">
+            <i class="ph-fill ph-lightning text-amber-500 text-lg shrink-0"></i>
             <div>
-                <span class="font-bold block">Delivery Window: {{ $order->delivery_slot }}</span>
-                <span class="text-amber-700 text-[11px]">Estimated By: {{ $order->estimated_delivery_at ? $order->estimated_delivery_at->format('d M Y, h:i A') : 'N/A' }}</span>
+                <p class="font-bold text-amber-900 dark:text-amber-200">{{ $gu ? 'ડિલિવરી સમય' : 'Delivery window' }}: @include('frontend.partials.slot-text', ['order' => $order])</p>
+                <p class="text-[12px] text-amber-800/80 dark:text-amber-200/70">{{ $gu ? 'અંદાજિત' : 'Estimated by' }}: {{ $order->estimated_delivery_at ? $order->estimated_delivery_at->format('d M Y, h:i A') : 'N/A' }}</p>
             </div>
         </div>
+    </section>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+        <section class="fx-card p-4 sm:p-6 text-[13px] space-y-2">
+            <h4 class="font-extrabold text-slate-900 dark:text-white text-[14px] flex items-center gap-2 mb-1"><i class="ph-fill ph-map-pin text-rose-500"></i>{{ $gu ? 'ડિલિવરી સરનામું' : 'Delivery address' }}</h4>
+            <p class="font-bold text-slate-900 dark:text-white">{{ $order->customer_name }}</p>
+            <p class="text-slate-600 dark:text-slate-300 leading-relaxed">{{ $order->delivery_address }}</p>
+            <p class="text-slate-700 dark:text-slate-200 font-semibold font-mono">+91 {{ $order->customer_phone }}</p>
+        </section>
+        <section class="fx-card p-4 sm:p-6 text-[13px]">
+            <h4 class="font-extrabold text-slate-900 dark:text-white text-[14px] flex items-center gap-2 mb-3"><i class="ph-fill ph-credit-card text-emerald-600"></i>{{ $gu ? 'ચુકવણી માહિતી' : 'Payment information' }}</h4>
+            <dl class="space-y-2">
+                <div class="flex justify-between"><dt class="text-slate-500 dark:text-slate-400">{{ $gu ? 'પદ્ધતિ' : 'Method' }}</dt><dd class="font-bold text-slate-900 dark:text-white">{{ \Lang::has('messages.payment_methods.' . $order->payment_method) ? __('messages.payment_methods.' . $order->payment_method) : strtoupper($order->payment_method) }}</dd></div>
+                <div class="flex justify-between"><dt class="text-slate-500 dark:text-slate-400">{{ $gu ? 'સ્થિતિ' : 'Status' }}</dt><dd class="font-bold {{ $order->payment_status === 'paid' ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400' }}">{{ \Lang::has('messages.payment_statuses.' . $order->payment_status) ? __('messages.payment_statuses.' . $order->payment_status) : ucfirst($order->payment_status) }}</dd></div>
+                @if($order->transaction_id)
+                    <div class="flex justify-between gap-3"><dt class="text-slate-500 dark:text-slate-400">Txn ref</dt><dd class="font-mono font-bold text-slate-700 dark:text-slate-200 break-all text-right">{{ $order->transaction_id }}</dd></div>
+                @endif
+                @if($order->coupon_code)
+                    <div class="flex justify-between"><dt class="text-slate-500 dark:text-slate-400">{{ $gu ? 'કૂપન' : 'Coupon' }}</dt><dd class="font-mono font-bold text-emerald-700 dark:text-emerald-400">{{ $order->coupon_code }}</dd></div>
+                @endif
+            </dl>
+        </section>
     </div>
 
-    <!-- Items & Address Details -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Delivery Address -->
-        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 text-xs space-y-3">
-            <h4 class="font-extrabold text-slate-900 text-sm flex items-center gap-2">
-                <i class="fa-solid fa-location-dot text-rose-500"></i>
-                <span>Delivery Address</span>
-            </h4>
-            <p class="font-bold text-slate-900 text-sm">{{ $order->customer_name }}</p>
-            <p class="text-slate-600 leading-relaxed">{{ $order->delivery_address }}</p>
-            <p class="text-slate-800 font-semibold">Phone: +91 {{ $order->customer_phone }}</p>
-        </div>
-
-        <!-- Payment Info -->
-        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 text-xs space-y-3">
-            <h4 class="font-extrabold text-slate-900 text-sm flex items-center gap-2">
-                <i class="fa-solid fa-credit-card text-emerald-600"></i>
-                <span>Payment Information</span>
-            </h4>
-            <div class="flex justify-between">
-                <span class="text-slate-500">Method:</span>
-                <span class="font-bold uppercase text-slate-800">{{ $order->payment_method }}</span>
-            </div>
-            <div class="flex justify-between">
-                <span class="text-slate-500">Status:</span>
-                <span class="font-bold uppercase text-emerald-700">{{ $order->payment_status }}</span>
-            </div>
-            @if($order->transaction_id)
-                <div class="flex justify-between font-mono">
-                    <span class="text-slate-500">Txn Ref:</span>
-                    <span class="font-bold text-slate-700">{{ $order->transaction_id }}</span>
-                </div>
-            @endif
-        </div>
-    </div>
-
-    <!-- Ordered Items -->
-    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-4">
-        <h4 class="font-extrabold text-slate-900 text-sm">Ordered Items</h4>
-
-        <div class="divide-y divide-slate-100">
+    <section class="fx-card p-4 sm:p-6">
+        <h4 class="font-extrabold text-slate-900 dark:text-white text-[14px] mb-2">{{ $gu ? 'ઓર્ડર કરેલી વસ્તુઓ' : 'Ordered items' }} ({{ $order->items->sum('quantity') }})</h4>
+        <ul class="divide-y divide-slate-100 dark:divide-slate-800">
             @foreach($order->items as $item)
-                <div class="py-3 flex items-center justify-between text-xs">
-                    <div class="flex items-center gap-3">
-                        <img src="{{ $item->product ? $item->product->thumbnail_url : ($item->product_image ?: asset('images/default-product.png')) }}" class="w-12 h-12 rounded-xl object-cover border border-slate-200">
-                        <div>
-                            <span class="font-bold text-slate-900 text-sm block">{{ $item->product_name_en }}</span>
-                            <span class="text-brand-700 font-semibold">{{ $item->product_name_gu }}</span>
-                            <span class="text-slate-400 block text-[11px]">{{ $item->product_unit }} &times; {{ $item->quantity }}</span>
-                        </div>
+                <li class="py-3 flex items-center gap-3">
+                    <img src="{{ $item->product ? $item->product->thumbnail_url : ($item->product_image ?: asset('images/default-product.png')) }}" alt="" class="w-14 h-14 rounded-xl object-cover bg-slate-100 dark:bg-slate-800 shrink-0" loading="lazy">
+                    <div class="flex-1 min-w-0 text-[13px]">
+                        @php
+                            $itPrimary = $gu && $item->product_name_gu ? $item->product_name_gu : $item->product_name_en;
+                            $itSecondary = $gu ? $item->product_name_en : $item->product_name_gu;
+                        @endphp
+                        @if($item->product)
+                            <a href="{{ route('products.show', $item->product->slug) }}" class="font-bold text-slate-900 dark:text-white hover:text-brand-700 dark:hover:text-brand-400 line-clamp-1">{{ $itPrimary }}</a>
+                        @else
+                            <span class="font-bold text-slate-900 dark:text-white line-clamp-1">{{ $itPrimary }}</span>
+                        @endif
+                        <p class="text-brand-700 dark:text-brand-400 font-semibold text-[12px] line-clamp-1">{{ $itSecondary }}</p>
+                        <p class="text-[12px] text-slate-400">{{ $item->product_unit }} × {{ $item->quantity }} · ₹{{ number_format($item->unit_price, 2) }}</p>
                     </div>
-                    <span class="font-extrabold text-slate-900 text-sm">₹{{ number_format($item->total_price, 2) }}</span>
-                </div>
+                    <span class="font-extrabold text-[14px] text-slate-900 dark:text-white shrink-0">₹{{ number_format($item->total_price, 2) }}</span>
+                </li>
             @endforeach
-        </div>
-
-        <div class="pt-4 border-t border-slate-100 space-y-2 text-xs">
-            <div class="flex justify-between text-slate-600">
-                <span>Subtotal</span>
-                <span class="font-bold">₹{{ number_format($order->subtotal, 2) }}</span>
-            </div>
+        </ul>
+        <dl class="mt-2 pt-4 border-t border-slate-100 dark:border-slate-800 space-y-2 text-[13px] sm:max-w-xs sm:ml-auto">
+            <div class="flex justify-between text-slate-600 dark:text-slate-300"><dt>{{ $gu ? 'પેટા સરવાળો' : 'Subtotal' }}</dt><dd class="font-bold text-slate-900 dark:text-white">₹{{ number_format($order->subtotal, 2) }}</dd></div>
             @if($order->discount_amount > 0)
-                <div class="flex justify-between text-emerald-600 font-bold">
-                    <span>Discount</span>
-                    <span>-₹{{ number_format($order->discount_amount, 2) }}</span>
-                </div>
+                <div class="flex justify-between text-emerald-700 dark:text-emerald-400 font-semibold"><dt>{{ __('messages.discount') }}</dt><dd class="font-bold">-₹{{ number_format($order->discount_amount, 2) }}</dd></div>
             @endif
-            <div class="flex justify-between text-slate-600">
-                <span>Delivery Fee</span>
-                <span class="font-bold">{{ $order->delivery_charge == 0 ? 'FREE' : '₹' . number_format($order->delivery_charge, 2) }}</span>
-            </div>
-            <div class="flex justify-between text-slate-900 font-extrabold text-base pt-2 border-t border-slate-200">
-                <span>Total Amount</span>
-                <span class="text-brand-700">₹{{ number_format($order->total_amount, 2) }}</span>
-            </div>
-        </div>
-    </div>
-
+            <div class="flex justify-between text-slate-600 dark:text-slate-300"><dt>{{ __('messages.delivery_fee') }}</dt><dd class="font-bold text-slate-900 dark:text-white">{{ $order->delivery_charge == 0 ? __('messages.free') : '₹' . number_format($order->delivery_charge, 2) }}</dd></div>
+            <div class="flex justify-between items-baseline pt-2 border-t border-dashed border-slate-200 dark:border-slate-700"><dt class="font-extrabold text-slate-900 dark:text-white">{{ __('messages.grand_total') }}</dt><dd class="text-lg font-extrabold text-slate-900 dark:text-white">₹{{ number_format($order->total_amount, 2) }}</dd></div>
+        </dl>
+    </section>
 </div>
 @endsection

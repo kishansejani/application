@@ -1,163 +1,169 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import '../../constants/api_constants.dart';
-import '../../constants/app_colors.dart';
+import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/offer.dart';
-import '../../services/api_service.dart';
+import '../../providers/product_provider.dart';
+import '../../theme/app_theme.dart';
+import '../../utils/responsive.dart';
+import '../../widgets/empty_state.dart';
+import '../../widgets/error_state.dart';
+import '../../widgets/offer_card.dart';
+import '../../widgets/shimmer_box.dart';
 
+/// Coupons & offers. In [selectMode] the "Apply" action pops the coupon code.
 class OffersScreen extends StatefulWidget {
-  const OffersScreen({Key? key}) : super(key: key);
+  final bool selectMode;
+
+  const OffersScreen({super.key, this.selectMode = false});
 
   @override
   State<OffersScreen> createState() => _OffersScreenState();
 }
 
 class _OffersScreenState extends State<OffersScreen> {
-  List<Offer> _offers = [];
-  bool _isLoading = true;
+  List<Offer>? _offers;
+  Object? _error;
+  bool _loading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadOffers();
+    final cached = context.read<ProductProvider>().offers;
+    if (cached.isNotEmpty) {
+      _offers = cached;
+      _loading = false;
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) => _load());
   }
 
-  Future<void> _loadOffers() async {
+  Future<void> _load() async {
+    if (_offers == null) setState(() => _loading = true);
     try {
-      final res = await ApiService.get(ApiConstants.offers);
-      if (res['data'] != null) {
-        final list = (res['data'] as List).map((i) => Offer.fromJson(i)).toList();
-        setState(() {
-          _offers = list;
-          _isLoading = false;
-        });
-      }
+      final offers = await context.read<ProductProvider>().fetchOffers();
+      if (!mounted) return;
+      setState(() {
+        _offers = offers;
+        _error = null;
+        _loading = false;
+      });
     } catch (e) {
-      setState(() => _isLoading = false);
+      if (!mounted) return;
+      setState(() {
+        _error = e;
+        _loading = false;
+      });
     }
+  }
+
+  Widget _card(BuildContext context, Offer offer) {
+    return OfferCard(
+      offer: offer,
+      onApply: widget.selectMode ? () => Navigator.of(context).pop(offer.code) : null,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final offers = _offers;
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text(
-          context.tr('offers'),
-          style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 18),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
-          : _offers.isEmpty
-              ? const Center(child: Text('No active offers right now.'))
-              : ListView.separated(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: _offers.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 14),
-                  itemBuilder: (context, index) {
-                    final offer = _offers[index];
-                    return Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: AppColors.primary.withOpacity(0.3), width: 1.5),
-                        boxShadow: [
-                          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.accentLight,
-                                    borderRadius: BorderRadius.circular(14),
-                                  ),
-                                  child: const Icon(Icons.local_offer_rounded, color: AppColors.accent, size: 26),
-                                ),
-                                const SizedBox(width: 14),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        offer.title,
-                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppColors.textPrimary),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        offer.description ?? 'Use code at checkout to enjoy discounts.',
-                                        style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
-                                      ),
-                                      const SizedBox(height: 6),
-                                      Text(
-                                        'Min order: ₹${offer.minOrderAmount.toStringAsFixed(0)}',
-                                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.primary),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+      appBar: AppBar(title: Text(context.tr(widget.selectMode ? 'select_coupon' : 'offers_coupons'))),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final hPad = Responsive.centeredPadding(constraints.maxWidth);
+          final columns = (constraints.maxWidth - hPad * 2) >= 760 ? 2 : 1;
 
-                          // Coupon Bar
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                            decoration: const BoxDecoration(
-                              color: AppColors.background,
-                              borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  offer.code,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w900,
-                                    fontSize: 15,
-                                    letterSpacing: 1.2,
-                                    color: AppColors.primaryDark,
-                                  ),
-                                ),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    Clipboard.setData(ClipboardData(text: offer.code));
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('Code ${offer.code} copied!'), backgroundColor: AppColors.primary),
-                                    );
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.white,
-                                    foregroundColor: AppColors.primaryDark,
-                                    elevation: 0,
-                                    side: const BorderSide(color: AppColors.border),
-                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                  ),
-                                  child: const Text('COPY', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+          if (_loading && offers == null) {
+            return ListSkeleton(itemCount: 4, itemHeight: 130, padding: EdgeInsets.all(hPad));
+          }
+          if (offers == null || (_error != null && offers.isEmpty)) {
+            return ErrorState(error: _error, onRetry: _load);
+          }
+          if (offers.isEmpty) {
+            return RefreshIndicator(
+              onRefresh: _load,
+              child: EmptyState(
+                icon: Icons.local_offer_outlined,
+                title: context.tr('no_offers'),
+                message: context.tr('no_offers_msg'),
+              ),
+            );
+          }
+          return RefreshIndicator(
+            onRefresh: _load,
+            child: CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: [
+                SliverPadding(
+                  padding: EdgeInsets.fromLTRB(hPad, AppSpacing.sm, hPad, AppSpacing.lg),
+                  sliver: SliverToBoxAdapter(child: _OffersHeader(count: offers.length)),
                 ),
+                SliverPadding(
+                  padding: EdgeInsets.fromLTRB(hPad, 0, hPad, AppSpacing.xxl),
+                  sliver: columns == 1
+                      ? SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, i) => Padding(
+                              padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                              child: _card(context, offers[i]),
+                            ),
+                            childCount: offers.length,
+                          ),
+                        )
+                      : SliverGrid(
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: AppSpacing.md,
+                            crossAxisSpacing: AppSpacing.md,
+                            mainAxisExtent: 210,
+                          ),
+                          delegate: SliverChildBuilderDelegate(
+                            (context, i) => _card(context, offers[i]),
+                            childCount: offers.length,
+                          ),
+                        ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _OffersHeader extends StatelessWidget {
+  final int count;
+  const _OffersHeader({required this.count});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(colors: [Color(0xFFF59E0B), Color(0xFFEA580C)]),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.redeem_rounded, color: Colors.white, size: 36),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  context.tr('offers_available', {'count': '$count'}),
+                  style: context.textStyles.titleMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.w800),
+                ),
+                Text(
+                  context.tr('tap_code_to_copy'),
+                  style: context.textStyles.bodySmall?.copyWith(color: Colors.white.fade(0.9)),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

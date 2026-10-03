@@ -1,291 +1,243 @@
 @extends('admin.layouts.admin')
 
-@section('title', 'Stock')
+@section('title')
+Stock & Inventory
+@endsection
 
 @section('content')
-<div class="space-y-6">
-    <!-- Header Section -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-            <h1 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Stock & Inventory</h1>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Real-time inventory levels, quick adjustments, and low-stock alerts.</p>
-        </div>
-        <button onclick="openBulkAdjustModal()" class="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 rounded-2xl text-xs font-bold shadow-md transition active:scale-95">
-            <i class="fa-solid fa-sliders text-xs"></i>
-            <span>Bulk Stock Adjustment</span>
-        </button>
+    <x-admin.page-header title="Stock & inventory" subtitle="Live inventory levels, quick adjustments and low-stock alerts." icon="warehouse">
+        <a href="{{ route('admin.products.index') }}" class="btn btn-outline"><i class="ph ph-package"></i> Products</a>
+        <button type="button" onclick="openBulkAdjustModal()" class="btn btn-primary"><i class="ph ph-sliders-horizontal"></i> Bulk adjustment</button>
+    </x-admin.page-header>
+
+    @php
+        $filter = request('filter');
+        $catParam = request('category_id') ? ['category_id' => request('category_id')] : [];
+    @endphp
+    <div class="stat-grid cols-4">
+        <x-admin.stat-card label="Units in stock" :value="number_format($stats['total_items'])" icon="stack" tone="slate" meta="Across all products" />
+        <x-admin.stat-card label="Tracked products" :value="$stats['total_products']" icon="package" tone="emerald"
+            :href="route('admin.stock.index')" :active="!$filter && !request('category_id')" meta="View all stock" />
+        <x-admin.stat-card label="Low stock" :value="$stats['low_stock_count']" icon="warning" tone="amber"
+            :href="route('admin.stock.index', ['filter' => 'low'])" :active="$filter === 'low'" meta="At or below alert level" />
+        <x-admin.stat-card label="Out of stock" :value="$stats['out_of_stock_count']" icon="prohibit" tone="rose"
+            :href="route('admin.stock.index', ['filter' => 'out'])" :active="$filter === 'out'" meta="Needs restocking" />
     </div>
 
-    <!-- Stat Metrics -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <!-- Card 1: Total Units -->
-        <div class="group relative overflow-hidden rounded-2xl p-5 flex flex-col justify-between bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white shadow-lg border border-slate-700/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-            <div class="flex items-start justify-between gap-2">
-                <div>
-                    <span class="text-[11px] font-extrabold uppercase tracking-wider block text-slate-300">Total Units</span>
-                    <div class="text-3xl font-black mt-2 leading-none text-white">{{ number_format($stats['total_items']) }}</div>
-                </div>
-                <div class="w-10 h-10 rounded-xl bg-white/10 text-indigo-300 flex items-center justify-center text-sm shadow-inner border border-white/20 backdrop-blur-md flex-shrink-0">
-                    <i class="fa-solid fa-boxes-stacked"></i>
-                </div>
+    <div class="card table-card">
+        <div class="filter-bar">
+            <div class="flex flex-wrap items-center gap-2">
+                <a href="{{ route('admin.stock.index', $catParam) }}" class="filter-chip {{ !$filter ? 'is-active' : '' }}">All</a>
+                <a href="{{ route('admin.stock.index', ['filter' => 'healthy'] + $catParam) }}" class="filter-chip {{ $filter === 'healthy' ? 'is-active' : '' }}"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Healthy</a>
+                <a href="{{ route('admin.stock.index', ['filter' => 'low'] + $catParam) }}" class="filter-chip {{ $filter === 'low' ? 'is-active' : '' }}"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Low ({{ $stats['low_stock_count'] }})</a>
+                <a href="{{ route('admin.stock.index', ['filter' => 'out'] + $catParam) }}" class="filter-chip {{ $filter === 'out' ? 'is-active' : '' }}"><span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Out ({{ $stats['out_of_stock_count'] }})</a>
             </div>
-            <div class="mt-4 flex items-center gap-1.5">
-                <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-white/10 text-slate-200">● In Warehouse</span>
-            </div>
-            <i class="fa-solid fa-boxes-stacked absolute -right-2 -bottom-2 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
-        </div>
-
-        <!-- Card 2: Tracked SKUs -->
-        <div class="group relative overflow-hidden rounded-2xl p-5 flex flex-col justify-between bg-gradient-to-br from-white via-white to-emerald-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/60 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-            <div class="flex items-start justify-between gap-2">
-                <div>
-                    <span class="text-[11px] font-extrabold uppercase tracking-wider block text-emerald-700 dark:text-emerald-400">Tracked SKUs</span>
-                    <div class="text-3xl font-black mt-2 leading-none text-slate-900 dark:text-white">{{ $stats['total_products'] }}</div>
-                </div>
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-white flex items-center justify-center text-sm shadow-md shadow-emerald-500/25 flex-shrink-0">
-                    <i class="fa-solid fa-circle-check"></i>
-                </div>
-            </div>
-            <div class="mt-4 flex items-center gap-1.5">
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> Active SKUs
-                </span>
-            </div>
-            <i class="fa-solid fa-circle-check absolute -right-2 -bottom-2 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
-        </div>
-
-        <!-- Card 3: Low Stock Alerts -->
-        <div class="group relative overflow-hidden rounded-2xl p-5 flex flex-col justify-between bg-gradient-to-br from-white via-white to-amber-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-amber-950/30 border border-amber-200/80 dark:border-amber-800/60 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-            <div class="flex items-start justify-between gap-2">
-                <div>
-                    <span class="text-[11px] font-extrabold uppercase tracking-wider block text-amber-700 dark:text-amber-400">Low Stock Alerts</span>
-                    <div class="text-3xl font-black mt-2 leading-none text-slate-900 dark:text-white">{{ $stats['low_stock_count'] }}</div>
-                </div>
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-400 text-white flex items-center justify-center text-sm shadow-md shadow-amber-500/25 flex-shrink-0">
-                    <i class="fa-solid fa-triangle-exclamation"></i>
-                </div>
-            </div>
-            <div class="mt-4 flex items-center gap-1.5">
-                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800">
-                    ⚠️ Urgent Reorder
-                </span>
-            </div>
-            <i class="fa-solid fa-triangle-exclamation absolute -right-2 -bottom-2 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
-        </div>
-
-        <!-- Card 4: Out of Stock -->
-        <div class="group relative overflow-hidden rounded-2xl p-5 flex flex-col justify-between bg-gradient-to-br from-white via-white to-rose-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-rose-950/30 border border-rose-200/80 dark:border-rose-800/60 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-            <div class="flex items-start justify-between gap-2">
-                <div>
-                    <span class="text-[11px] font-extrabold uppercase tracking-wider block text-rose-700 dark:text-rose-400">Out of Stock</span>
-                    <div class="text-3xl font-black mt-2 leading-none text-slate-900 dark:text-white">{{ $stats['out_of_stock_count'] }}</div>
-                </div>
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-500 to-pink-500 text-white flex items-center justify-center text-sm shadow-md shadow-rose-500/25 flex-shrink-0">
-                    <i class="fa-solid fa-ban"></i>
-                </div>
-            </div>
-            <div class="mt-4 flex items-center gap-1.5">
-                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800 dark:bg-rose-950/80 dark:text-rose-300 border border-rose-200/80 dark:border-rose-800">
-                    ● Critical (0 Left)
-                </span>
-            </div>
-            <i class="fa-solid fa-ban absolute -right-2 -bottom-2 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
-        </div>
-    </div>
-
-    <!-- Stock Table Card -->
-    <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200/90 dark:border-slate-700/80 shadow-sm p-6 overflow-hidden">
-        <!-- Filter buttons -->
-        <div class="mb-5 flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-700/60">
-            <div class="flex items-center gap-2">
-                <a href="{{ route('admin.stock.index') }}" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition {{ !request('filter') ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200' }}">
-                    All Items
-                </a>
-                <a href="{{ route('admin.stock.index', ['filter' => 'low']) }}" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition {{ request('filter') == 'low' ? 'bg-amber-500 text-white shadow-sm' : 'bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 hover:bg-amber-100' }}">
-                    ⚠️ Low Stock ({{ $stats['low_stock_count'] }})
-                </a>
-                <a href="{{ route('admin.stock.index', ['filter' => 'out']) }}" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition {{ request('filter') == 'out' ? 'bg-rose-600 text-white shadow-sm' : 'bg-rose-50 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 hover:bg-rose-100' }}">
-                    🚫 Out of Stock ({{ $stats['out_of_stock_count'] }})
-                </a>
-            </div>
-
-            <form action="{{ route('admin.stock.index') }}" method="GET" class="flex items-center gap-2">
-                <select name="category_id" onchange="this.form.submit()" class="px-3.5 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none">
-                    <option value="">Filter by Category</option>
+            <form action="{{ route('admin.stock.index') }}" method="GET" class="flex flex-wrap items-center gap-2.5 sm:ml-auto" data-no-loading>
+                @if($filter)<input type="hidden" name="filter" value="{{ $filter }}">@endif
+                <select name="category_id" onchange="this.form.submit()" class="form-select w-auto min-w-[11rem]" aria-label="Filter by category">
+                    <option value="">All categories</option>
                     @foreach($categories as $cat)
-                        <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>
-                            {{ $cat->name_en }}
-                        </option>
+                        <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name_en }}</option>
                     @endforeach
                 </select>
+                @if($filter || request('category_id'))
+                    <a href="{{ route('admin.stock.index') }}" class="btn btn-ghost btn-sm text-rose-600"><i class="ph ph-x-circle"></i> Clear</a>
+                @endif
             </form>
         </div>
 
-        <div class="overflow-x-auto">
-            <table id="stockTable" class="w-full text-left text-xs">
-                <thead>
-                    <tr class="bg-slate-50 dark:bg-slate-900/60 text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200 dark:border-slate-700">
-                        <th class="px-4 py-3.5 rounded-l-2xl">Product Item</th>
-                        <th class="px-4 py-3.5">Category</th>
-                        <th class="px-4 py-3.5">Price</th>
-                        <th class="px-4 py-3.5">Threshold</th>
-                        <th class="px-4 py-3.5">Stock Qty</th>
-                        <th class="px-4 py-3.5">Status</th>
-                        <th class="px-4 py-3.5 text-right rounded-r-2xl">Quick Stock Update</th>
+        <table id="stockTable" class="w-full" data-export-title="Stock & inventory">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th class="export-only">SKU</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Alert at</th>
+                    <th>Status</th>
+                    <th class="text-right">Stock quantity</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($products as $prod)
+                    <tr id="row-prod-{{ $prod->id }}">
+                        <td data-export="{{ $prod->name_en }}{{ $prod->name_gu ? ' / '.$prod->name_gu : '' }} ({{ $prod->unit }})">
+                            <div class="flex items-center gap-3 sm:min-w-[13rem]">
+                                <img src="{{ $prod->thumbnail_url }}" alt="" class="thumb hidden sm:block" loading="lazy">
+                                <div class="min-w-0">
+                                    <a href="{{ route('admin.products.edit', $prod) }}" class="block font-bold text-slate-900 dark:text-white hover:underline leading-snug">{{ $prod->name_en }}</a>
+                                    @if($prod->name_gu)<span class="block text-xs text-slate-500 dark:text-slate-400 mt-0.5" lang="gu">{{ $prod->name_gu }}</span>@endif
+                                    <span class="block text-[11px] text-slate-400 mt-0.5">{{ $prod->unit }} · <span class="font-mono">{{ $prod->sku }}</span></span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ $prod->sku }}</td>
+                        <td data-export="{{ $prod->category->name_en ?? 'N/A' }}">
+                            <span class="badge badge-neutral">{{ $prod->category->name_en ?? 'N/A' }}</span>
+                        </td>
+                        <td class="whitespace-nowrap" data-order="{{ $prod->effective_price }}" data-export="₹{{ number_format($prod->effective_price, 2) }}">
+                            <span class="font-bold text-slate-900 dark:text-white">₹{{ number_format($prod->effective_price, 2) }}</span>
+                        </td>
+                        <td class="whitespace-nowrap" data-order="{{ $prod->low_stock_threshold }}" data-export="{{ $prod->low_stock_threshold }}">
+                            <span class="text-slate-500 dark:text-slate-400">≤ {{ $prod->low_stock_threshold }} units</span>
+                        </td>
+                        <td id="stock-badge-{{ $prod->id }}" data-order="{{ $prod->stock_quantity <= 0 ? 0 : ($prod->is_low_stock ? 1 : 2) }}"
+                            data-export="{{ $prod->stock_quantity <= 0 ? 'Out of stock' : ($prod->is_low_stock ? 'Low stock' : 'Healthy') }}">
+                            @if($prod->stock_quantity <= 0)
+                                <span class="badge badge-danger badge-dot">Out of stock</span>
+                            @elseif($prod->is_low_stock)
+                                <span class="badge badge-warning badge-dot">Low stock</span>
+                            @else
+                                <span class="badge badge-success badge-dot">Healthy</span>
+                            @endif
+                        </td>
+                        <td class="text-right" data-order="{{ $prod->stock_quantity }}" id="stock-cell-{{ $prod->id }}">
+                            <div class="inline-flex items-center justify-end gap-1.5">
+                                <div class="inline-flex items-center rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden">
+                                    <button type="button" onclick="quickAdjust({{ $prod->id }}, -10)" class="hidden lg:flex h-9 px-2 items-center text-[11px] font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 border-r border-slate-200 dark:border-slate-700" title="Remove 10">−10</button>
+                                    <button type="button" onclick="quickAdjust({{ $prod->id }}, -1)" class="h-9 w-8 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800" title="Remove 1" aria-label="Remove 1"><i class="ph-bold ph-minus"></i></button>
+                                    <input type="number" min="0" id="input-qty-{{ $prod->id }}" value="{{ $prod->stock_quantity }}" data-saved="{{ $prod->stock_quantity }}" aria-label="Stock quantity for {{ $prod->name_en }}"
+                                        class="stock-input !w-12 sm:!w-16 !h-9 !rounded-none !border-0 !border-x !border-slate-200 dark:!border-slate-700 !bg-transparent text-center font-extrabold text-sm text-slate-900 dark:text-white !px-1 focus:!shadow-none"
+                                        onkeydown="if(event.key==='Enter'){event.preventDefault();saveStock({{ $prod->id }});}">
+                                    <button type="button" onclick="quickAdjust({{ $prod->id }}, 1)" class="h-9 w-8 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800" title="Add 1" aria-label="Add 1"><i class="ph-bold ph-plus"></i></button>
+                                    <button type="button" onclick="quickAdjust({{ $prod->id }}, 10)" class="hidden lg:flex h-9 px-2 items-center text-[11px] font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 border-l border-slate-200 dark:border-slate-700" title="Add 10">+10</button>
+                                </div>
+                                <button type="button" id="save-btn-{{ $prod->id }}" onclick="saveStock({{ $prod->id }})" class="act-btn" title="Save stock" aria-label="Save stock"><i class="ph ph-floppy-disk"></i></button>
+                            </div>
+                        </td>
                     </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100 dark:divide-slate-700/60 font-medium">
-                    @foreach($products as $prod)
-                        <tr id="row-prod-{{ $prod->id }}" class="hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition-colors">
-                            <td class="px-4 py-3.5">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-11 h-11 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0 group">
-                                        <img src="{{ $prod->thumbnail_url }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                                    </div>
-                                    <div>
-                                        <div class="font-bold text-slate-900 dark:text-white text-sm leading-tight">{{ $prod->name_en }}</div>
-                                        <div class="text-xs text-indigo-600 dark:text-indigo-400 font-semibold mt-0.5">{{ $prod->name_gu }}</div>
-                                        <div class="text-[10px] text-slate-400">{{ $prod->unit }} • {{ $prod->sku }}</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-4 py-3.5 font-semibold text-slate-600 dark:text-slate-300">
-                                <span class="px-2.5 py-1 bg-slate-100 dark:bg-slate-700 rounded-lg text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                                    {{ $prod->category->name_en ?? 'N/A' }}
-                                </span>
-                            </td>
-                            <td class="px-4 py-3.5 font-bold text-slate-900 dark:text-white text-sm">
-                                ₹{{ number_format($prod->effective_price, 2) }}
-                            </td>
-                            <td class="px-4 py-3.5 text-slate-500 dark:text-slate-400 font-semibold">
-                                &le; {{ $prod->low_stock_threshold }} units
-                            </td>
-                            <td class="px-4 py-3.5 font-black text-sm" id="stock-val-{{ $prod->id }}">
-                                {{ $prod->stock_quantity }}
-                            </td>
-                            <td class="px-4 py-3.5" id="stock-badge-{{ $prod->id }}">
-                                @if($prod->stock_quantity <= 0)
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> OUT OF STOCK
-                                    </span>
-                                @elseif($prod->is_low_stock)
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> LOW STOCK
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> HEALTHY
-                                    </span>
-                                @endif
-                            </td>
-                            <td class="px-4 py-3.5 text-right">
-                                <div class="flex items-center justify-end gap-1.5">
-                                    <button onclick="quickAdjust({{ $prod->id }}, -10)" class="w-7 h-7 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold text-xs" title="-10">-10</button>
-                                    <button onclick="quickAdjust({{ $prod->id }}, -1)" class="w-7 h-7 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold text-xs" title="-1">-1</button>
-                                    <input type="number" id="input-qty-{{ $prod->id }}" value="{{ $prod->stock_quantity }}" class="w-16 px-2 py-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-center font-bold text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-slate-400">
-                                    <button onclick="quickAdjust({{ $prod->id }}, 1)" class="w-7 h-7 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold text-xs" title="+1">+1</button>
-                                    <button onclick="quickAdjust({{ $prod->id }}, 10)" class="w-7 h-7 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold text-xs" title="+10">+10</button>
-                                    <button onclick="saveStock({{ $prod->id }})" class="w-8 h-8 rounded-xl bg-slate-900 hover:bg-black text-white dark:bg-white dark:text-slate-900 flex items-center justify-center text-xs font-bold transition shadow-sm" title="Save Stock">
-                                        <i class="fa-solid fa-floppy-disk"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<!-- Bulk Adjustment Modal -->
-<div id="bulkAdjustModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-slate-700">
-        <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-700 mb-6">
-            <h3 class="text-lg font-bold text-slate-900 dark:text-white">Bulk Stock Adjustment</h3>
-            <button onclick="closeBulkAdjustModal()" class="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-
-        <form action="{{ route('admin.stock.bulk_adjust') }}" method="POST" class="space-y-4">
-            @csrf
-            <div class="max-h-96 overflow-y-auto space-y-3 pr-2">
-                @foreach($products as $idx => $p)
-                    <div class="flex items-center justify-between p-3 rounded-2xl border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
-                        <div class="flex items-center gap-3">
-                            <input type="hidden" name="adjustments[{{ $idx }}][product_id]" value="{{ $p->id }}">
-                            <span class="text-xs font-bold text-slate-800 dark:text-slate-200">{{ $p->name_en }}</span>
-                            <span class="text-[10px] text-slate-400">({{ $p->stock_quantity }} current)</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <select name="adjustments[{{ $idx }}][type]" class="px-2.5 py-1 text-xs border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200">
-                                <option value="add">+ Add</option>
-                                <option value="subtract">- Subtract</option>
-                                <option value="set">Set Exact</option>
-                            </select>
-                            <input type="number" name="adjustments[{{ $idx }}][quantity]" value="0" min="0" class="w-20 px-2 py-1 text-xs border border-slate-200 dark:border-slate-700 rounded-xl text-center font-bold bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-                        </div>
-                    </div>
                 @endforeach
+            </tbody>
+        </table>
+    </div>
+
+    {{-- Bulk adjustment modal --}}
+    <div id="bulkAdjustModal" class="fixed inset-0 z-[80] hidden items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/50 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="bulkTitle">
+        <div class="card w-full sm:max-w-2xl max-h-[92vh] flex flex-col !rounded-b-none sm:!rounded-b-[var(--radius-lg)] shadow-2xl">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title" id="bulkTitle"><i class="ph-duotone ph-sliders-horizontal"></i> Bulk stock adjustment</h3>
+                    <p class="card-subtitle">Rows left at 0 with “Add” are not changed.</p>
+                </div>
+                <button type="button" onclick="closeBulkAdjustModal()" class="act-btn" aria-label="Close"><i class="ph ph-x"></i></button>
             </div>
 
-            <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-700">
-                <button type="button" onclick="closeBulkAdjustModal()" class="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300">Cancel</button>
-                <button type="submit" class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-black text-white dark:bg-white dark:text-slate-900 text-xs font-bold shadow-md">Apply Bulk Adjustments</button>
-            </div>
-        </form>
+            <form action="{{ route('admin.stock.bulk_adjust') }}" method="POST" class="flex flex-col min-h-0 flex-1">
+                @csrf
+                <div class="px-5 pt-4">
+                    <div class="relative">
+                        <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="search" id="bulkSearch" placeholder="Find a product…" class="form-control !pl-9" autocomplete="off" data-no-export>
+                    </div>
+                </div>
+                <div class="overflow-y-auto px-5 py-4 space-y-2 min-h-0 flex-1" id="bulkList">
+                    @foreach($products as $idx => $p)
+                        <div class="bulk-row flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/40" data-name="{{ strtolower($p->name_en.' '.$p->sku) }}">
+                            <input type="hidden" name="adjustments[{{ $idx }}][product_id]" value="{{ $p->id }}">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <img src="{{ $p->thumbnail_url }}" alt="" class="thumb !w-9 !h-9 !rounded-lg" loading="lazy">
+                                <div class="min-w-0">
+                                    <p class="text-[13px] font-bold text-slate-800 dark:text-slate-100 truncate">{{ $p->name_en }}</p>
+                                    <p class="text-[11px] text-slate-500 dark:text-slate-400">{{ $p->stock_quantity }} in stock · {{ $p->unit }}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0 ml-auto">
+                                <select name="adjustments[{{ $idx }}][type]" class="form-select !h-9 !text-xs w-auto" aria-label="Adjustment type">
+                                    <option value="add">Add</option>
+                                    <option value="subtract">Subtract</option>
+                                    <option value="set">Set exact</option>
+                                </select>
+                                <input type="number" name="adjustments[{{ $idx }}][quantity]" value="0" min="0" class="form-control !w-20 !h-9 text-center font-bold" aria-label="Quantity">
+                            </div>
+                        </div>
+                    @endforeach
+                    <div id="bulkEmpty" class="empty-state hidden"><i class="ph-duotone ph-magnifying-glass"></i><h4>No matching products</h4></div>
+                </div>
+                <div class="flex items-center justify-end gap-2.5 px-5 py-4 border-t border-slate-200 dark:border-slate-700">
+                    <button type="button" onclick="closeBulkAdjustModal()" class="btn btn-outline">Cancel</button>
+                    <button type="submit" class="btn btn-primary"><i class="ph-bold ph-check"></i> Apply adjustments</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 @endsection
 
 @push('scripts')
 <script>
-    $(document).ready(function() {
-        $('#stockTable').DataTable({
-            order: [[4, 'asc']]
+    let stockTable;
+    $(function () {
+        stockTable = $('#stockTable').DataTable({
+            order: [[6, 'asc']],
+            columnDefs: [
+                { targets: 1, visible: false },            // SKU: export-only
+                { targets: 6, responsivePriority: 1 },
+                { targets: 0, responsivePriority: 2 },
+                { targets: [3, 4], responsivePriority: 4 }
+            ]
         });
+
+        // Highlight unsaved stepper values
+        $(document).on('input', '.stock-input', function () { markDirty(this.id.replace('input-qty-', '')); });
+
+        // Bulk modal search
+        $('#bulkSearch').on('input', function () {
+            const q = this.value.trim().toLowerCase();
+            let shown = 0;
+            $('#bulkList .bulk-row').each(function () { const ok = !q || this.dataset.name.includes(q); $(this).toggle(ok); if (ok) shown++; });
+            $('#bulkEmpty').toggleClass('hidden', shown > 0);
+        });
+        $('#bulkAdjustModal').on('click', function (e) { if (e.target === this) closeBulkAdjustModal(); });
+        $(document).on('keydown', function (e) { if (e.key === 'Escape' && !$('#bulkAdjustModal').hasClass('hidden')) closeBulkAdjustModal(); });
     });
+
+    function markDirty(id) {
+        const $in = $(`#input-qty-${id}`);
+        const dirty = String(parseInt($in.val(), 10)) !== String($in.data('saved'));
+        $in.toggleClass('!bg-amber-50 dark:!bg-amber-500/10', dirty);
+        $(`#save-btn-${id}`).toggleClass('is-edit !bg-emerald-600 !text-white !border-emerald-600', dirty);
+    }
 
     function quickAdjust(id, delta) {
         const input = $(`#input-qty-${id}`);
-        let cur = parseInt(input.val()) || 0;
+        let cur = parseInt(input.val(), 10) || 0;
         cur = Math.max(0, cur + delta);
         input.val(cur);
+        markDirty(id);
     }
 
     function saveStock(id) {
         const qty = $(`#input-qty-${id}`).val();
-        $.ajax({
-            url: `/admin/stock/${id}`,
-            type: 'PATCH',
-            data: { stock_quantity: qty },
-            success: function(res) {
-                if (res.success) {
-                    $(`#stock-val-${id}`).text(res.new_stock);
-                    
-                    let badgeHtml = '';
-                    if (res.is_out) {
-                        badgeHtml = '<span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-rose-100 text-rose-800">OUT OF STOCK</span>';
-                    } else if (res.is_low) {
-                        badgeHtml = '<span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800">LOW STOCK</span>';
-                    } else {
-                        badgeHtml = '<span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800">HEALTHY</span>';
-                    }
-                    $(`#stock-badge-${id}`).html(badgeHtml);
-                    toastr.success(res.message);
-                }
-            },
-            error: function() {
-                toastr.error('Failed to update stock');
-            }
-        });
+        const $btn = $(`#save-btn-${id}`).prop('disabled', true);
+        $.ajax({ url: `/admin/stock/${id}`, type: 'PATCH', data: { stock_quantity: qty } })
+            .done(function (res) {
+                if (!res.success) return;
+                const $in = $(`#input-qty-${id}`).val(res.new_stock).data('saved', res.new_stock);
+                markDirty(id);
+                let html, label, rank;
+                if (res.is_out) { html = '<span class="badge badge-danger badge-dot">Out of stock</span>'; label = 'Out of stock'; rank = 0; }
+                else if (res.is_low) { html = '<span class="badge badge-warning badge-dot">Low stock</span>'; label = 'Low stock'; rank = 1; }
+                else { html = '<span class="badge badge-success badge-dot">Healthy</span>'; label = 'Healthy'; rank = 2; }
+                $(`#stock-badge-${id}`).html(html).attr({ 'data-export': label, 'data-order': rank });
+                $(`#stock-cell-${id}`).attr('data-order', res.new_stock);
+                if (stockTable) stockTable.row($(`#row-prod-${id}`)).invalidate('dom');
+                toastr.success(res.message);
+            })
+            .fail(function (xhr) {
+                const msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Failed to update stock';
+                toastr.error(msg);
+            })
+            .always(function () { $btn.prop('disabled', false); });
     }
 
     function openBulkAdjustModal() {
-        $('#bulkAdjustModal').removeClass('hidden');
+        $('#bulkAdjustModal').removeClass('hidden').addClass('flex');
+        $('body').addClass('overflow-hidden');
+        setTimeout(function () { $('#bulkSearch').trigger('focus'); }, 50);
     }
 
     function closeBulkAdjustModal() {
-        $('#bulkAdjustModal').addClass('hidden');
+        $('#bulkAdjustModal').addClass('hidden').removeClass('flex');
+        $('body').removeClass('overflow-hidden');
     }
 </script>
 @endpush

@@ -1,99 +1,84 @@
 import 'package:flutter/material.dart';
-import '../constants/app_colors.dart';
 import '../l10n/app_localizations.dart';
+import '../models/json_utils.dart';
+import '../theme/app_theme.dart';
 
+/// Express (2-hour) vs next-day banner driven by the backend delivery slot.
+/// Accepts the home `delivery_banner` ({type, slot, promise_text}) or the
+/// `/delivery-slot` payload ({type, slot_text, rule_description}).
 class DeliverySlotBanner extends StatelessWidget {
   final Map<String, dynamic>? slotInfo;
+  final bool compact;
 
-  const DeliverySlotBanner({Key? key, this.slotInfo}) : super(key: key);
+  const DeliverySlotBanner({super.key, this.slotInfo, this.compact = false});
+
+  static bool isExpress(Map<String, dynamic>? info) {
+    final type = asStringOrNull(info?['type']);
+    if (type != null) return type == 'two_hours' || type == '2_hours';
+    return DateTime.now().hour < 12;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final is2Hours = slotInfo?['is_2_hours'] == true;
-    final title = slotInfo?['title'] ?? (is2Hours ? context.tr('delivery_within_2_hours') : context.tr('delivery_next_day'));
-    final description = slotInfo?['description'] ?? (is2Hours ? context.tr('order_before_12') : context.tr('order_after_12'));
-    final timeStr = slotInfo?['delivery_time_formatted'];
+    final express = isExpress(slotInfo);
+    final title = context.tr(express ? 'delivery_within_2_hours' : 'delivery_next_day');
+    final slot = asStringOrNull(slotInfo?['slot'] ?? slotInfo?['slot_text']);
+    final promise = asStringOrNull(slotInfo?['promise_text'] ?? slotInfo?['rule_description']) ??
+        context.tr(express ? 'order_before_12' : 'order_after_12');
+
+    final colors = express
+        ? const [Color(0xFF16A34A), Color(0xFF0D9488)]
+        : const [Color(0xFF4F46E5), Color(0xFF7C3AED)];
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: is2Hours
-              ? [const Color(0xFF16A34A), const Color(0xFF0D9488)]
-              : [const Color(0xFFD97706), const Color(0xFFEA580C)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: (is2Hours ? AppColors.primary : AppColors.accent).withOpacity(0.25),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: colors),
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        boxShadow: [BoxShadow(color: colors.first.fade(0.25), blurRadius: 16, offset: const Offset(0, 6))],
       ),
+      padding: EdgeInsets.all(compact ? AppSpacing.md : AppSpacing.lg),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            width: compact ? 40 : 48,
+            height: compact ? 40 : 48,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              shape: BoxShape.circle,
+              color: Colors.white.fade(0.18),
+              borderRadius: BorderRadius.circular(AppRadius.sm),
             ),
             child: Icon(
-              is2Hours ? Icons.electric_bolt_rounded : Icons.wb_sunny_rounded,
+              express ? Icons.bolt_rounded : Icons.schedule_rounded,
               color: Colors.white,
-              size: 24,
+              size: compact ? 22 : 28,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Flexible(
-                      child: Text(
-                        title,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w900,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ),
-                    if (timeStr != null) ...[
-                      const SizedBox(width: 6),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          timeStr,
-                          style: TextStyle(
-                            color: is2Hours ? AppColors.primaryDark : Colors.orange.shade900,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 10,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-                const SizedBox(height: 3),
                 Text(
-                  description,
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
-                    fontSize: 11,
-                    height: 1.2,
-                  ),
+                  title,
+                  style: context.textStyles.titleSmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w800),
                 ),
+                if (slot != null) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    slot,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.textStyles.bodySmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
+                  ),
+                ],
+                if (!compact) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    promise,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: context.textStyles.bodySmall?.copyWith(color: Colors.white.fade(0.85)),
+                  ),
+                ],
               ],
             ),
           ),

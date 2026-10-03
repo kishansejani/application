@@ -1,0 +1,152 @@
+/* ==========================================================================
+   OTP verification screen (frontend/auth/_otp-verify.blade.php)
+   Illustration, staggered code boxes, error shake, success check, resend ring.
+   Dark mode = html.dark. Honors prefers-reduced-motion.
+   ========================================================================== */
+.fx-otp {
+    --otp-brand: #059669; --otp-brand-2: #10b981; --otp-brand-soft: #ecfdf5;
+    --otp-ok: #16a34a; --otp-ok-soft: #f0fdf4;
+    --otp-bad: #e11d48; --otp-bad-soft: #fff1f2;
+    --otp-surface: #ffffff; --otp-paper: #ffffff; --otp-stroke: #0f172a; --otp-line: #cbd5e1; --otp-line-soft: #e2e8f0;
+    --otp-box-bg: #ffffff; --otp-box-border: #e2e8f0; --otp-text: #0f172a; --otp-ring: rgba(16, 185, 129, .16);
+}
+html.dark .fx-otp {
+    --otp-brand: #34d399; --otp-brand-2: #10b981; --otp-brand-soft: rgba(16, 185, 129, .12);
+    --otp-ok: #4ade80; --otp-ok-soft: rgba(34, 197, 94, .14);
+    --otp-bad: #fb7185; --otp-bad-soft: rgba(244, 63, 94, .12);
+    --otp-surface: #1e293b; --otp-paper: #0f172a; --otp-stroke: #e2e8f0; --otp-line: #475569; --otp-line-soft: #334155;
+    --otp-box-bg: #0b1222; --otp-box-border: #334155; --otp-text: #f8fafc; --otp-ring: rgba(52, 211, 153, .14);
+}
+
+/* ---------- Illustration ---------- */
+.fx-otp-art { position: relative; width: 200px; height: 160px; margin: -.25rem auto 1rem; }
+.fx-otp-svg { position: relative; width: 100%; height: 100%; overflow: visible; }
+.fx-otp-ring {
+    position: absolute; left: 50%; top: 46%; width: 112px; height: 112px; margin: -56px 0 0 -56px; border-radius: 9999px;
+    background: var(--otp-ring); animation: fx-otp-ripple 3.2s cubic-bezier(.22, .61, .36, 1) infinite;
+}
+.fx-otp-art--email .fx-otp-ring { top: 56%; }
+.fx-otp-ring.r2 { animation-delay: 1.05s; }
+.fx-otp-ring.r3 { animation-delay: 2.1s; }
+@keyframes fx-otp-ripple { 0% { transform: scale(.55); opacity: 0; } 25% { opacity: 1; } 100% { transform: scale(1.65); opacity: 0; } }
+
+.fx-otp-surface { fill: var(--otp-surface); }
+.fx-otp-paper { fill: var(--otp-paper); stroke: var(--otp-line-soft); stroke-width: 1.5; }
+.fx-otp-stroke { stroke: var(--otp-stroke); stroke-width: 3; }
+.fx-otp-line { fill: var(--otp-line); }
+.fx-otp-line.soft { fill: var(--otp-line-soft); }
+.fx-otp-fold { fill: none; stroke: var(--otp-line); stroke-width: 2; stroke-linecap: round; }
+.fx-otp-dots circle { fill: var(--otp-brand-2); transform-box: fill-box; transform-origin: center; animation: fx-otp-dot 1.4s ease-in-out infinite; }
+.fx-otp-dots circle:nth-child(2) { animation-delay: .15s; }
+.fx-otp-dots circle:nth-child(3) { animation-delay: .3s; }
+.fx-otp-dots circle:nth-child(4) { animation-delay: .45s; }
+@keyframes fx-otp-dot { 0%, 60%, 100% { transform: translateY(0); opacity: .55; } 30% { transform: translateY(-4px); opacity: 1; } }
+
+.fx-otp-device { transform-box: fill-box; transform-origin: center bottom; animation: fx-otp-rise .7s cubic-bezier(.34, 1.56, .64, 1) both; }
+@keyframes fx-otp-rise { from { transform: translateY(18px) scale(.92); opacity: 0; } to { transform: none; opacity: 1; } }
+
+.fx-otp-bubble { transform-box: fill-box; transform-origin: 15% 100%; animation: fx-otp-fly .75s .45s cubic-bezier(.34, 1.56, .64, 1) both, fx-otp-float 4s 1.4s ease-in-out infinite; }
+@keyframes fx-otp-fly { from { transform: translate(46px, -26px) scale(.25) rotate(18deg); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes fx-otp-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+
+.fx-otp-letter { animation: fx-otp-letter .9s .35s cubic-bezier(.34, 1.4, .64, 1) both, fx-otp-float 4s 1.5s ease-in-out infinite; }
+@keyframes fx-otp-letter { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+.fx-otp-shield-body { transform-box: fill-box; transform-origin: center; animation: fx-otp-pop-in .6s .25s cubic-bezier(.34, 1.56, .64, 1) both, fx-otp-pulse 2.4s 1s ease-in-out infinite; }
+.fx-otp-shield-fill { fill: url(#fxOtpShield); transition: fill .3s; }
+.fx-otp-shield-gloss { fill: #fff; opacity: .14; clip-path: inset(0 50% 0 0); }
+.fx-otp-lock { transition: opacity .2s, transform .3s; transform-box: fill-box; transform-origin: center; }
+.fx-otp-check { stroke-dasharray: 32; stroke-dashoffset: 32; }
+@keyframes fx-otp-pop-in { from { transform: scale(0); } to { transform: scale(1); } }
+@keyframes fx-otp-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.07); } }
+
+.fx-otp-sparkles > * { fill: #fbbf24; transform-box: fill-box; transform-origin: center; animation: fx-otp-twinkle 2.6s ease-in-out infinite; }
+.fx-otp-sparkles > :nth-child(2) { animation-delay: .7s; fill: var(--otp-brand-2); }
+.fx-otp-sparkles > :nth-child(3) { animation-delay: 1.3s; fill: #38bdf8; }
+.fx-otp-sparkles > :nth-child(4) { animation-delay: 1.9s; }
+@keyframes fx-otp-twinkle { 0%, 100% { transform: scale(.4); opacity: .2; } 50% { transform: scale(1); opacity: 1; } }
+
+/* ---------- Code boxes ---------- */
+.fx-otp-boxes { display: grid; grid-template-columns: repeat(var(--n, 4), minmax(0, 3.75rem)); justify-content: center; gap: clamp(.5rem, 3vw, .85rem); }
+.fx-otp-box {
+    width: 100%; height: 4rem; border-radius: 1rem; text-align: center; caret-color: var(--otp-brand);
+    font: 800 1.75rem/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--otp-text);
+    background: var(--otp-box-bg); border: 2px solid var(--otp-box-border); outline: none; padding: 0;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, .05);
+    transition: border-color .18s, box-shadow .18s, background-color .18s, transform .18s;
+    animation: fx-otp-box-in .5s calc(.35s + var(--i, 0) * 80ms) cubic-bezier(.34, 1.56, .64, 1) both;
+}
+.fx-otp-box:focus { border-color: var(--otp-brand-2); box-shadow: 0 0 0 4px var(--otp-ring), 0 8px 18px -10px rgba(5, 150, 105, .6); transform: translateY(-2px); }
+.fx-otp-box.is-filled { border-color: var(--otp-brand-2); background: var(--otp-brand-soft); }
+.fx-otp.is-ready .fx-otp-box { animation: none; }
+.fx-otp.is-ready .fx-otp-shield-body { animation: fx-otp-pulse 2.4s ease-in-out infinite; }
+.fx-otp .fx-otp-box.is-bump { animation: fx-otp-bump .32s cubic-bezier(.34, 1.56, .64, 1); }
+@keyframes fx-otp-box-in { from { transform: translateY(14px) scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes fx-otp-bump { 0% { transform: scale(1); } 40% { transform: scale(1.14) translateY(-3px); } 100% { transform: scale(1); } }
+
+/* error: shake + red glow */
+.fx-otp.is-error .fx-otp-boxes { animation: fx-otp-shake .5s cubic-bezier(.36, .07, .19, .97) both; }
+.fx-otp.is-error .fx-otp-box { border-color: var(--otp-bad); background: var(--otp-bad-soft); box-shadow: 0 0 0 4px rgba(244, 63, 94, .15), 0 0 18px rgba(244, 63, 94, .35); color: var(--otp-bad); }
+.fx-otp.is-error .fx-otp-shield-fill { fill: #f43f5e; }
+.fx-otp.is-error .fx-otp-shield-body { animation: fx-otp-wobble .5s ease both; }
+@keyframes fx-otp-shake {
+    10%, 90% { transform: translateX(-2px); } 20%, 80% { transform: translateX(4px); }
+    30%, 50%, 70% { transform: translateX(-8px); } 40%, 60% { transform: translateX(8px); }
+}
+@keyframes fx-otp-wobble { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-10deg); } 75% { transform: rotate(10deg); } }
+
+/* success: green boxes, check drawn in the shield */
+.fx-otp.is-success .fx-otp-box {
+    border-color: var(--otp-ok); background: var(--otp-ok-soft); color: var(--otp-ok);
+    animation: fx-otp-ok .55s calc(var(--i, 0) * 70ms) cubic-bezier(.34, 1.56, .64, 1) both;
+}
+@keyframes fx-otp-ok { 0% { transform: scale(1); } 45% { transform: scale(1.12) translateY(-4px); box-shadow: 0 10px 24px -10px rgba(22, 163, 74, .7); } 100% { transform: scale(1); } }
+.fx-otp.is-success .fx-otp-shield-fill { fill: url(#fxOtpShieldOk); }
+.fx-otp.is-success .fx-otp-lock { opacity: 0; transform: scale(.3); }
+.fx-otp.is-success .fx-otp-check { animation: fx-otp-draw .45s .15s ease-out forwards; }
+.fx-otp.is-success .fx-otp-shield-body { animation: fx-otp-celebrate .6s cubic-bezier(.34, 1.56, .64, 1) both; }
+.fx-otp.is-success .fx-otp-ring { background: rgba(34, 197, 94, .2); }
+.fx-otp.is-success .fx-otp-submit { background: #16a34a; }
+@keyframes fx-otp-draw { to { stroke-dashoffset: 0; } }
+@keyframes fx-otp-celebrate { 0% { transform: scale(1); } 50% { transform: scale(1.25); } 100% { transform: scale(1.1); } }
+
+.fx-otp-msg { min-height: 1.25rem; margin-top: .75rem; text-align: center; font-size: .78rem; font-weight: 700; color: var(--otp-bad); }
+.fx-otp-msg:empty { min-height: 0; margin-top: .25rem; }
+.fx-otp-notice { display: flex; align-items: center; justify-content: center; gap: .4rem; margin-top: .5rem; font-size: .78rem; font-weight: 600; color: var(--otp-brand); animation: fx-otp-fade .4s ease both; }
+.fx-otp-notice.hidden { display: none; }
+@keyframes fx-otp-fade { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+.fx-otp-demo { animation: fx-otp-fade .4s .8s ease both; }
+
+/* ---------- Resend with countdown ring ---------- */
+.fx-otp-resend { display: inline-flex; align-items: center; gap: .35rem; font-weight: 700; color: var(--otp-brand); border-radius: .6rem; padding: .25rem .4rem; }
+.fx-otp-resend:hover:not(:disabled) { text-decoration: underline; }
+.fx-otp-resend:disabled { color: #94a3b8; cursor: default; }
+.fx-otp-resend:focus-visible { outline: 2px solid var(--otp-brand-2); outline-offset: 2px; }
+.fx-otp-countdown, .fx-otp-resend-ready { display: inline-flex; align-items: center; gap: .35rem; }
+.fx-otp-countdown[hidden], .fx-otp-resend-ready[hidden] { display: none; }
+.fx-otp-countdown-ring { width: 1.25rem; height: 1.25rem; transform: rotate(-90deg); }
+.fx-otp-countdown-ring circle { fill: none; stroke-width: 3; }
+.fx-otp-countdown-ring .track { stroke: var(--otp-line-soft); }
+.fx-otp-countdown-ring .bar { stroke: var(--otp-brand-2); stroke-linecap: round; stroke-dasharray: 56.55; transition: stroke-dashoffset 1s linear; }
+.fx-otp-resend-ready i { transition: transform .5s; }
+.fx-otp-resend.is-spinning .fx-otp-resend-ready i { animation: fx-spin .7s linear infinite; }
+.fx-otp-resend-ready { animation: fx-otp-fade .35s ease both; }
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+    .fx-otp *, .fx-otp *::before, .fx-otp *::after { animation-duration: .001ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+    .fx-otp-ring { display: none; }
+    .fx-otp.is-success .fx-otp-check { stroke-dashoffset: 0; }
+}
+
+@media (max-width: 380px) {
+    .fx-otp-art { width: 170px; height: 136px; }
+    .fx-otp-box { height: 3.5rem; font-size: 1.5rem; }
+}
+
+/* success polish */
+.fx-otp.is-success .fx-otp-submit:disabled { opacity: 1; background: #16a34a; box-shadow: 0 8px 22px -8px rgba(22, 163, 74, .6); }
+.fx-otp-box::selection { background: transparent; }
+.fx-otp.is-success [data-otp-resend-form], .fx-otp.is-success .fx-otp-demo { opacity: .35; pointer-events: none; transition: opacity .3s; }
+.fx-otp.is-success .fx-otp-notice { color: var(--otp-ok); }

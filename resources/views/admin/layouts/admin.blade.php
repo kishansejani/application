@@ -1,24 +1,141 @@
 @php
+    use App\Models\Order;
+    use App\Models\Product;
+
     $sysSettings = \App\Models\Setting::getAllSettings();
+    $authUser    = Auth::user();
+    $storeName   = $sysSettings['store_name'] ?? 'Fresh Express';
+
+    // ---- Colour helpers (settings are user-defined hex values) --------------------------
+    $hexToRgb = function ($hex, $fallback = '15 23 42') {
+        $hex = ltrim(trim((string) $hex), '#');
+        if (strlen($hex) === 3) { $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2]; }
+        if (!preg_match('/^[0-9a-fA-F]{6}$/', $hex)) { return $fallback; }
+        return hexdec(substr($hex, 0, 2)).' '.hexdec(substr($hex, 2, 2)).' '.hexdec(substr($hex, 4, 2));
+    };
+    $contrast = function ($hex) use ($hexToRgb) {
+        [$r, $g, $b] = array_map('intval', explode(' ', $hexToRgb($hex)));
+        return ((0.299 * $r + 0.587 * $g + 0.114 * $b) / 255) > 0.6 ? '#0f172a' : '#ffffff';
+    };
+
+    $primary       = $sysSettings['theme_primary_color'] ?? '#0f172a';
+    $sidebarBg     = $sysSettings['sidebar_bg_color'] ?? '#0b1120';
+    $sidebarActive = $sysSettings['sidebar_active_color'] ?? '#add8e6';
+    $sidebarText   = $sysSettings['sidebar_text_color'] ?? $contrast($sidebarBg);
+
+    // ---- Live counters for badges & notifications ---------------------------------------
+    $pendingCnt  = Order::where('order_status', 'pending')->count();
+    $lowStockCnt = Product::where('stock_quantity', '>', 0)->whereColumn('stock_quantity', '<=', 'low_stock_threshold')->count();
+    $outStockCnt = Product::where('stock_quantity', '<=', 0)->count();
+    $notifOrders = Order::where('order_status', 'pending')->latest()->take(5)->get();
+    $notifStock  = Product::whereColumn('stock_quantity', '<=', 'low_stock_threshold')->orderBy('stock_quantity')->take(5)->get();
+    $notifTotal  = $pendingCnt + $lowStockCnt + $outStockCnt;
+
+    $can = fn ($perm) => $authUser && ($perm === null || $authUser->hasPermission($perm));
+
+    // ---- Sidebar navigation definition ---------------------------------------------------
+    $navGroups = [
+        ['label' => 'Overview', 'items' => [
+            ['label' => 'Dashboard', 'icon' => 'squares-four', 'route' => 'admin.dashboard', 'active' => 'admin.dashboard', 'perm' => null],
+        ]],
+        ['label' => 'Sales', 'items' => [
+            ['label' => 'Orders', 'icon' => 'shopping-cart-simple', 'route' => 'admin.orders.index', 'active' => ['admin.orders.*', 'admin.invoices.*'], 'perm' => 'manage_orders',
+             'badge' => $pendingCnt ?: null, 'badgeTone' => 'amber', 'badgeTitle' => 'Pending orders'],
+            ['label' => 'Offers & Coupons', 'icon' => 'ticket', 'route' => 'admin.offers.index', 'active' => 'admin.offers.*', 'perm' => 'manage_offers'],
+        ]],
+        ['label' => 'Catalog', 'items' => [
+            ['label' => 'Categories', 'icon' => 'stack', 'route' => 'admin.categories.index', 'active' => 'admin.categories.*', 'perm' => 'manage_categories'],
+            ['label' => 'Sub Categories', 'icon' => 'tree-structure', 'route' => 'admin.subcategories.index', 'active' => 'admin.subcategories.*', 'perm' => 'manage_categories'],
+            ['label' => 'Products', 'icon' => 'package', 'route' => 'admin.products.index', 'active' => 'admin.products.*', 'perm' => 'manage_products'],
+            ['label' => 'Stock & Inventory', 'icon' => 'warehouse', 'route' => 'admin.stock.index', 'active' => 'admin.stock.*', 'perm' => 'manage_stock',
+             'badge' => ($lowStockCnt + $outStockCnt) ?: null, 'badgeTone' => 'rose', 'badgeTitle' => 'Low / out of stock'],
+        ]],
+        ['label' => 'Storefront', 'items' => [
+            ['label' => 'Home Sliders', 'icon' => 'slideshow', 'route' => 'admin.sliders.index', 'active' => 'admin.sliders.*', 'perm' => 'manage_sliders'],
+            ['label' => 'Content Pages', 'icon' => 'article', 'route' => 'admin.pages.index', 'active' => 'admin.pages.*', 'perm' => 'manage_pages'],
+        ]],
+        ['label' => 'Administration', 'items' => [
+            ['label' => 'Users', 'icon' => 'users-three', 'route' => 'admin.users.index', 'active' => 'admin.users.*', 'perm' => 'manage_users'],
+            ['label' => 'Roles & Permissions', 'icon' => 'shield-check', 'route' => 'admin.roles.index', 'active' => 'admin.roles.*', 'perm' => 'manage_roles'],
+            ['label' => 'Settings', 'icon' => 'gear-six', 'route' => 'admin.settings.index', 'active' => 'admin.settings.*', 'perm' => 'manage_settings'],
+        ]],
+    ];
+
+    // Filter by permission and work out the active item (for breadcrumbs)
+    $activeGroup = null; $activeItem = null;
+    foreach ($navGroups as $gi => $group) {
+        $navGroups[$gi]['key']   = \Illuminate\Support\Str::slug($group['label']);
+        $navGroups[$gi]['label'] = __($group['label']);
+        $group['items'] = array_map(fn ($i) => array_merge($i, ['label' => __($i['label'])]), $group['items']);
+        $navGroups[$gi]['items'] = array_values(array_filter($group['items'], fn ($i) => $can($i['perm'])));
+        foreach ($navGroups[$gi]['items'] as $ii => $item) {
+            $isActive = request()->routeIs(...(array) $item['active']);
+            $navGroups[$gi]['items'][$ii]['isActive'] = $isActive;
+            if ($isActive) { $activeGroup = $group['label']; $activeItem = $item; }
+        }
+    }
+    $navGroups = array_values(array_filter($navGroups, fn ($g) => count($g['items'])));
+
+    // Quick "create" actions for the command palette
+    $quickActions = array_values(array_filter([
+        $can('manage_products')   ? ['label' => 'Add new product', 'icon' => 'plus-circle', 'url' => route('admin.products.create'), 'hint' => 'Catalog'] : null,
+        $can('manage_categories') ? ['label' => 'Add new category', 'icon' => 'plus-circle', 'url' => route('admin.categories.create'), 'hint' => 'Catalog'] : null,
+        $can('manage_categories') ? ['label' => 'Add new sub category', 'icon' => 'plus-circle', 'url' => route('admin.subcategories.create'), 'hint' => 'Catalog'] : null,
+        $can('manage_offers')     ? ['label' => 'Create coupon / offer', 'icon' => 'plus-circle', 'url' => route('admin.offers.create'), 'hint' => 'Sales'] : null,
+        $can('manage_sliders')    ? ['label' => 'Add home slider', 'icon' => 'plus-circle', 'url' => route('admin.sliders.create'), 'hint' => 'Storefront'] : null,
+        $can('manage_users')      ? ['label' => 'Add new user', 'icon' => 'user-plus', 'url' => route('admin.users.create'), 'hint' => 'Administration'] : null,
+        $can('manage_roles')      ? ['label' => 'Create role', 'icon' => 'shield-plus', 'url' => route('admin.roles.create'), 'hint' => 'Administration'] : null,
+        $can('manage_orders')     ? ['label' => 'Pending orders', 'icon' => 'hourglass-medium', 'url' => route('admin.orders.index', ['status' => 'pending']), 'hint' => 'Sales'] : null,
+        $can('manage_stock')      ? ['label' => 'Low stock items', 'icon' => 'warning', 'url' => route('admin.stock.index', ['filter' => 'low']), 'hint' => 'Catalog'] : null,
+        ['label' => 'Open storefront', 'icon' => 'storefront', 'url' => route('home'), 'hint' => 'External', 'external' => true],
+    ]));
+    $quickActions = array_map(fn ($a) => array_merge($a, ['label' => __($a['label']), 'hint' => __($a['hint'])]), $quickActions);
+
+    $paletteItems = [];
+    foreach ($navGroups as $group) {
+        foreach ($group['items'] as $item) {
+            $paletteItems[] = ['label' => $item['label'], 'icon' => $item['icon'], 'url' => route($item['route']), 'hint' => $group['label']];
+        }
+    }
+    $paletteItems = array_merge($paletteItems, $quickActions);
+
+    $pageTitle = __(html_entity_decode(trim($__env->yieldContent('title', 'Admin Portal')), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+    $btnPrimaryBg = $sysSettings['btn_primary_bg'] ?? '#0f172a';
+    [$bpR, $bpG, $bpB] = array_map('intval', explode(' ', $hexToRgb($btnPrimaryBg)));
+    $btnPrimaryIsDark = ((0.299 * $bpR + 0.587 * $bpG + 0.114 * $bpB) / 255) < 0.28;
+    $initials  = collect(explode(' ', $authUser->name ?? 'Admin'))->filter()->map(fn ($w) => mb_substr($w, 0, 1))->take(2)->implode('');
 @endphp
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="theme-color" content="{{ $sidebarBg }}">
+    <title>{{ $pageTitle }} · {{ $storeName }} Admin</title>
 
-    <title>@yield('title', 'Admin Portal') - {{ config('app.name', 'Decent Infoways') }}</title>
+    {{-- Apply theme + sidebar state before first paint (prevents flashing) --}}
+    <script>
+        (function () {
+            var d = document.documentElement, mode = 'system';
+            try { mode = localStorage.getItem('admin_theme_mode') || '{{ $sysSettings['theme_mode'] ?? 'system' }}'; } catch (e) {}
+            var dark = mode === 'dark' || (mode === 'system' && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches);
+            if (dark) d.classList.add('dark');
+            try { if (localStorage.getItem('admin_sidebar_collapsed') === 'true') d.classList.add('sidebar-mini'); } catch (e) {}
+        })();
+    </script>
 
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Hind+Vadodara:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Hind+Vadodara:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Font Awesome -->
+    {{-- Phosphor Icons (UI) + Font Awesome (category icons stored in the database) --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/bold/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -26,818 +143,352 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: 'var(--theme-primary)',
+                        primary: 'rgb(var(--c-primary) / <alpha-value>)',
                         hover: 'var(--theme-hover)',
                         sidebarBg: 'var(--sidebar-bg)',
                         sidebarActive: 'var(--sidebar-active)',
-                        brand: {
-                            50: '#ecfdf5',
-                            100: '#d1fae5',
-                            200: '#a7f3d0',
-                            300: '#6ee7b7',
-                            400: '#34d399',
-                            500: '#10b981',
-                            600: '#059669',
-                            700: '#047857',
-                            800: '#065f46',
-                            900: '#064e3b',
-                            950: '#022c22',
-                        }
+                        brand: { 50: '#ecfdf5', 100: '#d1fae5', 200: '#a7f3d0', 300: '#6ee7b7', 400: '#34d399', 500: '#10b981', 600: '#059669', 700: '#047857', 800: '#065f46', 900: '#064e3b', 950: '#022c22' },
                     },
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', '"Hind Vadodara"', 'sans-serif'],
-                    }
+                    fontFamily: { sans: ['"Plus Jakarta Sans"', '"Hind Vadodara"', 'ui-sans-serif', 'system-ui', 'sans-serif'] },
+                    boxShadow: { soft: '0 1px 2px rgba(16,24,40,.04), 0 1px 3px rgba(16,24,40,.06)', lift: '0 12px 32px -12px rgba(15,23,42,.25)' },
                 }
             }
         }
     </script>
 
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.tailwindcss.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.tailwindcss.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.tailwindcss.min.css">
-
-    <!-- Toastr CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <style>
         :root {
-            --theme-primary: {{ $sysSettings['theme_primary_color'] ?? '#0f172a' }};
+            --theme-primary: {{ $primary }};
+            --c-primary: {{ $hexToRgb($primary) }};
+            --theme-primary-contrast: {{ $contrast($primary) }};
             --theme-hover: {{ $sysSettings['theme_hover_color'] ?? '#334155' }};
             --btn-primary-bg: {{ $sysSettings['btn_primary_bg'] ?? '#0f172a' }};
             --btn-primary-text: {{ $sysSettings['btn_primary_text'] ?? '#ffffff' }};
             --btn-primary-hover: {{ $sysSettings['btn_primary_hover'] ?? '#1e293b' }};
             --btn-accent-bg: {{ $sysSettings['btn_accent_bg'] ?? '#10b981' }};
             --btn-accent-text: {{ $sysSettings['btn_accent_text'] ?? '#ffffff' }};
-            --sidebar-bg: {{ $sysSettings['sidebar_bg_color'] ?? '#000000' }};
-            --sidebar-active: {{ $sysSettings['sidebar_active_color'] ?? '#add8e6' }};
-            --sidebar-text: {{ $sysSettings['sidebar_text_color'] ?? '#ffffff' }};
+            --sidebar-bg: {{ $sidebarBg }};
+            --c-sidebar-text: {{ $hexToRgb($sidebarText, '255 255 255') }};
+            --sidebar-text: {{ $sidebarText }};
+            --sidebar-active: {{ $sidebarActive }};
+            --sidebar-active-text: {{ $contrast($sidebarActive) }};
         }
-        body {
-            font-family: 'Plus Jakarta Sans', 'Hind Vadodara', sans-serif;
-        }
-        .btn-theme-primary, .btn-primary-custom { 
-            background-color: var(--btn-primary-bg) !important; 
-            color: var(--btn-primary-text) !important; 
-            border: none;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .btn-theme-primary:hover, .btn-primary-custom:hover {
-            background-color: var(--btn-primary-hover) !important;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        .btn-theme-accent {
-            background-color: var(--btn-accent-bg) !important;
-            color: var(--btn-accent-text) !important;
-            transition: all 0.2s ease;
-        }
-        .bg-primary-custom { background-color: var(--theme-primary) !important; }
-        .text-primary-custom { color: var(--theme-primary) !important; }
-        .border-primary-custom { border-color: var(--theme-primary) !important; }
-        .sidebar-custom-bg { background-color: var(--sidebar-bg) !important; }
-        .sidebar-active-item { 
-            background-color: var(--sidebar-active) !important; 
-            color: #000000 !important;
-            font-weight: 700 !important;
-        }
-        
-        /* Collapsible Mini Sidebar Styles */
-        #adminSidebar {
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        #adminSidebar.collapsed {
-            width: 5rem !important; /* 80px */
-        }
-        #adminSidebar.collapsed .sidebar-text,
-        #adminSidebar.collapsed .sidebar-heading,
-        #adminSidebar.collapsed .sidebar-badge,
-        #adminSidebar.collapsed .sidebar-brand-text,
-        #adminSidebar.collapsed .sidebar-chevron {
-            display: none !important;
-        }
-        #adminSidebar.collapsed .sidebar-item {
-            justify-content: center !important;
-            padding-left: 0.75rem !important;
-            padding-right: 0.75rem !important;
-        }
-        #adminSidebar.collapsed .sidebar-brand-wrapper {
-            justify-content: center !important;
-            padding-left: 0 !important;
-            padding-right: 0 !important;
-        }
-
-        /* Tooltip styling for collapsed sidebar */
-        #adminSidebar.collapsed .sidebar-item {
-            position: relative;
-        }
-
-        /* Modern DataTables Styling */
-        .dataTables_wrapper {
-            width: 100% !important;
-        }
-        .dataTables_wrapper .dt-header {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            margin-bottom: 1.25rem;
-        }
-        @media (min-width: 640px) {
-            .dataTables_wrapper .dt-header {
-                flex-direction: row;
-                align-items: center;
-                justify-content: space-between;
-            }
-        }
-        .dataTables_wrapper .dataTables_length label {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.8125rem;
-            font-weight: 600;
-            color: #64748b;
-        }
-        .dark .dataTables_wrapper .dataTables_length label {
-            color: #94a3b8;
-        }
-        .dataTables_wrapper .dataTables_length select {
-            border: 1px solid #e2e8f0;
-            background-color: #ffffff;
-            color: #0f172a;
-            border-radius: 0.75rem;
-            padding: 0.45rem 2rem 0.45rem 0.85rem;
-            font-size: 0.8125rem;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            outline: none;
-            transition: all 0.2s ease;
-        }
-        .dark .dataTables_wrapper .dataTables_length select {
-            border-color: #334155;
-            background-color: #0f172a;
-            color: #f8fafc;
-        }
-        .dataTables_wrapper .dataTables_length select:focus {
-            border-color: #0f172a;
-            box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.1);
-        }
-        .dataTables_wrapper .dataTables_filter {
-            margin: 0;
-            position: relative;
-        }
-        .dataTables_wrapper .dataTables_filter label {
-            display: flex;
-            align-items: center;
-            position: relative;
-            margin: 0;
-            font-size: 0;
-        }
-        .dataTables_wrapper .dataTables_filter input {
-            border: 1px solid #e2e8f0;
-            background-color: #ffffff;
-            color: #0f172a;
-            border-radius: 0.875rem;
-            padding: 0.55rem 1rem 0.55rem 2.5rem;
-            font-size: 0.8125rem;
-            font-weight: 500;
-            width: 16rem;
-            outline: none;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            transition: all 0.2s ease;
-        }
-        .dark .dataTables_wrapper .dataTables_filter input {
-            border-color: #334155;
-            background-color: #0f172a;
-            color: #f8fafc;
-        }
-        .dataTables_wrapper .dataTables_filter input:focus {
-            border-color: #0f172a;
-            box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1);
-            width: 18rem;
-        }
-        .dark .dataTables_wrapper .dataTables_filter input:focus {
-            border-color: #94a3b8;
-            box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.15);
-        }
-        .dataTables_wrapper .dataTables_filter::before {
-            content: "\f002";
-            font-family: "Font Awesome 6 Free";
-            font-weight: 900;
-            position: absolute;
-            left: 0.9rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #94a3b8;
-            font-size: 0.8125rem;
-            pointer-events: none;
-            z-index: 10;
-        }
-        .dataTables_wrapper table.dataTable {
-            border-collapse: separate !important;
-            border-spacing: 0 !important;
-            margin-top: 0.5rem !important;
-            margin-bottom: 0.5rem !important;
-            width: 100% !important;
-        }
-        .dataTables_wrapper table.dataTable thead th {
-            background-color: #f8fafc;
-            color: #64748b;
-            font-size: 0.6875rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 0.875rem 1rem;
-            border-top: 1px solid #f1f5f9;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        .dark .dataTables_wrapper table.dataTable thead th {
-            background-color: #0f172a;
-            color: #94a3b8;
-            border-color: #1e293b;
-        }
-        .dataTables_wrapper table.dataTable tbody td {
-            padding: 0.875rem 1rem;
-            vertical-align: middle;
-            border-bottom: 1px solid #f1f5f9;
-        }
-        .dark .dataTables_wrapper table.dataTable tbody td {
-            border-bottom: 1px solid #1e293b;
-        }
-        .dataTables_wrapper .dt-footer {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            margin-top: 1.25rem;
-            padding-top: 0.75rem;
-            border-top: 1px solid #f1f5f9;
-        }
-        .dark .dataTables_wrapper .dt-footer {
-            border-color: #1e293b;
-        }
-        @media (min-width: 640px) {
-            .dataTables_wrapper .dt-footer {
-                flex-direction: row;
-                align-items: center;
-                justify-content: space-between;
-            }
-        }
-        .dataTables_wrapper .dataTables_info {
-            font-size: 0.8125rem;
-            font-weight: 500;
-            color: #64748b;
-            padding: 0;
-            margin: 0;
-        }
-        .dark .dataTables_wrapper .dataTables_info {
-            color: #94a3b8;
-        }
-        .dataTables_wrapper .dataTables_paginate {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            padding: 0;
-            margin: 0;
-        }
-        .dataTables_wrapper .dataTables_paginate .paginate_button {
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            min-width: 2.25rem !important;
-            height: 2.25rem !important;
-            padding: 0 0.625rem !important;
-            border-radius: 0.75rem !important;
-            font-size: 0.8125rem !important;
-            font-weight: 600 !important;
-            border: 1px solid transparent !important;
-            background: transparent !important;
-            color: #64748b !important;
-            cursor: pointer !important;
-            transition: all 0.2s ease !important;
-        }
-        .dark .dataTables_wrapper .dataTables_paginate .paginate_button {
-            color: #94a3b8 !important;
-        }
-        .dataTables_wrapper .dataTables_paginate .paginate_button:hover:not(.disabled) {
-            background-color: #f1f5f9 !important;
-            color: #0f172a !important;
-            border-color: #e2e8f0 !important;
-        }
-        .dark .dataTables_wrapper .dataTables_paginate .paginate_button:hover:not(.disabled) {
-            background-color: #1e293b !important;
-            color: #ffffff !important;
-            border-color: #334155 !important;
-        }
-        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-            background-color: #0f172a !important;
-            color: #ffffff !important;
-            border-color: #0f172a !important;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-        }
-        .dark .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-            background-color: #ffffff !important;
-            color: #0f172a !important;
-            border-color: #ffffff !important;
-        }
-        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
-            opacity: 0.35 !important;
-            cursor: not-allowed !important;
-        }
-
-        .dropzone-container {
-            border: 2px dashed #cbd5e1;
-            transition: all 0.2s ease-in-out;
-        }
-        .dropzone-container.dragover {
-            border-color: var(--theme-primary);
-            background-color: rgba(0, 0, 0, 0.05);
-        }
+        @if($btnPrimaryIsDark)
+        /* A very dark primary button would vanish on dark surfaces: use a light variant in dark mode */
+        .dark { --btn-primary-bg: #e2e8f0; --btn-primary-text: #0f172a; --btn-primary-hover: #ffffff; }
+        @endif
     </style>
+    <link rel="stylesheet" href="{{ asset('assets/shared/fx-select.css') }}?v=2.1.0">
+    <link rel="stylesheet" href="{{ asset('assets/admin/admin.css') }}?v=2.1.0">
     @stack('styles')
 </head>
-<body class="h-full bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 antialiased flex flex-col transition-colors duration-200">
+<body class="admin-body">
+    <div id="pageProgress" class="page-progress"></div>
 
-    <div class="min-h-screen flex flex-col">
-        <!-- Top Navbar -->
-        <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30 shadow-sm">
-            <div class="px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
-                <!-- Left: Sidebar Toggle & Search Bar (Ctrl+/) -->
-                <div class="flex items-center gap-3 sm:gap-4 flex-1">
-                    <!-- Desktop & Mobile Sidebar Collapse Toggle Button -->
-                    <button id="sidebarCollapseToggle" type="button" class="p-2.5 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition flex items-center justify-center" title="Toggle Sidebar Width">
-                        <i class="fa-solid fa-bars-staggered text-base"></i>
+    {{-- ============================== SIDEBAR ============================== --}}
+    <aside id="adminSidebar" class="app-sidebar" aria-label="Main navigation">
+        <div class="sb-brand">
+            <a href="{{ route('admin.dashboard') }}" class="sb-brand-link">
+                <span class="sb-logo"><i class="ph-fill ph-basket"></i></span>
+                <span class="sb-brand-text">
+                    <span class="sb-brand-name">{{ $storeName }}</span>
+                    <span class="sb-brand-sub">{{ __('Admin Console') }}</span>
+                </span>
+            </a>
+            <button type="button" class="sb-close" data-sidebar-close aria-label="Close menu"><i class="ph ph-x"></i></button>
+        </div>
+
+        <div class="sb-search">
+            <i class="ph ph-magnifying-glass"></i>
+            <input type="search" id="sidebarFilter" placeholder="{{ __('Filter menu…') }}" autocomplete="off" aria-label="Filter menu">
+        </div>
+
+        <nav class="sb-nav" id="sidebarNav">
+            @foreach($navGroups as $group)
+                @php $gKey = $group['key']; @endphp
+                <div class="sb-group" data-group="{{ $gKey }}">
+                    <button type="button" class="sb-group-title" data-group-toggle="{{ $gKey }}">
+                        <span>{{ $group['label'] }}</span>
+                        <i class="ph ph-caret-down"></i>
                     </button>
-                    
-                    <!-- Search Input -->
-                    <div class="relative w-full max-w-md hidden sm:block">
-                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                            <i class="fa-solid fa-magnifying-glass text-sm"></i>
-                        </span>
-                        <input type="text" id="adminQuickSearch" placeholder="Search anything (Ctrl+/)..."
-                               class="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-300">
+                    <ul class="sb-group-items">
+                        @foreach($group['items'] as $item)
+                            <li>
+                                <a href="{{ route($item['route']) }}" class="sb-item {{ $item['isActive'] ? 'is-active' : '' }}" data-label="{{ strtolower($item['label']) }}" @if($item['isActive']) aria-current="page" @endif>
+                                    <i class="sb-icon {{ $item['isActive'] ? 'ph-fill' : 'ph-duotone' }} ph-{{ $item['icon'] }}"></i>
+                                    <span class="sb-label">{{ $item['label'] }}</span>
+                                    @if(!empty($item['badge']))
+                                        <span class="sb-badge sb-badge-{{ $item['badgeTone'] }}" title="{{ $item['badgeTitle'] ?? '' }}">{{ $item['badge'] > 99 ? '99+' : $item['badge'] }}</span>
+                                    @endif
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endforeach
+            <p class="sb-empty hidden" id="sidebarEmpty">{{ __('No menu items match.') }}</p>
+        </nav>
+
+        <div class="sb-footer">
+            <div class="sb-user">
+                <span class="sb-avatar">{{ $initials }}</span>
+                <span class="sb-user-meta">
+                    <span class="sb-user-name">{{ $authUser->name ?? 'Administrator' }}</span>
+                    <span class="sb-user-role">{{ $authUser->roleModel->display_name ?? ucfirst(str_replace('_', ' ', $authUser->role ?? 'admin')) }}</span>
+                </span>
+                <form action="{{ route('admin.logout') }}" method="POST" class="sb-logout-form">
+                    @csrf
+                    <button type="submit" class="sb-logout" title="Sign out" data-no-loading><i class="ph ph-sign-out"></i></button>
+                </form>
+            </div>
+        </div>
+    </aside>
+    <div class="sidebar-backdrop" data-sidebar-close></div>
+
+    {{-- ============================== MAIN ============================== --}}
+    <div class="app-main">
+        <header class="app-topbar">
+            <div class="flex items-center gap-2 min-w-0">
+                <button type="button" id="sidebarToggle" class="tb-btn" title="Toggle sidebar ( [ )" aria-label="Toggle sidebar">
+                    <i class="ph ph-sidebar-simple text-xl"></i>
+                </button>
+
+                <nav class="tb-breadcrumb hidden md:flex" aria-label="Breadcrumb">
+                    <a href="{{ route('admin.dashboard') }}" class="tb-crumb" title="Dashboard"><i class="ph ph-house"></i></a>
+                    @hasSection('breadcrumbs')
+                        @yield('breadcrumbs')
+                    @else
+                        @if($activeGroup && $activeGroup !== 'Overview')
+                            <i class="ph ph-caret-right tb-crumb-sep"></i>
+                            <span class="tb-crumb">{{ $activeGroup }}</span>
+                        @endif
+                        @if($activeItem && $activeItem['label'] !== $pageTitle && $activeItem['route'] !== 'admin.dashboard')
+                            <i class="ph ph-caret-right tb-crumb-sep"></i>
+                            <a href="{{ route($activeItem['route']) }}" class="tb-crumb">{{ $activeItem['label'] }}</a>
+                        @endif
+                        <i class="ph ph-caret-right tb-crumb-sep"></i>
+                        <span class="tb-crumb is-current">{{ $pageTitle }}</span>
+                    @endif
+                </nav>
+            </div>
+
+            <div class="flex items-center gap-1 sm:gap-1.5">
+                <button type="button" class="tb-search" data-palette-open aria-label="Search">
+                    <i class="ph ph-magnifying-glass text-lg"></i>
+                    <span class="hidden lg:inline">{{ __('Search or jump to…') }}</span>
+                    <kbd class="hidden lg:inline-flex">Ctrl K</kbd>
+                </button>
+
+                {{-- Theme --}}
+                <div class="relative" data-dropdown>
+                    <button type="button" class="tb-btn" data-dropdown-toggle title="Appearance" aria-label="Appearance">
+                        <i id="themeCurrentIcon" class="ph ph-desktop text-lg"></i>
+                    </button>
+                    <div class="tb-menu w-44" data-dropdown-menu>
+                        <p class="tb-menu-title">{{ __('Appearance') }}</p>
+                        <button type="button" class="tb-menu-item" data-theme-set="light"><i class="ph ph-sun"></i> {{ __('Light') }} <i class="ph-bold ph-check ml-auto tm-check"></i></button>
+                        <button type="button" class="tb-menu-item" data-theme-set="dark"><i class="ph ph-moon-stars"></i> {{ __('Dark') }} <i class="ph-bold ph-check ml-auto tm-check"></i></button>
+                        <button type="button" class="tb-menu-item" data-theme-set="system"><i class="ph ph-desktop"></i> {{ __('System') }} <i class="ph-bold ph-check ml-auto tm-check"></i></button>
                     </div>
                 </div>
 
-                <!-- Right Controls: Theme Mode (Light/Dark/System), Language, Storefront & Profile -->
-                <div class="flex items-center gap-2.5 sm:gap-3">
-                    <!-- Theme Mode Dropdown (Light / Dark / System Match PC) -->
-                    <div class="relative" id="themeDropdownContainer">
-                        <button id="themeModeBtn" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition">
-                            <i id="themeCurrentIcon" class="fa-solid fa-laptop text-slate-500 dark:text-slate-300"></i>
-                            <span id="themeCurrentLabel" class="hidden md:inline text-slate-700 dark:text-slate-200">System</span>
-                            <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
-                        </button>
-                        <div id="themeDropdownMenu" class="hidden absolute right-0 mt-2 w-40 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 py-1 z-50 text-xs font-semibold">
-                            <button onclick="setThemeMode('light')" class="w-full text-left px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2.5 text-slate-700 dark:text-slate-200">
-                                <i class="fa-solid fa-sun text-amber-500 w-4"></i> Light
-                            </button>
-                            <button onclick="setThemeMode('dark')" class="w-full text-left px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2.5 text-slate-700 dark:text-slate-200">
-                                <i class="fa-solid fa-moon text-indigo-400 w-4"></i> Dark
-                            </button>
-                            <button onclick="setThemeMode('system')" class="w-full text-left px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2.5 text-slate-700 dark:text-slate-200">
-                                <i class="fa-solid fa-laptop text-slate-500 w-4"></i> System (PC)
-                            </button>
+                {{-- Fullscreen --}}
+                <button type="button" class="tb-btn" id="fullscreenToggle" title="Full screen (Ctrl+Shift+F)" aria-label="Toggle full screen">
+                    <i class="ph ph-corners-out text-lg"></i>
+                </button>
+
+                {{-- Language --}}
+                <span class="hidden sm:inline-flex">
+                    <a href="{{ route('lang.switch', app()->getLocale() === 'gu' ? 'en' : 'gu') }}" class="tb-btn tb-btn-text" title="Switch language">
+                        <i class="ph ph-translate text-lg"></i>
+                        <span class="text-[11px] font-bold">{{ app()->getLocale() === 'gu' ? 'EN' : 'ગુજ' }}</span>
+                    </a>
+                </span>
+
+                {{-- Notifications --}}
+                <div class="relative" data-dropdown>
+                    <button type="button" class="tb-btn relative" data-dropdown-toggle title="Notifications" aria-label="Notifications">
+                        <i class="ph ph-bell text-lg"></i>
+                        @if($notifTotal > 0)
+                            <span class="tb-dot">{{ $notifTotal > 9 ? '9+' : $notifTotal }}</span>
+                        @endif
+                    </button>
+                    <div class="tb-menu tb-menu-wide p-0" data-dropdown-menu>
+                        <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-700/70">
+                            <p class="text-sm font-bold text-slate-900 dark:text-white">{{ __('Notifications') }}</p>
+                            <span class="text-[11px] font-semibold text-slate-500">{{ __($notifTotal == 1 ? ':count alert' : ':count alerts', ['count' => $notifTotal]) }}</span>
                         </div>
-                    </div>
-
-                    <!-- Language Switcher -->
-                    <a href="{{ route('lang.switch', app()->getLocale() === 'gu' ? 'en' : 'gu') }}" 
-                       class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
-                        <i class="fa-solid fa-language text-slate-500"></i>
-                        <span>{{ app()->getLocale() === 'gu' ? 'ENG' : 'ગુજ' }}</span>
-                    </a>
-
-                    <!-- Visit Storefront -->
-                    <a href="{{ route('home') }}" target="_blank" 
-                       class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl transition border border-slate-200 dark:border-slate-600">
-                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                        <span>Storefront</span>
-                    </a>
-
-                    <!-- Admin Profile -->
-                    <div class="relative pl-1 sm:pl-2">
-                        <div class="flex items-center gap-2 cursor-pointer" id="userMenuBtn">
-                            <div class="relative">
-                                <div class="w-9 h-9 rounded-full bg-slate-900 dark:bg-slate-100 text-white dark:text-black flex items-center justify-center font-bold text-sm shadow">
-                                    {{ substr(Auth::user()->name ?? 'A', 0, 1) }}
+                        <div class="max-h-80 overflow-y-auto p-1.5">
+                            @if($can('manage_orders'))
+                                @foreach($notifOrders as $n)
+                                    <a href="{{ route('admin.orders.show', $n) }}" class="notif-item">
+                                        <span class="notif-icon bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300"><i class="ph ph-shopping-cart-simple"></i></span>
+                                        <span class="min-w-0 flex-1">
+                                            <span class="block text-xs font-bold text-slate-800 dark:text-slate-100 truncate">{{ __('New order #:number', ['number' => $n->order_number]) }}</span>
+                                            <span class="block text-[11px] text-slate-500 truncate">{{ $n->customer_name }} · ₹{{ number_format($n->total_amount, 2) }}</span>
+                                        </span>
+                                        <span class="text-[10px] text-slate-400 whitespace-nowrap">{{ $n->created_at->diffForHumans(null, true) }}</span>
+                                    </a>
+                                @endforeach
+                            @endif
+                            @if($can('manage_stock'))
+                                @foreach($notifStock as $p)
+                                    <a href="{{ route('admin.stock.index', ['filter' => $p->stock_quantity <= 0 ? 'out' : 'low']) }}" class="notif-item">
+                                        <span class="notif-icon {{ $p->stock_quantity <= 0 ? 'bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300' : 'bg-orange-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-300' }}"><i class="ph ph-package"></i></span>
+                                        <span class="min-w-0 flex-1">
+                                            <span class="block text-xs font-bold text-slate-800 dark:text-slate-100 truncate">{{ $p->name_en }}</span>
+                                            <span class="block text-[11px] text-slate-500">{{ $p->stock_quantity <= 0 ? 'Out of stock' : $p->stock_quantity.' left · low stock' }}</span>
+                                        </span>
+                                    </a>
+                                @endforeach
+                            @endif
+                            @if($notifTotal === 0)
+                                <div class="px-4 py-10 text-center">
+                                    <i class="ph-duotone ph-bell-simple-slash text-4xl text-slate-300 dark:text-slate-600"></i>
+                                    <p class="mt-2 text-xs font-semibold text-slate-500">{{ __('You\'re all caught up') }}</p>
                                 </div>
-                                <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white dark:border-slate-800"></span>
-                            </div>
-                            <div class="hidden md:block text-left">
-                                <p class="text-xs font-bold text-slate-900 dark:text-white leading-none">{{ Auth::user()->name ?? 'Administrator' }}</p>
-                                <p class="text-[10px] text-slate-500 dark:text-slate-400 font-semibold mt-0.5 uppercase">{{ Auth::user()->roleModel->display_name ?? Auth::user()->role ?? 'Admin' }}</p>
-                            </div>
+                            @endif
                         </div>
+                        @if($can('manage_orders') && $pendingCnt > 0)
+                            <a href="{{ route('admin.orders.index', ['status' => 'pending']) }}" class="block text-center text-xs font-bold py-2.5 border-t border-slate-100 dark:border-slate-700/70 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/40 rounded-b-2xl">{{ __('View all pending orders') }}</a>
+                        @endif
+                    </div>
+                </div>
+
+                {{-- Profile --}}
+                <div class="relative" data-dropdown>
+                    <button type="button" class="tb-profile" data-dropdown-toggle aria-label="Account menu">
+                        <span class="tb-avatar">{{ $initials }}<span class="tb-online"></span></span>
+                        <span class="hidden xl:block text-left leading-tight">
+                            <span class="block text-xs font-bold text-slate-900 dark:text-white max-w-[9rem] truncate">{{ $authUser->name ?? 'Administrator' }}</span>
+                            <span class="block text-[10px] font-semibold text-slate-500 uppercase tracking-wide">{{ $authUser->roleModel->display_name ?? $authUser->role ?? 'Admin' }}</span>
+                        </span>
+                        <i class="ph ph-caret-down text-xs text-slate-400 hidden xl:block"></i>
+                    </button>
+                    <div class="tb-menu w-60" data-dropdown-menu>
+                        <div class="px-3 py-2.5 mb-1 border-b border-slate-100 dark:border-slate-700/70">
+                            <p class="text-sm font-bold text-slate-900 dark:text-white truncate">{{ $authUser->name ?? 'Administrator' }}</p>
+                            <p class="text-[11px] text-slate-500 truncate">{{ $authUser->email ?? $authUser->phone }}</p>
+                        </div>
+                        <a href="{{ route('home') }}" target="_blank" class="tb-menu-item"><i class="ph ph-storefront"></i> {{ __('View storefront') }} <i class="ph ph-arrow-square-out ml-auto text-slate-400"></i></a>
+                        @if($can('manage_settings'))
+                            <a href="{{ route('admin.settings.index') }}" class="tb-menu-item"><i class="ph ph-gear-six"></i> {{ __('Settings') }}</a>
+                        @endif
+                        @if($can('manage_users') && $authUser)
+                            <a href="{{ route('admin.users.edit', $authUser) }}" class="tb-menu-item"><i class="ph ph-user-circle-gear"></i> {{ __('My account') }}</a>
+                        @endif
+                        <a href="{{ route('lang.switch', app()->getLocale() === 'gu' ? 'en' : 'gu') }}" class="tb-menu-item"><i class="ph ph-translate"></i> {{ app()->getLocale() === 'gu' ? 'Switch to English' : 'ગુજરાતીમાં જુઓ' }}</a>
+                        <button type="button" class="tb-menu-item" data-shortcuts-open><i class="ph ph-keyboard"></i> {{ __('Keyboard shortcuts') }} <kbd class="ml-auto">?</kbd></button>
+                        <div class="my-1 border-t border-slate-100 dark:border-slate-700/70"></div>
+                        <form action="{{ route('admin.logout') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="tb-menu-item text-rose-600 dark:text-rose-400" data-no-loading><i class="ph ph-sign-out"></i> {{ __('Sign out') }}</button>
+                        </form>
                     </div>
                 </div>
             </div>
         </header>
 
-        <!-- Main Wrapper with Sidebar & Content -->
-        <div class="flex-1 flex overflow-hidden">
-            <!-- Sidebar Navigation (Collapsible to Icon-Only Mode) -->
-            <aside id="adminSidebar" class="w-64 sidebar-custom-bg text-slate-300 flex-shrink-0 flex flex-col justify-between hidden lg:flex z-20">
-                <div class="p-3 space-y-1 overflow-y-auto max-h-[calc(100vh-4rem)]">
-                    <!-- Brand Header in Sidebar -->
-                    <div class="sidebar-brand-wrapper flex items-center justify-between px-3 py-3 mb-2 border-b border-white/10">
-                        <div class="flex items-center gap-2.5 overflow-hidden">
-                            <div class="w-9 h-9 flex-shrink-0 rounded-xl bg-white/10 flex items-center justify-center text-white font-black text-base shadow-sm">
-                                <i class="fa-solid fa-layer-group"></i>
-                            </div>
-                            <div class="sidebar-brand-text truncate">
-                                <span class="font-extrabold text-sm tracking-tight text-white block truncate">{{ $sysSettings['footer_creator_name'] ?? 'Decent Infoways' }}</span>
-                                <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Admin Panel</span>
-                            </div>
-                        </div>
+        <main class="app-content" id="appContent">
+            @if($errors->any())
+                <div class="alert alert-danger mb-5" role="alert">
+                    <i class="ph-fill ph-warning-circle text-lg"></i>
+                    <div class="min-w-0">
+                        <p class="font-bold">Please fix the following {{ $errors->count() > 1 ? $errors->count().' errors' : 'error' }}:</p>
+                        <ul class="mt-1 list-disc list-inside text-[13px] space-y-0.5">
+                            @foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach
+                        </ul>
                     </div>
-
-                    <p class="sidebar-heading px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-3 mb-1">Core</p>
-
-                    <!-- Dashboard -->
-                    <a href="{{ route('admin.dashboard') }}" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all {{ request()->routeIs('admin.dashboard') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}" title="Dashboard">
-                        <i class="fa-solid fa-chart-pie text-sm w-5 text-center flex-shrink-0"></i>
-                        <span class="sidebar-text">Dashboard</span>
-                    </a>
-
-                    <!-- Orders -->
-                    <a href="{{ route('admin.orders.index') }}" class="sidebar-item flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all {{ request()->routeIs('admin.orders.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}" title="Orders">
-                        <div class="flex items-center gap-3">
-                            <i class="fa-solid fa-truck-fast text-sm w-5 text-center flex-shrink-0"></i>
-                            <span class="sidebar-text">Orders</span>
-                        </div>
-                        @php $pendingCnt = \App\Models\Order::where('order_status', 'pending')->count(); @endphp
-                        @if($pendingCnt > 0)
-                            <span class="sidebar-badge px-2 py-0.5 text-[10px] font-bold rounded-full bg-amber-400 text-black">{{ $pendingCnt }}</span>
-                        @endif
-                    </a>
-
-                    <p class="sidebar-heading px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 pt-3 pb-1">Catalog & Stock</p>
-
-                    <!-- Sliders (Clean Name as requested) -->
-                    <a href="{{ route('admin.sliders.index') }}" class="sidebar-item flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all {{ request()->routeIs('admin.sliders.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}" title="Sliders">
-                        <i class="fa-solid fa-images text-sm w-5 text-center flex-shrink-0"></i>
-                        <span class="sidebar-text">Sliders</span>
-                    </a>
-
-                    <!-- Categories -->
-                    <a href="{{ route('admin.categories.index') }}" class="sidebar-item flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all {{ request()->routeIs('admin.categories.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}" title="Categories">
-                        <i class="fa-solid fa-layer-group text-sm w-5 text-center flex-shrink-0"></i>
-                        <span class="sidebar-text">Categories</span>
-                    </a>
-
-                    <!-- Sub Categories -->
-                    <a href="{{ route('admin.subcategories.index') }}" class="sidebar-item flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all {{ request()->routeIs('admin.subcategories.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}" title="Sub Categories">
-                        <i class="fa-solid fa-sitemap text-sm w-5 text-center flex-shrink-0"></i>
-                        <span class="sidebar-text">Sub Categories</span>
-                    </a>
-
-                    <!-- Products -->
-                    <a href="{{ route('admin.products.index') }}" class="sidebar-item flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all {{ request()->routeIs('admin.products.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}" title="Products">
-                        <i class="fa-solid fa-boxes-stacked text-sm w-5 text-center flex-shrink-0"></i>
-                        <span class="sidebar-text">Products</span>
-                    </a>
-
-                    <!-- Stock -->
-                    <a href="{{ route('admin.stock.index') }}" class="sidebar-item flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all {{ request()->routeIs('admin.stock.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}" title="Stock & Inventory">
-                        <div class="flex items-center gap-3">
-                            <i class="fa-solid fa-warehouse text-sm w-5 text-center flex-shrink-0"></i>
-                            <span class="sidebar-text">Stock</span>
-                        </div>
-                        @php $lowStockCount = \App\Models\Product::where('stock_quantity', '<=', 5)->count(); @endphp
-                        @if($lowStockCount > 0)
-                            <span class="sidebar-badge px-1.5 py-0.5 text-[10px] font-bold rounded bg-rose-500 text-white">Low</span>
-                        @endif
-                    </a>
-
-                    <!-- Offers & Pages -->
-                    <p class="sidebar-heading px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 pt-3 pb-1">Marketing & Content</p>
-
-                    <a href="{{ route('admin.offers.index') }}" class="sidebar-item flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all {{ request()->routeIs('admin.offers.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}" title="Offers">
-                        <i class="fa-solid fa-tag text-sm w-5 text-center flex-shrink-0"></i>
-                        <span class="sidebar-text">Offers</span>
-                    </a>
-
-                    <a href="{{ route('admin.pages.index') }}" class="sidebar-item flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all {{ request()->routeIs('admin.pages.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}" title="Pages">
-                        <i class="fa-solid fa-file-contract text-sm w-5 text-center flex-shrink-0"></i>
-                        <span class="sidebar-text">Pages</span>
-                    </a>
-
-                    <!-- Role & User Management -->
-                    <p class="sidebar-heading px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 pt-3 pb-1">Administration</p>
-
-                    <a href="{{ route('admin.roles.index') }}" class="sidebar-item flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all {{ request()->routeIs('admin.roles.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}" title="Roles & Permissions">
-                        <div class="flex items-center gap-3">
-                            <i class="fa-solid fa-shield-halved text-sm w-5 text-center flex-shrink-0"></i>
-                            <span class="sidebar-text">Roles & Permissions</span>
-                        </div>
-                        <i class="sidebar-chevron fa-solid fa-chevron-right text-[10px] opacity-60"></i>
-                    </a>
-
-                    <a href="{{ route('admin.users.index') }}" class="sidebar-item flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all {{ request()->routeIs('admin.users.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}" title="Users">
-                        <div class="flex items-center gap-3">
-                            <i class="fa-solid fa-users-gear text-sm w-5 text-center flex-shrink-0"></i>
-                            <span class="sidebar-text">Users</span>
-                        </div>
-                        <i class="sidebar-chevron fa-solid fa-chevron-right text-[10px] opacity-60"></i>
-                    </a>
-
-                    <!-- Settings -->
-                    <p class="sidebar-heading px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 pt-3 pb-1">Settings</p>
-
-                    <a href="{{ route('admin.settings.index') }}" class="sidebar-item flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all {{ request()->routeIs('admin.settings.*') ? 'sidebar-active-item' : 'hover:bg-white/10 hover:text-white' }}" title="Settings">
-                        <i class="fa-solid fa-gear text-sm w-5 text-center flex-shrink-0"></i>
-                        <span class="sidebar-text">Settings</span>
-                    </a>
+                    <button type="button" class="alert-close" onclick="this.closest('.alert').remove()" aria-label="Dismiss"><i class="ph ph-x"></i></button>
                 </div>
+            @endif
 
-                <!-- Sidebar Footer & Logout -->
-                <div class="p-3 border-t border-white/10 bg-black/40">
-                    <form action="{{ route('admin.logout') }}" method="POST">
-                        @csrf
-                        <button type="submit" class="sidebar-item w-full flex items-center justify-center gap-2 py-2.5 px-3 bg-white/10 hover:bg-rose-600/40 text-rose-300 hover:text-rose-100 rounded-xl text-xs font-bold transition" title="Logout Account">
-                            <i class="fa-solid fa-arrow-right-from-bracket flex-shrink-0"></i>
-                            <span class="sidebar-text">Logout</span>
-                        </button>
-                    </form>
-                </div>
-            </aside>
+            @yield('content')
+        </main>
 
-            <!-- Main Content Container -->
-            <main class="flex-1 overflow-y-auto bg-slate-100 dark:bg-slate-900 p-4 sm:p-6 lg:p-8 flex flex-col justify-between">
-                <div>
-                    <!-- Flash Messages -->
-                    @if(session('success'))
-                        <div class="mb-6 p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 flex items-center justify-between shadow-sm animate-fade-in">
-                            <div class="flex items-center gap-3">
-                                <i class="fa-solid fa-circle-check text-emerald-500 text-lg"></i>
-                                <span class="font-semibold text-sm">{{ session('success') }}</span>
-                            </div>
-                            <button onclick="this.parentElement.remove()" class="text-emerald-500 hover:text-emerald-800"><i class="fa-solid fa-xmark"></i></button>
-                        </div>
-                    @endif
+        <footer class="app-footer">
+            <div>
+                <span>{{ $sysSettings['footer_copyright_prefix'] ?? '© '.date('Y').', made with ❤️ by' }}</span>
+                <a href="{{ $sysSettings['footer_creator_url'] ?? 'https://decentinfoways.com' }}" target="_blank" rel="noopener" class="font-bold text-slate-700 dark:text-slate-200 hover:underline">{{ $sysSettings['footer_creator_name'] ?? 'Decent Infoways' }}</a>
+            </div>
+            <div class="flex items-center gap-4">
+                <button type="button" class="hover:text-slate-800 dark:hover:text-white" data-shortcuts-open>{{ __('Shortcuts') }}</button>
+                <a href="{{ route('home') }}" target="_blank" class="hover:text-slate-800 dark:hover:text-white">{{ __('Storefront') }}</a>
+                <span class="hidden sm:inline text-slate-400">v2.0</span>
+            </div>
+        </footer>
+    </div>
 
-                    @if(session('error'))
-                        <div class="mb-6 p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200 flex items-center justify-between shadow-sm animate-fade-in">
-                            <div class="flex items-center gap-3">
-                                <i class="fa-solid fa-circle-exclamation text-rose-500 text-lg"></i>
-                                <span class="font-semibold text-sm">{{ session('error') }}</span>
-                            </div>
-                            <button onclick="this.parentElement.remove()" class="text-rose-500 hover:text-rose-800"><i class="fa-solid fa-xmark"></i></button>
-                        </div>
-                    @endif
-
-                    @yield('content')
-                </div>
-
-                <!-- Footer (Matching Screenshot Footer: © 2026, made with ❤️ by Decent Infoways) -->
-                <footer class="mt-12 pt-6 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2">
-                    <div>
-                        <span>{{ $sysSettings['footer_copyright_prefix'] ?? '© 2026, made with ❤️ by' }}</span>
-                        <a href="{{ $sysSettings['footer_creator_url'] ?? 'https://decentinfoways.com' }}" target="_blank" class="font-bold hover:underline text-slate-800 dark:text-white">
-                            {{ $sysSettings['footer_creator_name'] ?? 'Decent Infoways' }}
-                        </a>
-                    </div>
-                    <div class="flex items-center gap-4 text-[11px]">
-                        <a href="{{ route('admin.settings.index') }}" class="hover:underline">Settings</a>
-                        <span>•</span>
-                        <a href="{{ route('password.forgot') }}" class="hover:underline">Reset Password</a>
-                    </div>
-                </footer>
-            </main>
+    {{-- ============================== COMMAND PALETTE ============================== --}}
+    <div id="commandPalette" class="cp-overlay hidden" role="dialog" aria-modal="true" aria-label="Command palette">
+        <div class="cp-panel">
+            <div class="cp-search">
+                <i class="ph ph-magnifying-glass text-lg text-slate-400"></i>
+                <input type="text" id="cpInput" placeholder="{{ __('Search pages and actions…') }}" autocomplete="off" spellcheck="false">
+                <kbd>Esc</kbd>
+            </div>
+            <ul id="cpList" class="cp-list" role="listbox"></ul>
+            <div class="cp-foot">
+                <span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+                <span><kbd>Enter</kbd> open</span>
+                <span class="ml-auto hidden sm:inline">Tip: press <kbd>Ctrl</kbd>+<kbd>K</kbd> anywhere</span>
+            </div>
         </div>
     </div>
 
-    <!-- Scripts -->
+    {{-- ============================== SHORTCUTS ============================== --}}
+    <div id="shortcutsModal" class="cp-overlay hidden" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+        <div class="cp-panel max-w-md p-5">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2"><i class="ph-duotone ph-keyboard text-xl"></i> Keyboard shortcuts</h3>
+                <button type="button" class="tb-btn" data-modal-close aria-label="Close"><i class="ph ph-x"></i></button>
+            </div>
+            <dl class="shortcut-list">
+                <div><dt>{{ __('Search / command palette') }}</dt><dd><kbd>Ctrl</kbd><kbd>K</kbd></dd></div>
+                <div><dt>{{ __('Toggle sidebar') }}</dt><dd><kbd>[</kbd></dd></div>
+                <div><dt>{{ __('Toggle full screen') }}</dt><dd><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>F</kbd></dd></div>
+                <div><dt>{{ __('Toggle dark mode') }}</dt><dd><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>L</kbd></dd></div>
+                <div><dt>{{ __('Focus table search') }}</dt><dd><kbd>/</kbd></dd></div>
+                <div><dt>{{ __('Show this help') }}</dt><dd><kbd>?</kbd></dd></div>
+            </dl>
+        </div>
+    </div>
+
+    <div id="toastStack" class="toast-stack" aria-live="polite"></div>
+    <button type="button" id="backToTop" class="back-to-top" aria-label="Back to top"><i class="ph-bold ph-arrow-up"></i></button>
+
+    {{-- ============================== SCRIPTS ============================== --}}
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.tailwindcss.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.js"></script>
     <script>
-        // Setup CSRF Token
-        $.ajaxSetup({
-            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
-        });
-
-        // 3-Option Theme Mode Switcher (Light / Dark / System Match PC)
-        function applyTheme(mode) {
-            const html = document.documentElement;
-            let isDark = false;
-
-            if (mode === 'dark') {
-                isDark = true;
-            } else if (mode === 'light') {
-                isDark = false;
-            } else {
-                // System (Match PC Windows / Mac / Linux OS setting)
-                isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            }
-
-            if (isDark) {
-                html.classList.add('dark');
-            } else {
-                html.classList.remove('dark');
-            }
-
-            // Update icon & label
-            const icon = document.getElementById('themeCurrentIcon');
-            const label = document.getElementById('themeCurrentLabel');
-            if (icon && label) {
-                if (mode === 'light') {
-                    icon.className = 'fa-solid fa-sun text-amber-500';
-                    label.textContent = 'Light';
-                } else if (mode === 'dark') {
-                    icon.className = 'fa-solid fa-moon text-indigo-400';
-                    label.textContent = 'Dark';
-                } else {
-                    icon.className = 'fa-solid fa-laptop text-slate-500 dark:text-slate-300';
-                    label.textContent = 'System';
-                }
-            }
-        }
-
-        function setThemeMode(mode) {
-            localStorage.setItem('admin_theme_mode', mode);
-            applyTheme(mode);
-            $('#themeDropdownMenu').addClass('hidden');
-        }
-
-        // Initialize Theme Mode on page load
-        const savedThemeMode = localStorage.getItem('admin_theme_mode') || '{{ $sysSettings["theme_mode"] ?? "system" }}';
-        applyTheme(savedThemeMode);
-
-        // Listen for OS system theme changes if in 'system' mode
-        if (window.matchMedia) {
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-                const current = localStorage.getItem('admin_theme_mode') || 'system';
-                if (current === 'system') {
-                    applyTheme('system');
-                }
-            });
-        }
-
-        // Theme dropdown toggle
-        $('#themeModeBtn').on('click', function(e) {
-            e.stopPropagation();
-            $('#themeDropdownMenu').toggleClass('hidden');
-        });
-
-        // Sidebar Collapsible Mini/Icon-Only Toggle & Mobile Responsive Toggle
-        function applySidebarState(isCollapsed) {
-            const sidebar = $('#adminSidebar');
-            if (isCollapsed) {
-                sidebar.addClass('collapsed');
-            } else {
-                sidebar.removeClass('collapsed');
-            }
-        }
-
-        // Initialize sidebar state from localStorage
-        const savedSidebarState = localStorage.getItem('admin_sidebar_collapsed') === 'true';
-        if (savedSidebarState && window.innerWidth >= 1024) {
-            $('#adminSidebar').addClass('collapsed');
-        }
-
-        $('#sidebarCollapseToggle').on('click', function() {
-            const sidebar = $('#adminSidebar');
-            if (window.innerWidth < 1024) {
-                // Mobile: toggle visibility
-                sidebar.toggleClass('hidden');
-            } else {
-                // Desktop: toggle mini icon-only collapsed mode
-                sidebar.toggleClass('collapsed');
-                const isCollapsed = sidebar.hasClass('collapsed');
-                localStorage.setItem('admin_sidebar_collapsed', isCollapsed ? 'true' : 'false');
-            }
-        });
-
-        // Setup DataTables Global Defaults with modern design
-        if ($.fn.dataTable) {
-            $.fn.dataTable.ext.errMode = 'none'; // Suppress intrusive DataTables alert popups globally
-            $.extend(true, $.fn.dataTable.defaults, {
-                responsive: true,
-                pageLength: 10,
-                language: {
-                    search: "",
-                    searchPlaceholder: "Search records...",
-                    lengthMenu: "Show _MENU_ entries",
-                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
-                    infoEmpty: "Showing 0 to 0 of 0 entries",
-                    infoFiltered: "(filtered from _MAX_ total records)",
-                    emptyTable: '<div class="py-12 text-center text-slate-400 dark:text-slate-500 font-medium"><i class="fa-solid fa-folder-open text-4xl mb-3 text-slate-300 dark:text-slate-600 block"></i>No records found matching criteria</div>',
-                    zeroRecords: '<div class="py-12 text-center text-slate-400 dark:text-slate-500 font-medium"><i class="fa-solid fa-magnifying-glass text-4xl mb-3 text-slate-300 dark:text-slate-600 block"></i>No matching records found</div>',
-                    paginate: {
-                        first: '<i class="fa-solid fa-angles-left"></i>',
-                        previous: '<i class="fa-solid fa-chevron-left"></i>',
-                        next: '<i class="fa-solid fa-chevron-right"></i>',
-                        last: '<i class="fa-solid fa-angles-right"></i>'
-                    }
-                },
-                dom: '<"dt-header flex flex-col sm:flex-row items-center justify-between gap-4 mb-4"lf>rt<"dt-footer flex flex-col sm:flex-row items-center justify-between gap-4 mt-4"ip>',
-                drawCallback: function() {
-                    // Modernize pagination buttons styling on render
-                    $('.dataTables_paginate .paginate_button').addClass('transition duration-150');
-                }
-            });
-        }
-
-        // Quick Search keyboard shortcut Ctrl+/
-        document.addEventListener('keydown', function(e) {
-            if (e.ctrlKey && e.key === '/') {
-                e.preventDefault();
-                const search = document.getElementById('adminQuickSearch');
-                if (search) search.focus();
-            }
-        });
-
-        // Universal Delete Confirmation with SweetAlert2
-        $(document).on('click', '.confirm-delete-btn', function(e) {
-            e.preventDefault();
-            const form = $(this).closest('form');
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "This action cannot be undone!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#64748b',
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    form.submit();
-                }
-            });
-        });
-
-        // Drag & Drop Uploader Helper
-        function initDragAndDropUploader(dropAreaId, inputId, previewId) {
-            const dropArea = document.getElementById(dropAreaId);
-            const input = document.getElementById(inputId);
-            const preview = document.getElementById(previewId);
-
-            if (!dropArea || !input) return;
-
-            ['dragenter', 'dragover'].forEach(eventName => {
-                dropArea.addEventListener(eventName, (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    dropArea.classList.add('dragover');
-                }, false);
-            });
-
-            ['dragleave', 'drop'].forEach(eventName => {
-                dropArea.addEventListener(eventName, (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    dropArea.classList.remove('dragover');
-                }, false);
-            });
-
-            dropArea.addEventListener('drop', (e) => {
-                const dt = e.dataTransfer;
-                const files = dt.files;
-                if (files.length) {
-                    input.files = files;
-                    showPreview(files);
-                }
-            });
-
-            input.addEventListener('change', () => {
-                if (input.files.length) {
-                    showPreview(input.files);
-                }
-            });
-
-            function showPreview(files) {
-                if (!preview) return;
-                preview.innerHTML = '';
-                Array.from(files).forEach(file => {
-                    if (file.type.startsWith('image/')) {
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                            const imgContainer = document.createElement('div');
-                            imgContainer.className = 'relative group w-24 h-24 rounded-xl overflow-hidden border border-slate-200 shadow-sm';
-                            imgContainer.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-semibold">Selected</div>`;
-                            preview.appendChild(imgContainer);
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                });
-            }
-        }
+        window.AdminConfig = {
+            storeName: @json($storeName),
+            pageTitle: @json($pageTitle),
+            userName: @json($authUser->name ?? 'Admin'),
+            defaultTheme: @json($sysSettings['theme_mode'] ?? 'system'),
+            palette: @json($paletteItems),
+            locale: @json(app()->getLocale()),
+            i18n: @json(app()->getLocale() === 'gu' ? json_decode(@file_get_contents(lang_path('gu.json')) ?: '{}', true) : new \stdClass),
+            flash: {
+                success: @json(session('success')),
+                error: @json(session('error')),
+                warning: @json(session('warning')),
+                info: @json(session('info')),
+            },
+        };
     </script>
+    <script src="{{ asset('assets/shared/fx-select.js') }}?v=2.1.0"></script>
+    <script src="{{ asset('assets/admin/admin.js') }}?v=2.1.0"></script>
     @stack('scripts')
 </body>
 </html>

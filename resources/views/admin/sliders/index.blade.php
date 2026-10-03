@@ -1,195 +1,140 @@
 @extends('admin.layouts.admin')
 
-@section('title', 'Sliders')
+@section('title', 'Home Sliders')
 
 @section('content')
-<div class="space-y-6">
-    <!-- Header Section -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-            <h1 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Homepage Sliders & Banners</h1>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Manage promotional hero banners, sale badges, and link destinations.</p>
-        </div>
-        <a href="{{ route('admin.sliders.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 rounded-2xl text-xs font-bold shadow-md transition active:scale-95">
-            <i class="fa-solid fa-plus text-xs"></i>
-            <span>Add New Slider</span>
-        </a>
+    <x-admin.page-header title="Home sliders" subtitle="Promotional hero banners, sale badges and their link destinations." icon="slideshow">
+        <a href="{{ route('home') }}" target="_blank" class="btn btn-outline"><i class="ph ph-storefront"></i> Storefront</a>
+        <a href="{{ route('admin.sliders.create') }}" class="btn btn-primary"><i class="ph-bold ph-plus"></i> Add banner</a>
+    </x-admin.page-header>
+
+    @php
+        // Resolve link targets for display (small tables, one query per type)
+        $ids = fn ($type) => $sliders->where('link_type', $type)->pluck('target_id')->filter()->unique()->values();
+        $targetNames = [
+            'category' => \App\Models\Category::whereIn('id', $ids('category'))->pluck('name_en', 'id'),
+            'product'  => \App\Models\Product::whereIn('id', $ids('product'))->pluck('name_en', 'id'),
+            'offer'    => \App\Models\Offer::whereIn('id', $ids('offer'))->pluck('title_en', 'id'),
+        ];
+        $linkMeta = [
+            'none'     => ['No link', 'badge-neutral', 'prohibit'],
+            'category' => ['Category', 'badge-violet', 'shapes'],
+            'product'  => ['Product', 'badge-info', 'package'],
+            'offer'    => ['Offer', 'badge-warning', 'ticket'],
+            'custom'   => ['Custom URL', 'badge-neutral', 'link-simple'],
+        ];
+    @endphp
+
+    <div class="stat-grid cols-4">
+        <x-admin.stat-card label="All banners" :value="$stats['total'] ?? $sliders->count()" icon="slideshow" tone="slate"
+            :href="route('admin.sliders.index')" :active="!request('status')" meta="In the home slider" />
+        <x-admin.stat-card label="Active" :value="$stats['active'] ?? 0" icon="check-circle" tone="emerald"
+            :href="route('admin.sliders.index', ['status' => 'active'])" :active="request('status') === 'active'" meta="Currently rotating" />
+        <x-admin.stat-card label="Inactive" :value="$stats['inactive'] ?? 0" icon="pause-circle" tone="rose"
+            :href="route('admin.sliders.index', ['status' => 'inactive'])" :active="request('status') === 'inactive'" meta="Hidden from the home page" />
+        <x-admin.stat-card label="With promo badge" :value="$stats['with_badge'] ?? 0" icon="tag" tone="amber" meta="Show a sale label" />
     </div>
 
-    <!-- Top KPI / Pipeline Stats Grid -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <!-- Card 1: All Sliders -->
-        <a href="{{ route('admin.sliders.index') }}" class="group relative overflow-hidden rounded-2xl p-5 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ !request('status') ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white shadow-lg border border-slate-700/60' : 'bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 hover:border-slate-300 shadow-sm' }}">
-            <div class="flex items-start justify-between gap-2">
-                <div>
-                    <span class="text-[11px] font-extrabold uppercase tracking-wider block {{ !request('status') ? 'text-slate-300' : 'text-slate-500 dark:text-slate-400' }}">All Sliders</span>
-                    <div class="text-3xl font-black mt-2 leading-none {{ !request('status') ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['total'] ?? $sliders->count() }}</div>
-                </div>
-                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm shadow-sm flex-shrink-0 {{ !request('status') ? 'bg-white/10 text-indigo-300 border border-white/20 backdrop-blur-md' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300' }}">
-                    <i class="fa-solid fa-images"></i>
-                </div>
+    <div class="card table-card">
+        <div class="filter-bar">
+            <div class="flex flex-wrap items-center gap-2">
+                <a href="{{ route('admin.sliders.index') }}" class="filter-chip {{ !request('status') ? 'is-active' : '' }}">All</a>
+                <a href="{{ route('admin.sliders.index', ['status' => 'active']) }}" class="filter-chip {{ request('status') === 'active' ? 'is-active' : '' }}">Active</a>
+                <a href="{{ route('admin.sliders.index', ['status' => 'inactive']) }}" class="filter-chip {{ request('status') === 'inactive' ? 'is-active' : '' }}">Inactive</a>
             </div>
-            <div class="mt-4 flex items-center gap-1.5">
-                <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full {{ !request('status') ? 'bg-white/10 text-slate-200' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300' }}">● Total Banners</span>
-            </div>
-            <i class="fa-solid fa-images absolute -right-2 -bottom-2 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
-        </a>
-
-        <!-- Card 2: Active Banners -->
-        <a href="{{ route('admin.sliders.index', ['status' => 'active']) }}" class="group relative overflow-hidden rounded-2xl p-5 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('status') == 'active' ? 'bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-lg border border-emerald-500' : 'bg-gradient-to-br from-white via-white to-emerald-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/60 shadow-sm' }}">
-            <div class="flex items-start justify-between gap-2">
-                <div>
-                    <span class="text-[11px] font-extrabold uppercase tracking-wider block {{ request('status') == 'active' ? 'text-emerald-100' : 'text-emerald-700 dark:text-emerald-400' }}">Active Banners</span>
-                    <div class="text-3xl font-black mt-2 leading-none {{ request('status') == 'active' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['active'] ?? 0 }}</div>
-                </div>
-                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm text-white shadow-md flex-shrink-0 {{ request('status') == 'active' ? 'bg-white/20 text-white border border-white/30' : 'bg-gradient-to-tr from-emerald-500 to-teal-400 shadow-emerald-500/25' }}">
-                    <i class="fa-solid fa-circle-check"></i>
-                </div>
-            </div>
-            <div class="mt-4 flex items-center gap-1.5">
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold {{ request('status') == 'active' ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800' }}">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> Live & Visible
-                </span>
-            </div>
-            <i class="fa-solid fa-circle-check absolute -right-2 -bottom-2 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
-        </a>
-
-        <!-- Card 3: Inactive Banners -->
-        <a href="{{ route('admin.sliders.index', ['status' => 'inactive']) }}" class="group relative overflow-hidden rounded-2xl p-5 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('status') == 'inactive' ? 'bg-gradient-to-br from-rose-600 to-red-700 text-white shadow-lg border border-rose-500' : 'bg-gradient-to-br from-white via-white to-rose-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-rose-950/30 border border-rose-200/80 dark:border-rose-800/60 shadow-sm' }}">
-            <div class="flex items-start justify-between gap-2">
-                <div>
-                    <span class="text-[11px] font-extrabold uppercase tracking-wider block {{ request('status') == 'inactive' ? 'text-rose-100' : 'text-rose-700 dark:text-rose-400' }}">Inactive</span>
-                    <div class="text-3xl font-black mt-2 leading-none {{ request('status') == 'inactive' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['inactive'] ?? 0 }}</div>
-                </div>
-                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm text-white shadow-md flex-shrink-0 {{ request('status') == 'inactive' ? 'bg-white/20 text-white border border-white/30' : 'bg-gradient-to-tr from-rose-500 to-pink-500 shadow-rose-500/25' }}">
-                    <i class="fa-solid fa-circle-pause"></i>
-                </div>
-            </div>
-            <div class="mt-4 flex items-center gap-1.5">
-                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold {{ request('status') == 'inactive' ? 'bg-white/20 text-white' : 'bg-rose-100 text-rose-800 dark:bg-rose-950/80 dark:text-rose-300 border border-rose-200/80 dark:border-rose-800' }}">
-                    ● Hidden / Paused
-                </span>
-            </div>
-            <i class="fa-solid fa-circle-pause absolute -right-2 -bottom-2 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
-        </a>
-
-        <!-- Card 4: With Promo Badges -->
-        <div class="group relative overflow-hidden rounded-2xl p-5 flex flex-col justify-between bg-gradient-to-br from-white via-white to-amber-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-amber-950/30 border border-amber-200/80 dark:border-amber-800/60 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-            <div class="flex items-start justify-between gap-2">
-                <div>
-                    <span class="text-[11px] font-extrabold uppercase tracking-wider block text-amber-700 dark:text-amber-400">Promo Badges</span>
-                    <div class="text-3xl font-black mt-2 leading-none text-slate-900 dark:text-white">{{ $stats['with_badge'] ?? 0 }}</div>
-                </div>
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-400 text-white flex items-center justify-center text-sm shadow-md shadow-amber-500/25 flex-shrink-0">
-                    <i class="fa-solid fa-tags"></i>
-                </div>
-            </div>
-            <div class="mt-4 flex items-center gap-1.5">
-                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800">
-                    ★ Sale & Promo Tags
-                </span>
-            </div>
-            <i class="fa-solid fa-tags absolute -right-2 -bottom-2 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
+            <span class="ml-auto text-xs font-semibold text-slate-500">{{ $sliders->count() }} {{ \Illuminate\Support\Str::plural('banner', $sliders->count()) }}</span>
         </div>
-    </div>
 
-    <!-- Table Card Container -->
-    <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200/90 dark:border-slate-700/80 shadow-sm p-6 overflow-hidden">
-        <div class="overflow-x-auto">
-            <table id="slidersTable" class="w-full text-left text-xs">
-                <thead>
-                    <tr class="bg-slate-50 dark:bg-slate-900/60 text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200 dark:border-slate-700">
-                        <th class="px-4 py-3.5 rounded-l-2xl">Order</th>
-                        <th class="px-4 py-3.5">Banner Preview</th>
-                        <th class="px-4 py-3.5">Title & Info</th>
-                        <th class="px-4 py-3.5">Badge & Type</th>
-                        <th class="px-4 py-3.5">Status</th>
-                        <th class="px-4 py-3.5 text-right rounded-r-2xl">Actions</th>
+        <table id="slidersTable" class="w-full" data-export-title="Home sliders">
+            <thead>
+                <tr>
+                    <th>Order</th>
+                    <th>Banner</th>
+                    <th class="export-only">Subtitle</th>
+                    <th>Badge</th>
+                    <th>Links to</th>
+                    <th>Status</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($sliders as $slider)
+                    @php
+                        [$ltLabel, $ltBadge, $ltIcon] = $linkMeta[$slider->link_type] ?? [ucfirst($slider->link_type ?? 'none'), 'badge-neutral', 'link-simple'];
+                        $target = $slider->link_type === 'custom'
+                            ? $slider->link_url
+                            : ($targetNames[$slider->link_type][$slider->target_id] ?? ($slider->target_id ? '#'.$slider->target_id : null));
+                    @endphp
+                    <tr>
+                        <td data-order="{{ $slider->sort_order }}" data-export="{{ $slider->sort_order }}">
+                            <span class="badge badge-neutral font-mono">#{{ $slider->sort_order }}</span>
+                        </td>
+                        <td data-export="{{ $slider->title_en ?: 'Untitled banner' }}{{ $slider->title_gu ? ' / '.$slider->title_gu : '' }}">
+                            <div class="flex items-center gap-3 min-w-[16rem]">
+                                <img src="{{ $slider->image_url }}" alt="" class="w-28 h-14 rounded-xl object-cover border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 shrink-0" loading="lazy">
+                                <div class="min-w-0">
+                                    <a href="{{ route('admin.sliders.edit', $slider) }}" class="block font-bold text-slate-900 dark:text-white hover:underline leading-snug">{{ $slider->title_en ?: 'Untitled banner' }}</a>
+                                    @if($slider->title_gu)<span class="block text-xs text-slate-500 dark:text-slate-400 mt-0.5" lang="gu">{{ $slider->title_gu }}</span>@endif
+                                    @if($slider->subtitle_en)<span class="block text-[11px] text-slate-400 mt-0.5 truncate max-w-[18rem]">{{ $slider->subtitle_en }}</span>@endif
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ $slider->subtitle_en }}</td>
+                        <td data-export="{{ $slider->badge_en ?: '—' }}">
+                            @if($slider->badge_en)
+                                <span class="badge badge-warning"><i class="ph-fill ph-tag"></i> {{ $slider->badge_en }}</span>
+                            @else
+                                <span class="text-slate-300 dark:text-slate-600">—</span>
+                            @endif
+                        </td>
+                        <td data-export="{{ $ltLabel }}{{ $target ? ': '.$target : '' }}">
+                            <span class="badge {{ $ltBadge }}"><i class="ph ph-{{ $ltIcon }}"></i> {{ $ltLabel }}</span>
+                            @if($target)<span class="block text-[11px] text-slate-500 dark:text-slate-400 mt-1 truncate max-w-[12rem]">{{ $target }}</span>@endif
+                        </td>
+                        <td data-order="{{ $slider->is_active ? 1 : 0 }}" data-export="{{ $slider->is_active ? 'Active' : 'Inactive' }}">
+                            <button type="button" onclick="toggleSliderStatus({{ $slider->id }}, this)" class="switch {{ $slider->is_active ? 'is-on' : '' }}" role="switch" aria-checked="{{ $slider->is_active ? 'true' : 'false' }}">
+                                <span class="switch-track"></span><span class="switch-text">{{ $slider->is_active ? 'Active' : 'Inactive' }}</span>
+                            </button>
+                        </td>
+                        <td class="text-right">
+                            <div class="act justify-end">
+                                <a href="{{ route('admin.sliders.edit', $slider) }}" class="act-btn is-edit" title="Edit"><i class="ph ph-pencil-simple-line"></i></a>
+                                <form action="{{ route('admin.sliders.destroy', $slider) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="button" class="act-btn is-danger confirm-delete-btn" data-confirm-title="Delete “{{ $slider->title_en ?: 'this banner' }}”?" title="Delete"><i class="ph ph-trash"></i></button>
+                                </form>
+                            </div>
+                        </td>
                     </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100 dark:divide-slate-700/60 font-medium">
-                    @foreach($sliders as $slider)
-                        <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition-colors">
-                            <td class="px-4 py-3.5 font-mono font-bold text-slate-400">
-                                <span class="px-2.5 py-1 bg-slate-100 dark:bg-slate-700 rounded-lg text-[11px] text-slate-600 dark:text-slate-300 font-bold">#{{ $slider->sort_order }}</span>
-                            </td>
-                            <td class="px-4 py-3.5">
-                                <div class="w-28 h-16 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm bg-slate-100 dark:bg-slate-900 flex-shrink-0 group">
-                                    <img src="{{ $slider->image_url }}" alt="Slider Banner" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                                </div>
-                            </td>
-                            <td class="px-4 py-3.5">
-                                <div class="font-bold text-slate-900 dark:text-white text-sm leading-tight">{{ $slider->title_en ?: 'No English Title' }}</div>
-                                <div class="text-xs text-indigo-600 dark:text-indigo-400 font-semibold mt-0.5">{{ $slider->title_gu ?: 'ગુજરાતી શીર્ષક નથી' }}</div>
-                                <div class="text-[11px] text-slate-400 dark:text-slate-500 mt-1 truncate max-w-xs">{{ $slider->subtitle_en }}</div>
-                            </td>
-                            <td class="px-4 py-3.5">
-                                @if($slider->badge_en)
-                                    <span class="inline-block px-2.5 py-0.5 rounded-lg bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 font-bold text-[10px] mb-1 border border-amber-200 dark:border-amber-800">
-                                        {{ $slider->badge_en }}
-                                    </span>
-                                @endif
-                                <div class="text-[11px] text-slate-500 dark:text-slate-400">
-                                    Type: <span class="font-bold uppercase text-slate-700 dark:text-slate-300">{{ $slider->link_type }}</span>
-                                </div>
-                            </td>
-                            <td class="px-4 py-3.5">
-                                <button onclick="toggleSliderStatus({{ $slider->id }}, this)" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all shadow-sm border {{ $slider->is_active ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700' }}">
-                                    <span class="w-2 h-2 rounded-full {{ $slider->is_active ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400' }}"></span>
-                                    <span>{{ $slider->is_active ? 'Active' : 'Inactive' }}</span>
-                                </button>
-                            </td>
-                            <td class="px-4 py-3.5 text-right">
-                                <div class="flex items-center justify-end gap-2">
-                                    <a href="{{ route('admin.sliders.edit', $slider) }}" class="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-600 hover:text-white flex items-center justify-center transition shadow-sm" title="Edit Slider">
-                                        <i class="fa-solid fa-pen-to-square text-xs"></i>
-                                    </a>
-                                    <form action="{{ route('admin.sliders.destroy', $slider) }}" method="POST" class="inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="button" class="confirm-delete-btn w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 hover:bg-rose-600 hover:text-white flex items-center justify-center transition shadow-sm" title="Delete Slider">
-                                            <i class="fa-solid fa-trash-can text-xs"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+                @endforeach
+            </tbody>
+        </table>
     </div>
-</div>
 @endsection
 
 @push('scripts')
 <script>
-    $(document).ready(function() {
+    $(function () {
         $('#slidersTable').DataTable({
-            order: [[0, 'asc']]
+            order: [[0, 'asc']],
+            columnDefs: [
+                { targets: 2, visible: false },           // Subtitle: export-only
+                { targets: [3, 4], responsivePriority: 3 }
+            ]
         });
     });
 
     function toggleSliderStatus(id, btn) {
-        $.ajax({
-            url: `/admin/sliders/${id}/toggle-status`,
-            type: 'PATCH',
-            success: function(res) {
-                if (res.success) {
-                    if (res.is_active) {
-                        $(btn).removeClass('bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700')
-                              .addClass('bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800')
-                              .html('<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span><span>Active</span>');
-                        toastr.success('Slider banner activated');
-                    } else {
-                        $(btn).removeClass('bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800')
-                              .addClass('bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700')
-                              .html('<span class="w-2 h-2 rounded-full bg-slate-400"></span><span>Inactive</span>');
-                        toastr.info('Slider banner deactivated');
-                    }
-                }
-            }
-        });
+        $.ajax({ url: `/admin/sliders/${id}/toggle-status`, type: 'PATCH' })
+            .done(function (res) {
+                if (!res.success) return;
+                const on = !!res.is_active;
+                $(btn).toggleClass('is-on', on).attr('aria-checked', on ? 'true' : 'false').find('.switch-text').text(on ? 'Active' : 'Inactive');
+                $(btn).closest('td').attr('data-export', on ? 'Active' : 'Inactive');
+                toastr[on ? 'success' : 'info'](on ? 'Slider banner activated' : 'Slider banner deactivated');
+            })
+            .fail(function () { toastr.error('Could not update the banner. Please try again.'); });
     }
 </script>
 @endpush

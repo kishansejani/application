@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "testing-pro-grocery-api-v2",
 		"name": "Testing Pro - Bilingual Grocery REST API Collection (with Settings, Roles, Forgot Password)",
-		"description": "Complete REST API collection for the Bilingual (English & Gujarati) Grocery Platform with OTP Auth, Forgot Password flow, Roles & Permissions, Categories, Products, Delivery Slot (2 Hours vs Next Day), Cart, Wishlist, Leaflet Map Addresses, Orders, and Settings.",
+		"description": "Complete REST API collection for the Bilingual (English & Gujarati) Grocery Platform with OTP Auth, Forgot Password flow, Roles & Permissions, Categories, Products, Delivery Slot (2 Hours vs Next Day), Cart, Wishlist, Leaflet Map Addresses, Orders, and Settings. Auth: OTP login + sign-up (register -> verify), resend with cool-down, password reset by e-mail or SMS.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"variable": [
@@ -27,23 +27,113 @@
 			"name": "1. Authentication & Password Reset",
 			"item": [
 				{
+					"name": "Register (Sign up) - Send OTP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{locale}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Riya Shah\",\n    \"phone\": \"9123456780\",\n    \"email\": \"riya@example.com\",\n    \"language\": \"gu\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						},
+						"description": "Starts a sign-up: stores the details for a few minutes and sends a register OTP by SMS. 422 with `already_registered: true` if the phone exists. `data.demo_otp` is present only in demo mode (SMS_DRIVER=log). Finish with **Verify OTP** - it creates the account and returns a token."
+					}
+				},
+				{
 					"name": "Send OTP (Mobile Login)",
 					"request": {
 						"method": "POST",
 						"header": [
-							{"key": "Accept", "value": "application/json"},
-							{"key": "Accept-Language", "value": "{{locale}}"}
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{locale}}"
+							}
 						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"phone\": \"9876543210\"\n}",
-							"options": {"raw": {"language": "json"}}
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
 							"raw": "{{base_url}}/auth/otp/send",
-							"host": ["{{base_url}}"],
-							"path": ["auth", "otp", "send"]
-						}
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"otp",
+								"send"
+							]
+						},
+						"description": "Sends a login OTP to a registered mobile. Unregistered phone -> 404 `{success:false, needs_registration:true, message}` (call Register instead). Within the resend cool-down while a code is still valid it returns 200 again with `data.resend_in`. `data.demo_otp` only in demo mode."
+					}
+				},
+				{
+					"name": "Resend OTP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{locale}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone\": \"9123456780\",\n    \"purpose\": \"login\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/otp/resend",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"otp",
+								"resend"
+							]
+						},
+						"description": "purpose: login | register | reset. 429 `{reason:'cooldown', retry_after}` during the cool-down (OTP_RESEND_SECONDS) or `{reason:'hourly_limit'}` after OTP_MAX_PER_HOUR codes."
 					}
 				},
 				{
@@ -53,10 +143,9 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"var jsonData = pm.response.json();",
-									"if (jsonData.token) {",
-									"    pm.collectionVariables.set('auth_token', jsonData.token);",
-									"}"
+									"var j = pm.response.json();",
+									"var t = (j.data && j.data.token) || j.token;",
+									"if (t) { pm.collectionVariables.set('auth_token', t); }"
 								],
 								"type": "text/javascript"
 							}
@@ -65,19 +154,36 @@
 					"request": {
 						"method": "POST",
 						"header": [
-							{"key": "Accept", "value": "application/json"},
-							{"key": "Accept-Language", "value": "{{locale}}"}
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{locale}}"
+							}
 						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"phone\": \"9876543210\",\n    \"otp\": \"1234\"\n}",
-							"options": {"raw": {"language": "json"}}
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
 							"raw": "{{base_url}}/auth/otp/verify",
-							"host": ["{{base_url}}"],
-							"path": ["auth", "otp", "verify"]
-						}
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"otp",
+								"verify"
+							]
+						},
+						"description": "Verifies the code (purpose auto-detected: pending sign-up -> creates the account, else login). Returns `data.token`, `data.user`, `data.is_new_user`. Wrong code -> 422 `{reason:'invalid', attempts_left}`; after OTP_MAX_ATTEMPTS the code is discarded (`too_many_attempts`); expired -> `expired`."
 					}
 				},
 				{
@@ -85,18 +191,32 @@
 					"request": {
 						"method": "POST",
 						"header": [
-							{"key": "Accept", "value": "application/json"}
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
 						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"email_or_phone\": \"admin@grocery.com\"\n}",
-							"options": {"raw": {"language": "json"}}
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
 							"raw": "{{base_url}}/auth/forgot-password/send-otp",
-							"host": ["{{base_url}}"],
-							"path": ["auth", "forgot-password", "send-otp"]
-						}
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"forgot-password",
+								"send-otp"
+							]
+						},
+						"description": "email_or_phone: e-mail -> branded e-mail with the code + one-click reset link; 10-digit phone -> SMS. Always answers 200 with the same message whether or not the account exists."
 					}
 				},
 				{
@@ -104,18 +224,32 @@
 					"request": {
 						"method": "POST",
 						"header": [
-							{"key": "Accept", "value": "application/json"}
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email_or_phone\": \"admin@grocery.com\",\n    \"otp\": \"1234\",\n    \"password\": \"newpassword123\"\n}",
-							"options": {"raw": {"language": "json"}}
+							"raw": "{\n    \"email_or_phone\": \"admin@grocery.com\",\n    \"otp\": \"1234\",\n    \"password\": \"NewSecret#2026\",\n    \"password_confirmation\": \"NewSecret#2026\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
 							"raw": "{{base_url}}/auth/forgot-password/reset",
-							"host": ["{{base_url}}"],
-							"path": ["auth", "forgot-password", "reset"]
-						}
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"forgot-password",
+								"reset"
+							]
+						},
+						"description": "Verifies the reset OTP and sets the new password (min 8; password_confirmation optional but must match when sent). Revokes all API tokens of the user."
 					}
 				},
 				{
@@ -123,14 +257,28 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{"key": "Accept", "value": "application/json"},
-							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
-							{"key": "Accept-Language", "value": "{{locale}}"}
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{locale}}"
+							}
 						],
 						"url": {
 							"raw": "{{base_url}}/auth/profile",
-							"host": ["{{base_url}}"],
-							"path": ["auth", "profile"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"profile"
+							]
 						}
 					}
 				},
@@ -139,19 +287,37 @@
 					"request": {
 						"method": "POST",
 						"header": [
-							{"key": "Accept", "value": "application/json"},
-							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
-							{"key": "Accept-Language", "value": "{{locale}}"}
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{locale}}"
+							}
 						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"name\": \"Ramesh Patel\",\n    \"email\": \"ramesh.patel@example.com\"\n}",
-							"options": {"raw": {"language": "json"}}
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
 							"raw": "{{base_url}}/auth/profile",
-							"host": ["{{base_url}}"],
-							"path": ["auth", "profile"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"profile"
+							]
 						}
 					}
 				},
@@ -160,13 +326,24 @@
 					"request": {
 						"method": "POST",
 						"header": [
-							{"key": "Accept", "value": "application/json"},
-							{"key": "Authorization", "value": "Bearer {{auth_token}}"}
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
 						],
 						"url": {
 							"raw": "{{base_url}}/auth/logout",
-							"host": ["{{base_url}}"],
-							"path": ["auth", "logout"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"logout"
+							]
 						}
 					}
 				}
@@ -180,13 +357,23 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{"key": "Accept", "value": "application/json"},
-							{"key": "Accept-Language", "value": "{{locale}}"}
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{locale}}"
+							}
 						],
 						"url": {
 							"raw": "{{base_url}}/home",
-							"host": ["{{base_url}}"],
-							"path": ["home"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"home"
+							]
 						}
 					}
 				},
@@ -195,12 +382,19 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{"key": "Accept", "value": "application/json"}
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
 						],
 						"url": {
 							"raw": "{{base_url}}/settings",
-							"host": ["{{base_url}}"],
-							"path": ["settings"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"settings"
+							]
 						}
 					}
 				},
@@ -209,13 +403,23 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{"key": "Accept", "value": "application/json"},
-							{"key": "Accept-Language", "value": "{{locale}}"}
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{locale}}"
+							}
 						],
 						"url": {
 							"raw": "{{base_url}}/delivery-slot",
-							"host": ["{{base_url}}"],
-							"path": ["delivery-slot"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"delivery-slot"
+							]
 						}
 					}
 				},
@@ -224,13 +428,23 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{"key": "Accept", "value": "application/json"},
-							{"key": "Accept-Language", "value": "{{locale}}"}
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{locale}}"
+							}
 						],
 						"url": {
 							"raw": "{{base_url}}/offers",
-							"host": ["{{base_url}}"],
-							"path": ["offers"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"offers"
+							]
 						}
 					}
 				},
@@ -239,18 +453,34 @@
 					"request": {
 						"method": "POST",
 						"header": [
-							{"key": "Accept", "value": "application/json"},
-							{"key": "Accept-Language", "value": "{{locale}}"}
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{locale}}"
+							}
 						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"code\": \"FRESH20\",\n    \"subtotal\": 650.00\n}",
-							"options": {"raw": {"language": "json"}}
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
 							"raw": "{{base_url}}/checkout/coupon/apply",
-							"host": ["{{base_url}}"],
-							"path": ["checkout", "coupon", "apply"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"checkout",
+								"coupon",
+								"apply"
+							]
 						}
 					}
 				},
@@ -259,13 +489,24 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{"key": "Accept", "value": "application/json"},
-							{"key": "Accept-Language", "value": "{{locale}}"}
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{locale}}"
+							}
 						],
 						"url": {
 							"raw": "{{base_url}}/pages/about-us",
-							"host": ["{{base_url}}"],
-							"path": ["pages", "about-us"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"pages",
+								"about-us"
+							]
 						}
 					}
 				}
@@ -279,13 +520,23 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{"key": "Accept", "value": "application/json"},
-							{"key": "Accept-Language", "value": "{{locale}}"}
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{locale}}"
+							}
 						],
 						"url": {
 							"raw": "{{base_url}}/categories",
-							"host": ["{{base_url}}"],
-							"path": ["categories"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categories"
+							]
 						}
 					}
 				},
@@ -294,16 +545,32 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{"key": "Accept", "value": "application/json"},
-							{"key": "Accept-Language", "value": "{{locale}}"}
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{locale}}"
+							}
 						],
 						"url": {
 							"raw": "{{base_url}}/products?category_id=1&sort=price_low_to_high",
-							"host": ["{{base_url}}"],
-							"path": ["products"],
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products"
+							],
 							"query": [
-								{"key": "category_id", "value": "1"},
-								{"key": "sort", "value": "price_low_to_high"}
+								{
+									"key": "category_id",
+									"value": "1"
+								},
+								{
+									"key": "sort",
+									"value": "price_low_to_high"
+								}
 							]
 						}
 					}
@@ -313,13 +580,24 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{"key": "Accept", "value": "application/json"},
-							{"key": "Accept-Language", "value": "{{locale}}"}
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{locale}}"
+							}
 						],
 						"url": {
 							"raw": "{{base_url}}/products/1",
-							"host": ["{{base_url}}"],
-							"path": ["products", "1"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"1"
+							]
 						}
 					}
 				}
@@ -333,14 +611,27 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{"key": "Accept", "value": "application/json"},
-							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
-							{"key": "Accept-Language", "value": "{{locale}}"}
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{locale}}"
+							}
 						],
 						"url": {
 							"raw": "{{base_url}}/cart",
-							"host": ["{{base_url}}"],
-							"path": ["cart"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cart"
+							]
 						}
 					}
 				},
@@ -349,19 +640,37 @@
 					"request": {
 						"method": "POST",
 						"header": [
-							{"key": "Accept", "value": "application/json"},
-							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
-							{"key": "Accept-Language", "value": "{{locale}}"}
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{locale}}"
+							}
 						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"product_id\": 1,\n    \"quantity\": 2\n}",
-							"options": {"raw": {"language": "json"}}
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
 							"raw": "{{base_url}}/cart/add",
-							"host": ["{{base_url}}"],
-							"path": ["cart", "add"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cart",
+								"add"
+							]
 						}
 					}
 				},
@@ -370,14 +679,27 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{"key": "Accept", "value": "application/json"},
-							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
-							{"key": "Accept-Language", "value": "{{locale}}"}
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{locale}}"
+							}
 						],
 						"url": {
 							"raw": "{{base_url}}/wishlist",
-							"host": ["{{base_url}}"],
-							"path": ["wishlist"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"wishlist"
+							]
 						}
 					}
 				},
@@ -386,18 +708,33 @@
 					"request": {
 						"method": "POST",
 						"header": [
-							{"key": "Accept", "value": "application/json"},
-							{"key": "Authorization", "value": "Bearer {{auth_token}}"}
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
 						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"product_id\": 2\n}",
-							"options": {"raw": {"language": "json"}}
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
 							"raw": "{{base_url}}/wishlist/toggle",
-							"host": ["{{base_url}}"],
-							"path": ["wishlist", "toggle"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"wishlist",
+								"toggle"
+							]
 						}
 					}
 				}
@@ -411,13 +748,23 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{"key": "Accept", "value": "application/json"},
-							{"key": "Authorization", "value": "Bearer {{auth_token}}"}
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
 						],
 						"url": {
 							"raw": "{{base_url}}/addresses",
-							"host": ["{{base_url}}"],
-							"path": ["addresses"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"addresses"
+							]
 						}
 					}
 				},
@@ -426,18 +773,32 @@
 					"request": {
 						"method": "POST",
 						"header": [
-							{"key": "Accept", "value": "application/json"},
-							{"key": "Authorization", "value": "Bearer {{auth_token}}"}
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
 						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"name\": \"Ramesh Patel\",\n    \"phone\": \"9876543210\",\n    \"type\": \"home\",\n    \"address_line_1\": \"Flat 402, Shivam Heights\",\n    \"address_line_2\": \"Near Iscon Temple, SG Highway\",\n    \"city\": \"Ahmedabad\",\n    \"state\": \"Gujarat\",\n    \"pincode\": \"380015\",\n    \"latitude\": 23.0225,\n    \"longitude\": 72.5714,\n    \"is_default\": true\n}",
-							"options": {"raw": {"language": "json"}}
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
 							"raw": "{{base_url}}/addresses",
-							"host": ["{{base_url}}"],
-							"path": ["addresses"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"addresses"
+							]
 						}
 					}
 				}
@@ -451,19 +812,37 @@
 					"request": {
 						"method": "POST",
 						"header": [
-							{"key": "Accept", "value": "application/json"},
-							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
-							{"key": "Accept-Language", "value": "{{locale}}"}
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{locale}}"
+							}
 						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"address_id\": 1,\n    \"payment_method\": \"cod\",\n    \"coupon_code\": \"FRESH20\",\n    \"delivery_note\": \"Please ring bell twice.\"\n}",
-							"options": {"raw": {"language": "json"}}
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
 							"raw": "{{base_url}}/checkout/place-order",
-							"host": ["{{base_url}}"],
-							"path": ["checkout", "place-order"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"checkout",
+								"place-order"
+							]
 						}
 					}
 				},
@@ -472,14 +851,27 @@
 					"request": {
 						"method": "GET",
 						"header": [
-							{"key": "Accept", "value": "application/json"},
-							{"key": "Authorization", "value": "Bearer {{auth_token}}"},
-							{"key": "Accept-Language", "value": "{{locale}}"}
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "{{locale}}"
+							}
 						],
 						"url": {
 							"raw": "{{base_url}}/orders",
-							"host": ["{{base_url}}"],
-							"path": ["orders"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders"
+							]
 						}
 					}
 				}

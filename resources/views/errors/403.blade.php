@@ -1,0 +1,5 @@
+@extends('errors.layout')
+@section('code', '403')
+@section('title', 'Access denied')
+@section('icon', 'lock-key')
+@section('message', (isset($exception) && $exception->getMessage()) ? $exception->getMessage() : "You don't have permission to open this page. Ask a super administrator to update your role if you need access.")

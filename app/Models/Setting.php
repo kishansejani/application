@@ -50,6 +50,7 @@ class Setting extends Model
             'footer_creator_name' => 'Decent Infoways',
             'footer_creator_url' => 'https://decentinfoways.com',
             'theme_mode' => 'system', // light, dark, system
+            'store_name' => 'Fresh Express',
         ];
 
         $settings = self::all()->pluck('value', 'key')->toArray();

@@ -3,97 +3,68 @@
 @section('title', __('messages.order_history') . ' - ' . __('messages.store_name'))
 
 @section('content')
-<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+@php $gu = app()->getLocale() === 'gu'; @endphp
+<div class="max-w-4xl mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8">
 
-    <div class="flex items-center justify-between pb-4 border-b border-slate-200">
+    <div class="flex items-end justify-between gap-4 mb-5 sm:mb-6">
         <div>
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">{{ __('messages.order_history') }}</h1>
-            <p class="text-xs text-slate-500 mt-0.5">Track your past purchases and download tax invoices</p>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">{{ __('messages.order_history') }}</h1>
+            <p class="text-[13px] text-slate-500 dark:text-slate-400 mt-1">{{ $gu ? 'તમારા જૂના ઓર્ડર ટ્રેક કરો અને ઇન્વૉઇસ ડાઉનલોડ કરો' : 'Track past purchases and download tax invoices' }}</p>
         </div>
-        <a href="{{ route('order.track') }}" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5">
-            <i class="fa-solid fa-crosshairs"></i>
-            <span>Track Delivery</span>
-        </a>
+        <a href="{{ route('order.track') }}" class="fx-btn fx-btn-outline shrink-0"><i class="ph ph-crosshair text-lg"></i><span class="hidden sm:inline">{{ $gu ? 'ડિલિવરી ટ્રેક કરો' : 'Track delivery' }}</span></a>
     </div>
 
-    @forelse($orders as $order)
-        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
-            <!-- Order Top Header -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 text-xs">
-                <div>
-                    <span class="font-extrabold text-brand-700 text-sm">#{{ $order->order_number }}</span>
-                    <span class="text-slate-400 block text-[11px] mt-0.5">Placed on {{ $order->created_at->format('d M Y, h:i A') }}</span>
-                </div>
-
-                <div class="flex flex-wrap items-center gap-2">
-                    @if($order->delivery_type === 'two_hours')
-                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
-                            ⚡ 2-Hour Express
-                        </span>
-                    @else
-                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">
-                            📅 Next Day Delivery
-                        </span>
-                    @endif
-
-                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold border {{ $order->status_badge_class }}">
-                        {{ $order->localized_status }}
-                    </span>
-                </div>
-            </div>
-
-            <!-- Items -->
-            <div class="divide-y divide-slate-100">
-                @foreach($order->items as $item)
-                    <div class="py-3 flex items-center justify-between text-xs">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl overflow-hidden bg-slate-50 border border-slate-200 shrink-0">
-                                <img src="{{ $item->product ? $item->product->thumbnail_url : ($item->product_image ?: asset('images/default-product.png')) }}" class="w-full h-full object-cover">
-                            </div>
-                            <div>
-                                <span class="font-bold text-slate-900 block">{{ $item->product_name_en }}</span>
-                                <span class="text-brand-700 font-semibold text-[11px]">{{ $item->product_name_gu }}</span>
-                                <span class="text-[10px] text-slate-400">{{ $item->product_unit }} &times; {{ $item->quantity }}</span>
-                            </div>
-                        </div>
-                        <span class="font-bold text-slate-900">₹{{ number_format($item->total_price, 2) }}</span>
+    <div class="space-y-4">
+        @forelse($orders as $order)
+            <article class="fx-card overflow-hidden">
+                <header class="px-4 sm:px-6 py-3.5 bg-slate-50/70 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2">
+                    <div class="min-w-0">
+                        <a href="{{ route('order.show', $order->order_number) }}" class="font-extrabold text-[14px] text-slate-900 dark:text-white hover:text-brand-700 dark:hover:text-brand-400">#{{ $order->order_number }}</a>
+                        <p class="text-[12px] text-slate-500 dark:text-slate-400">{{ $order->created_at->format('d M Y, h:i A') }}</p>
                     </div>
-                @endforeach
-            </div>
+                    <div class="flex flex-wrap items-center gap-1.5">
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold {{ $order->delivery_type === 'two_hours' ? 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300' : 'bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-300' }}">
+                            <i class="ph-fill {{ $order->delivery_type === 'two_hours' ? 'ph-lightning' : 'ph-calendar-check' }}"></i>{{ $order->delivery_type === 'two_hours' ? ($gu ? '૨ કલાક' : '2-hour express') : ($gu ? 'આગલા દિવસે' : 'Next day') }}
+                        </span>
+                        @include('frontend.partials.status-pill', ['order' => $order])
+                    </div>
+                </header>
 
-            <!-- Footer Details & Buttons -->
-            <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs">
-                <div>
-                    <span class="text-slate-400 block mb-0.5">Total Amount:</span>
-                    <span class="font-extrabold text-slate-900 text-base">₹{{ number_format($order->total_amount, 2) }}</span>
-                    <span class="text-[10px] text-slate-400 block uppercase">via {{ $order->payment_method }} ({{ $order->payment_status }})</span>
+                <div class="px-4 sm:px-6 py-4 flex items-center gap-3">
+                    <div class="flex -space-x-3 shrink-0">
+                        @foreach($order->items->take(4) as $item)
+                            <img src="{{ $item->product ? $item->product->thumbnail_url : ($item->product_image ?: asset('images/default-product.png')) }}" alt="" class="w-12 h-12 rounded-xl object-cover bg-slate-100 dark:bg-slate-800 ring-2 ring-white dark:ring-slate-900" loading="lazy">
+                        @endforeach
+                        @if($order->items->count() > 4)
+                            <span class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 ring-2 ring-white dark:ring-slate-900 flex items-center justify-center text-[12px] font-bold text-slate-600 dark:text-slate-300">+{{ $order->items->count() - 4 }}</span>
+                        @endif
+                    </div>
+                    <p class="flex-1 min-w-0 text-[13px] text-slate-600 dark:text-slate-300 line-clamp-2">
+                        {{ $order->items->map(fn($i) => ($gu && $i->product_name_gu ? $i->product_name_gu : $i->product_name_en) . ' × ' . $i->quantity)->implode(', ') }}
+                    </p>
                 </div>
 
-                <div class="flex items-center gap-3">
-                    <a href="{{ route('order.invoice', $order->order_number) }}" target="_blank" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs transition-colors flex items-center gap-1.5">
-                        <i class="fa-solid fa-receipt"></i>
-                        <span>Invoice</span>
-                    </a>
-                    <a href="{{ route('order.show', $order->order_number) }}" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold text-xs shadow-sm transition-all">
-                        View Details
-                    </a>
-                </div>
+                <footer class="px-4 sm:px-6 py-3.5 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <p class="text-[17px] font-extrabold text-slate-900 dark:text-white leading-tight">₹{{ number_format($order->total_amount, 2) }}</p>
+                        <p class="text-[11px] text-slate-400 uppercase font-semibold">{{ \Lang::has('messages.payment_methods.' . $order->payment_method) ? __('messages.payment_methods.' . $order->payment_method) : strtoupper($order->payment_method) }} · {{ \Lang::has('messages.payment_statuses.' . $order->payment_status) ? __('messages.payment_statuses.' . $order->payment_status) : ucfirst($order->payment_status) }}</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <a href="{{ route('order.invoice', $order->order_number) }}" target="_blank" class="fx-btn fx-btn-outline fx-btn-sm"><i class="ph ph-receipt text-base"></i>{{ $gu ? 'ઇન્વૉઇસ' : 'Invoice' }}</a>
+                        <a href="{{ route('order.show', $order->order_number) }}" class="fx-btn fx-btn-primary fx-btn-sm">{{ $gu ? 'વિગતો જુઓ' : 'View details' }}<i class="ph-bold ph-caret-right"></i></a>
+                    </div>
+                </footer>
+            </article>
+        @empty
+            <div class="fx-card py-14 px-6 text-center">
+                <span class="w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center text-4xl mx-auto mb-4"><i class="ph-duotone ph-package"></i></span>
+                <h4 class="font-extrabold text-slate-900 dark:text-white">{{ $gu ? 'હજી સુધી કોઈ ઓર્ડર નથી' : "You haven't placed any orders yet" }}</h4>
+                <p class="text-[13px] text-slate-500 dark:text-slate-400 mt-1">{{ $gu ? 'બપોરે ૧૨ પહેલાં ઓર્ડર કરો અને ૨ કલાકમાં મેળવો!' : 'Order before 12 PM to receive your groceries in 2 hours!' }}</p>
+                <a href="{{ route('products.index') }}" class="fx-btn fx-btn-primary mt-5">{{ __('messages.start_shopping') }}</a>
             </div>
-        </div>
-    @empty
-        <div class="py-16 text-center bg-white rounded-3xl border border-slate-200 shadow-sm p-8 space-y-4">
-            <i class="fa-solid fa-box-open text-5xl text-slate-300"></i>
-            <h4 class="font-bold text-slate-700 text-base">You haven't placed any orders yet.</h4>
-            <p class="text-xs text-slate-400">Order before 12:00 PM to receive your groceries in 2 hours!</p>
-            <a href="{{ route('products.index') }}" class="inline-block px-6 py-3 bg-brand-600 text-white rounded-2xl text-xs font-bold shadow-md shadow-brand-500/20">
-                {{ __('messages.start_shopping') }}
-            </a>
-        </div>
-    @endforelse
-
-    <div class="pt-4">
-        {{ $orders->links() }}
+        @endforelse
     </div>
 
+    <div class="pt-6">{{ $orders->links('frontend.partials.pagination') }}</div>
 </div>
 @endsection

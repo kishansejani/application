@@ -19,14 +19,24 @@ class AppLocalizations {
     'gu': guTranslations,
   };
 
-  String translate(String key) {
+  String translate(String key, [Map<String, String>? args]) {
     final langCode = locale.languageCode;
+    String value;
     if (_localizedValues.containsKey(langCode) && _localizedValues[langCode]!.containsKey(key)) {
-      return _localizedValues[langCode]![key]!;
+      value = _localizedValues[langCode]![key]!;
+    } else {
+      // Fallback to English, then to the key itself.
+      value = _localizedValues['en']?[key] ?? key;
     }
-    // Fallback to English
-    return _localizedValues['en']?[key] ?? key;
+    if (args != null) {
+      args.forEach((name, replacement) {
+        value = value.replaceAll('{$name}', replacement);
+      });
+    }
+    return value;
   }
+
+  bool get isGujarati => locale.languageCode == 'gu';
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
@@ -45,7 +55,12 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
 }
 
 extension LocalizationExtension on BuildContext {
-  String tr(String key) {
-    return AppLocalizations.of(this)?.translate(key) ?? key;
+  /// `context.tr('key')` or `context.tr('items_count', {'count': '3'})`
+  /// - placeholders use `{name}` syntax.
+  String tr(String key, [Map<String, String>? args]) {
+    return AppLocalizations.of(this)?.translate(key, args) ?? key;
   }
+
+  /// Current UI language code (`en` / `gu`).
+  String get langCode => Localizations.localeOf(this).languageCode;
 }

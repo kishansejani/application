@@ -1,217 +1,140 @@
 @extends('admin.layouts.admin')
 
-@section('title', 'Users Management')
+@section('title', 'Users')
 
 @section('content')
-<div class="space-y-6">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-            <h1 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Users & Accounts</h1>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Manage super admins, store staff, and customer accounts.</p>
-        </div>
-        <a href="{{ route('admin.users.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 rounded-2xl text-xs font-bold shadow-md transition active:scale-95">
-            <i class="fa-solid fa-user-plus text-xs"></i>
-            <span>Add New User</span>
-        </a>
+@php
+    $roleBadge = fn ($name) => match ($name) { 'super_admin' => 'badge-violet', 'admin' => 'badge-info', 'user', 'customer', null => 'badge-success', default => 'badge-neutral' };
+    $noFilter = !request('role') && !request('search');
+@endphp
+    <x-admin.page-header title="Users" subtitle="Manage super admins, store staff and customer accounts." icon="users-three">
+        <a href="{{ route('admin.roles.index') }}" class="btn btn-outline"><i class="ph ph-shield-check"></i> Roles</a>
+        <a href="{{ route('admin.users.create') }}" class="btn btn-primary"><i class="ph-bold ph-user-plus"></i> Add user</a>
+    </x-admin.page-header>
+
+    <div class="stat-grid cols-5">
+        <x-admin.stat-card label="All accounts" :value="$stats['total'] ?? $users->count()" icon="users-three" tone="slate"
+            :href="route('admin.users.index')" :active="$noFilter" meta="Registered accounts" />
+        <x-admin.stat-card label="Super admins" :value="$stats['super_admin'] ?? 0" icon="crown" tone="violet"
+            :href="route('admin.users.index', ['role' => 'super_admin'])" :active="request('role') === 'super_admin'" meta="Full access" />
+        <x-admin.stat-card label="Store staff" :value="$stats['admin'] ?? 0" icon="user-gear" tone="blue"
+            :href="route('admin.users.index', ['role' => 'admin'])" :active="request('role') === 'admin'" meta="Admin panel users" />
+        <x-admin.stat-card label="Customers" :value="$stats['customer'] ?? 0" icon="basket" tone="emerald"
+            :href="route('admin.users.index', ['role' => 'user'])" :active="request('role') === 'user'" meta="Storefront shoppers" />
+        <x-admin.stat-card label="Active" :value="$stats['active'] ?? 0" icon="check-circle" tone="cyan" meta="Can sign in" class="col-span-2 md:col-span-1" />
     </div>
 
-    <!-- Top KPI / Pipeline Stats Grid -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <!-- Card 1: Total Accounts -->
-        <a href="{{ route('admin.users.index') }}" class="group relative overflow-hidden rounded-2xl p-5 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ !request('role') ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white shadow-lg border border-slate-700/60' : 'bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 hover:border-slate-300 shadow-sm' }}">
-            <div class="flex items-start justify-between gap-2">
-                <div>
-                    <span class="text-[11px] font-extrabold uppercase tracking-wider block {{ !request('role') ? 'text-slate-300' : 'text-slate-500 dark:text-slate-400' }}">Total Accounts</span>
-                    <div class="text-3xl font-black mt-2 leading-none {{ !request('role') ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['total'] ?? $users->total() }}</div>
+    <div class="card table-card">
+        <div class="filter-bar">
+            <form method="GET" action="{{ route('admin.users.index') }}" class="flex flex-wrap items-center gap-2.5" data-no-loading>
+                <div class="relative flex-1 min-w-[12rem] sm:flex-none sm:w-64">
+                    <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                    <input type="search" name="search" value="{{ request('search') }}" placeholder="Name, phone or email" class="form-control !pl-9" aria-label="Search users">
                 </div>
-                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm shadow-sm flex-shrink-0 {{ !request('role') ? 'bg-white/10 text-indigo-300 border border-white/20 backdrop-blur-md' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300' }}">
-                    <i class="fa-solid fa-users"></i>
-                </div>
-            </div>
-            <div class="mt-4 flex items-center gap-1.5">
-                <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full {{ !request('role') ? 'bg-white/10 text-slate-200' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300' }}">● Registered Users</span>
-            </div>
-            <i class="fa-solid fa-users absolute -right-2 -bottom-2 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
-        </a>
-
-        <!-- Card 2: Super Admins -->
-        <a href="{{ route('admin.users.index', ['role' => 'super_admin']) }}" class="group relative overflow-hidden rounded-2xl p-5 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('role') == 'super_admin' ? 'bg-gradient-to-br from-purple-600 to-indigo-700 text-white shadow-lg border border-purple-500' : 'bg-gradient-to-br from-white via-white to-purple-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-purple-950/30 border border-purple-200/80 dark:border-purple-800/60 shadow-sm' }}">
-            <div class="flex items-start justify-between gap-2">
-                <div>
-                    <span class="text-[11px] font-extrabold uppercase tracking-wider block {{ request('role') == 'super_admin' ? 'text-purple-100' : 'text-purple-700 dark:text-purple-400' }}">Super Admins</span>
-                    <div class="text-3xl font-black mt-2 leading-none {{ request('role') == 'super_admin' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['super_admin'] ?? 0 }}</div>
-                </div>
-                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm text-white shadow-md flex-shrink-0 {{ request('role') == 'super_admin' ? 'bg-white/20 text-white border border-white/30' : 'bg-gradient-to-tr from-purple-500 to-indigo-500 shadow-purple-500/25' }}">
-                    <i class="fa-solid fa-crown"></i>
-                </div>
-            </div>
-            <div class="mt-4 flex items-center gap-1.5">
-                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold {{ request('role') == 'super_admin' ? 'bg-white/20 text-white' : 'bg-purple-100 text-purple-800 dark:bg-purple-950/80 dark:text-purple-300 border border-purple-200/80 dark:border-purple-800' }}">
-                    ★ Full Authority
-                </span>
-            </div>
-            <i class="fa-solid fa-crown absolute -right-2 -bottom-2 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
-        </a>
-
-        <!-- Card 3: Store Staff -->
-        <a href="{{ route('admin.users.index', ['role' => 'admin']) }}" class="group relative overflow-hidden rounded-2xl p-5 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('role') == 'admin' ? 'bg-gradient-to-br from-blue-600 to-cyan-700 text-white shadow-lg border border-blue-500' : 'bg-gradient-to-br from-white via-white to-blue-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-blue-950/30 border border-blue-200/80 dark:border-blue-800/60 shadow-sm' }}">
-            <div class="flex items-start justify-between gap-2">
-                <div>
-                    <span class="text-[11px] font-extrabold uppercase tracking-wider block {{ request('role') == 'admin' ? 'text-blue-100' : 'text-blue-700 dark:text-blue-400' }}">Store Staff</span>
-                    <div class="text-3xl font-black mt-2 leading-none {{ request('role') == 'admin' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['admin'] ?? 0 }}</div>
-                </div>
-                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm text-white shadow-md flex-shrink-0 {{ request('role') == 'admin' ? 'bg-white/20 text-white border border-white/30' : 'bg-gradient-to-tr from-blue-500 to-cyan-400 shadow-blue-500/25' }}">
-                    <i class="fa-solid fa-user-shield"></i>
-                </div>
-            </div>
-            <div class="mt-4 flex items-center gap-1.5">
-                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold {{ request('role') == 'admin' ? 'bg-white/20 text-white' : 'bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300 border border-blue-200/80 dark:border-blue-800' }}">
-                    ● Operations
-                </span>
-            </div>
-            <i class="fa-solid fa-user-shield absolute -right-2 -bottom-2 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
-        </a>
-
-        <!-- Card 4: Customers -->
-        <a href="{{ route('admin.users.index', ['role' => 'user']) }}" class="group relative overflow-hidden rounded-2xl p-5 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-xl {{ request('role') == 'user' ? 'bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-lg border border-emerald-500' : 'bg-gradient-to-br from-white via-white to-emerald-50/70 dark:from-slate-800 dark:via-slate-800 dark:to-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/60 shadow-sm' }}">
-            <div class="flex items-start justify-between gap-2">
-                <div>
-                    <span class="text-[11px] font-extrabold uppercase tracking-wider block {{ request('role') == 'user' ? 'text-emerald-100' : 'text-emerald-700 dark:text-emerald-400' }}">Customers</span>
-                    <div class="text-3xl font-black mt-2 leading-none {{ request('role') == 'user' ? 'text-white' : 'text-slate-900 dark:text-white' }}">{{ $stats['customer'] ?? 0 }}</div>
-                </div>
-                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm text-white shadow-md flex-shrink-0 {{ request('role') == 'user' ? 'bg-white/20 text-white border border-white/30' : 'bg-gradient-to-tr from-emerald-500 to-teal-400 shadow-emerald-500/25' }}">
-                    <i class="fa-solid fa-basket-shopping"></i>
-                </div>
-            </div>
-            <div class="mt-4 flex items-center gap-1.5">
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold {{ request('role') == 'user' ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800' }}">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> Active Buyers
-                </span>
-            </div>
-            <i class="fa-solid fa-basket-shopping absolute -right-2 -bottom-2 text-5xl opacity-5 dark:opacity-10 pointer-events-none group-hover:scale-110 transition-transform"></i>
-        </a>
-    </div>
-
-    <!-- Filters & Search -->
-    <div class="bg-white dark:bg-slate-800 rounded-3xl p-5 border border-slate-200/90 dark:border-slate-700/80 shadow-sm">
-        <form method="GET" action="{{ route('admin.users.index') }}" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div>
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by name, phone, email..."
-                       class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-slate-400">
-            </div>
-            <div>
-                <select name="role" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-400">
-                    <option value="">All Roles</option>
+                <select name="role" onchange="this.form.submit()" class="form-select w-auto min-w-[10rem]" aria-label="Role">
+                    <option value="">All roles</option>
                     @foreach($roles as $r)
                         <option value="{{ $r->name }}" {{ request('role') == $r->name ? 'selected' : '' }}>{{ $r->display_name }}</option>
                     @endforeach
                 </select>
-            </div>
-            <div class="flex gap-2">
-                <button type="submit" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white dark:bg-white dark:text-slate-900 font-bold rounded-xl text-xs shadow-sm transition active:scale-95">
-                    Filter
-                </button>
-                <a href="{{ route('admin.users.index') }}" class="px-4 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-700 dark:text-slate-200 font-bold rounded-xl text-xs flex items-center justify-center transition">
-                    Reset
-                </a>
-            </div>
-        </form>
-    </div>
+                <button type="submit" class="btn btn-outline btn-sm"><i class="ph ph-funnel"></i> Apply</button>
+                @if(!$noFilter)
+                    <a href="{{ route('admin.users.index') }}" class="btn btn-ghost btn-sm text-rose-600"><i class="ph ph-x-circle"></i> Clear filters</a>
+                @endif
+            </form>
+            <span class="ml-auto text-xs font-semibold text-slate-500">{{ $users->count() }} {{ \Illuminate\Support\Str::plural('user', $users->count()) }}</span>
+        </div>
 
-    <!-- Users Table -->
-    <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200/90 dark:border-slate-700/80 overflow-hidden shadow-sm p-6">
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
-                <thead>
-                    <tr class="bg-slate-50 dark:bg-slate-900/60 text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200 dark:border-slate-700">
-                        <th class="px-4 py-3.5 rounded-l-2xl">User</th>
-                        <th class="px-4 py-3.5">Contact</th>
-                        <th class="px-4 py-3.5">Role</th>
-                        <th class="px-4 py-3.5">Status</th>
-                        <th class="px-4 py-3.5">Registered</th>
-                        <th class="px-4 py-3.5 text-right rounded-r-2xl">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100 dark:divide-slate-700/60 font-medium">
-                    @forelse($users as $user)
-                    <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition-colors">
-                        <td class="px-4 py-3.5 font-medium text-slate-900 dark:text-white">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-slate-800 to-slate-600 text-white font-black text-sm flex items-center justify-center shadow-sm">
-                                    {{ strtoupper(substr($user->name ?: 'U', 0, 1)) }}
-                                </div>
-                                <div>
-                                    <div class="font-bold text-slate-900 dark:text-white text-sm leading-tight">{{ $user->name }}</div>
-                                    <div class="text-[10px] font-mono text-slate-400">ID: #{{ $user->id }}</div>
+        <table id="usersTable" class="w-full" data-export-title="Users">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th class="export-only">Phone</th>
+                    <th class="export-only">Email</th>
+                    <th class="no-export">Contact</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Registered</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($users as $user)
+                    @php
+                        $roleLabel = $user->roleModel ? $user->roleModel->display_name : ucfirst(str_replace('_', ' ', $user->role ?? 'user'));
+                        $isSelf = $user->id === auth()->id();
+                        $initials = collect(explode(' ', $user->name ?: 'U'))->filter()->map(fn ($w) => mb_strtoupper(mb_substr($w, 0, 1)))->take(2)->implode('');
+                    @endphp
+                    <tr>
+                        <td data-export="{{ $user->name }}">
+                            <div class="flex items-center gap-3 min-w-[12rem]">
+                                <span class="w-10 h-10 rounded-xl flex items-center justify-center font-extrabold text-[13px] shrink-0 {{ $user->role === 'super_admin' ? 'tone-violet' : ($user->role === 'admin' ? 'tone-blue' : 'tone-slate') }}">{{ $initials }}</span>
+                                <div class="min-w-0">
+                                    <a href="{{ route('admin.users.edit', $user) }}" class="block font-bold text-slate-900 dark:text-white hover:underline leading-snug">{{ $user->name }}</a>
+                                    <span class="block font-mono text-[10.5px] text-slate-400 mt-0.5">ID #{{ $user->id }}@if($isSelf) · You @endif</span>
                                 </div>
                             </div>
                         </td>
-                        <td class="px-4 py-3.5">
-                            <div class="font-mono text-xs text-slate-800 dark:text-slate-200 font-bold">{{ $user->phone }}</div>
+                        <td>{{ $user->phone }}</td>
+                        <td>{{ $user->email }}</td>
+                        <td>
+                            <a href="tel:{{ $user->phone }}" class="block font-semibold text-slate-700 dark:text-slate-200 hover:underline whitespace-nowrap">{{ $user->phone }}</a>
                             @if($user->email)
-                            <div class="text-[11px] text-slate-400">{{ $user->email }}</div>
+                                <a href="mailto:{{ $user->email }}" class="block text-[11.5px] text-slate-400 hover:underline max-w-[14rem] truncate">{{ $user->email }}</a>
                             @endif
                         </td>
-                        <td class="px-4 py-3.5">
-                            <span class="px-3 py-1 rounded-xl text-[10px] font-extrabold uppercase tracking-wider border {{ $user->role === 'super_admin' ? 'bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300 border-purple-200 dark:border-purple-800' : ($user->role === 'admin' ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300 border-blue-200 dark:border-blue-800' : 'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-600') }}">
-                                {{ $user->roleModel ? $user->roleModel->display_name : ucfirst($user->role) }}
-                            </span>
+                        <td data-export="{{ $roleLabel }}">
+                            <span class="badge {{ $roleBadge($user->role) }}">{{ $roleLabel }}</span>
                         </td>
-                        <td class="px-4 py-3.5">
-                            @if($user->is_active)
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Active
-                                </span>
+                        <td data-order="{{ $user->is_active ? 1 : 0 }}" data-export="{{ $user->is_active ? 'Active' : 'Inactive' }}">
+                            @if($isSelf)
+                                <span class="badge badge-success badge-dot">Active</span>
                             @else
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Inactive
-                                </span>
-                            @endif
-                        </td>
-                        <td class="px-4 py-3.5 text-xs text-slate-500 dark:text-slate-400 font-semibold">
-                            {{ $user->created_at->format('d M, Y') }}
-                        </td>
-                        <td class="px-4 py-3.5 text-right">
-                            <div class="flex items-center justify-end gap-2">
                                 <form action="{{ route('admin.users.toggle-status', $user) }}" method="POST" class="inline">
                                     @csrf
                                     @method('PATCH')
-                                    <button type="submit" title="{{ $user->is_active ? 'Deactivate' : 'Activate' }}"
-                                            class="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 hover:bg-amber-600 hover:text-white flex items-center justify-center transition shadow-sm">
-                                        <i class="fas fa-power-off text-xs"></i>
+                                    <button type="submit" class="switch {{ $user->is_active ? 'is-on' : '' }}" role="switch" aria-checked="{{ $user->is_active ? 'true' : 'false' }}" title="{{ $user->is_active ? 'Deactivate account' : 'Activate account' }}">
+                                        <span class="switch-track"></span><span class="switch-text">{{ $user->is_active ? 'Active' : 'Inactive' }}</span>
                                     </button>
                                 </form>
-                                <a href="{{ route('admin.users.edit', $user) }}" title="Edit User"
-                                   class="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-600 hover:text-white flex items-center justify-center transition shadow-sm">
-                                    <i class="fas fa-edit text-xs"></i>
-                                </a>
-                                @if($user->id !== auth()->id())
-                                <form action="{{ route('admin.users.destroy', $user) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this user?')" class="inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" title="Delete User"
-                                            class="confirm-delete-btn w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 hover:bg-rose-600 hover:text-white flex items-center justify-center transition shadow-sm">
-                                        <i class="fas fa-trash-alt text-xs"></i>
-                                    </button>
-                                </form>
+                            @endif
+                        </td>
+                        <td data-order="{{ $user->created_at?->timestamp }}" data-export="{{ $user->created_at?->format('d M Y') }}" class="whitespace-nowrap">
+                            <span class="font-semibold text-slate-700 dark:text-slate-200">{{ $user->created_at?->format('d M Y') }}</span>
+                            <span class="block text-[11px] text-slate-400">{{ $user->created_at?->diffForHumans() }}</span>
+                        </td>
+                        <td class="text-right">
+                            <div class="act justify-end">
+                                <a href="{{ route('admin.users.edit', $user) }}" class="act-btn is-edit" title="Edit"><i class="ph ph-pencil-simple-line"></i></a>
+                                @if(!$isSelf)
+                                    <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button" class="act-btn is-danger confirm-delete-btn" data-confirm-title="Delete “{{ $user->name }}”?" title="Delete"><i class="ph ph-trash"></i></button>
+                                    </form>
                                 @endif
                             </div>
                         </td>
                     </tr>
-                    @empty
-                    <tr>
-                        <td colspan="6" class="px-6 py-8 text-center text-slate-400">No users found matching your criteria.</td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-
-        @if($users->hasPages())
-        <div class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
-            {{ $users->links() }}
-        </div>
-        @endif
+                @endforeach
+            </tbody>
+        </table>
     </div>
-</div>
 @endsection
+
+@push('scripts')
+<script>
+    $(function () {
+        $('#usersTable').DataTable({
+            order: [[6, 'desc']],
+            columnDefs: [
+                { targets: [1, 2], visible: false },   // Phone, email: export-only
+                { targets: 0, responsivePriority: 1 },
+                { targets: 7, responsivePriority: 2 },
+                { targets: 4, responsivePriority: 3 },
+                { targets: 5, responsivePriority: 4 }
+            ]
+        });
+    });
+</script>
+@endpush

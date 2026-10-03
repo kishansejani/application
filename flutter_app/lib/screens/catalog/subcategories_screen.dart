@@ -1,187 +1,144 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import '../../constants/api_constants.dart';
-import '../../constants/app_colors.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/category.dart';
+import '../../theme/app_theme.dart';
+import '../../utils/responsive.dart';
+import '../../widgets/app_card.dart';
+import '../../widgets/app_network_image.dart';
+import '../../widgets/category_card.dart';
 import 'product_list_screen.dart';
 
-class SubCategoriesScreen extends StatelessWidget {
+class SubcategoriesScreen extends StatelessWidget {
   final Category category;
 
-  const SubCategoriesScreen({Key? key, required this.category}) : super(key: key);
+  const SubcategoriesScreen({super.key, required this.category});
 
-  String _getImageUrl(String? path) {
-    if (path == null || path.isEmpty) return 'https://placehold.co/200x200/png?text=Grocery';
-    if (path.startsWith('http')) return path;
-    return '${ApiConstants.imageBaseUrl}/$path';
+  void _openProducts(BuildContext context, {SubCategory? sub}) {
+    final lang = context.langCode;
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ProductListScreen(
+          title: sub?.nameFor(lang) ?? category.nameFor(lang),
+          categoryId: category.id,
+          subCategoryId: sub?.id,
+          subCategories: category.subCategories,
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text(
-          category.name,
-          style: const TextStyle(
-            color: AppColors.textPrimary,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: Column(
-        children: [
-          // "All Products in this Category" Tile
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ProductListScreen(
-                      categoryId: category.id,
-                      title: 'All ${category.name}',
-                    ),
-                  ),
-                );
-              },
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryLight,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.primary.withOpacity(0.3)),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.apps_rounded, color: AppColors.primaryDark),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'Browse All ${category.name}',
-                        style: const TextStyle(
-                          color: AppColors.primaryDark,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                    const Icon(Icons.arrow_forward_ios_rounded, color: AppColors.primaryDark, size: 14),
-                  ],
-                ),
-              ),
-            ),
-          ),
+    final lang = context.langCode;
+    final scheme = context.colors;
+    final subs = category.subCategories;
 
-          // Sub Categories Grid
-          Expanded(
-            child: category.subCategories.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+    return Scaffold(
+      appBar: AppBar(title: Text(category.nameFor(lang))),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final width = constraints.maxWidth;
+          final hPad = Responsive.centeredPadding(width);
+          final content = width - hPad * 2;
+          final columns = content >= 1000 ? 5 : (content >= 700 ? 4 : (content >= 480 ? 3 : 2));
+
+          return CustomScrollView(
+            slivers: [
+              SliverPadding(
+                padding: EdgeInsets.fromLTRB(hPad, AppSpacing.sm, hPad, AppSpacing.lg),
+                sliver: SliverToBoxAdapter(
+                  child: AppCard(
+                    onTap: () => _openProducts(context),
+                    color: scheme.primaryContainer.fade(context.isDark ? 0.3 : 0.6),
+                    borderColor: Colors.transparent,
+                    child: Row(
                       children: [
-                        const Icon(Icons.folder_open, size: 48, color: AppColors.textMuted),
-                        const SizedBox(height: 12),
-                        const Text('No sub-categories found', style: TextStyle(color: AppColors.textSecondary)),
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => ProductListScreen(categoryId: category.id, title: category.name),
-                              ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
-                          child: const Text('View All Items'),
+                        Container(
+                          width: 52,
+                          height: 52,
+                          decoration: BoxDecoration(
+                            color: scheme.surface,
+                            borderRadius: BorderRadius.circular(AppRadius.sm),
+                          ),
+                          child: Icon(categoryIcon(category.icon), color: scheme.primary),
                         ),
+                        const SizedBox(width: AppSpacing.md),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                context.tr('all_in_category', {'name': category.nameFor(lang)}),
+                                style: context.textStyles.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+                              ),
+                              Text(
+                                context.tr('browse_products'),
+                                style: context.textStyles.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Icon(Icons.arrow_forward_rounded, color: scheme.primary),
                       ],
                     ),
-                  )
-                : GridView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 1.1,
-                      crossAxisSpacing: 14,
-                      mainAxisSpacing: 14,
-                    ),
-                    itemCount: category.subCategories.length,
-                    itemBuilder: (context, index) {
-                      final subCat = category.subCategories[index];
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => ProductListScreen(
-                                categoryId: category.id,
-                                subCategoryId: subCat.id,
-                                title: subCat.name,
+                  ),
+                ),
+              ),
+              SliverPadding(
+                padding: EdgeInsets.fromLTRB(hPad, 0, hPad, AppSpacing.xxl),
+                sliver: SliverGrid(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: columns,
+                    mainAxisSpacing: AppSpacing.md,
+                    crossAxisSpacing: AppSpacing.md,
+                    childAspectRatio: 0.82,
+                  ),
+                  delegate: SliverChildBuilderDelegate(
+                    (context, i) {
+                      final sub = subs[i];
+                      return AppCard(
+                        padding: const EdgeInsets.all(AppSpacing.sm),
+                        onTap: () => _openProducts(context, sub: sub),
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: categoryTint(context, i),
+                                  borderRadius: BorderRadius.circular(AppRadius.sm),
+                                ),
+                                child: AppNetworkImage(
+                                  url: sub.image,
+                                  borderRadius: BorderRadius.circular(AppRadius.sm),
+                                  placeholderIcon: categoryIcon(category.icon),
+                                ),
                               ),
                             ),
-                          );
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(18),
-                            border: Border.all(color: AppColors.borderLight, width: 1.5),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.03),
-                                blurRadius: 8,
-                                offset: const Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(14),
-                                child: SizedBox(
-                                  width: 60,
-                                  height: 60,
-                                  child: CachedNetworkImage(
-                                    imageUrl: _getImageUrl(subCat.image),
-                                    fit: BoxFit.cover,
-                                    errorWidget: (_, __, ___) => const Icon(Icons.category, color: AppColors.primary, size: 30),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            const SizedBox(height: AppSpacing.sm),
+                            SizedBox(
+                              height: 36,
+                              child: Center(
                                 child: Text(
-                                  subCat.name,
-                                  textAlign: TextAlign.center,
+                                  sub.nameFor(lang),
                                   maxLines: 2,
+                                  textAlign: TextAlign.center,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 13,
-                                    color: AppColors.textPrimary,
-                                  ),
+                                  style: context.textStyles.labelLarge?.copyWith(fontWeight: FontWeight.w700, height: 1.2),
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       );
                     },
+                    childCount: subs.length,
                   ),
-          ),
-        ],
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

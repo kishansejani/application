@@ -1,0 +1,5 @@
+@extends('errors.layout')
+@section('code', '503')
+@section('title', 'Be right back')
+@section('icon', 'wrench')
+@section('message', "We're doing some quick maintenance. Please check back shortly.")

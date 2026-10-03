@@ -1,3 +1,5 @@
+import 'json_utils.dart';
+
 class Category {
   final int id;
   final String name;
@@ -6,32 +8,44 @@ class Category {
   final String slug;
   final String? image;
   final String? icon;
+  final String? description;
   final List<SubCategory> subCategories;
 
   Category({
     required this.id,
     required this.name,
-    required this.nameEn,
-    required this.nameGu,
-    required this.slug,
+    this.nameEn = '',
+    this.nameGu = '',
+    this.slug = '',
     this.image,
     this.icon,
+    this.description,
     this.subCategories = const [],
   });
 
-  factory Category.fromJson(Map<String, dynamic> json) {
-    var subCatsJson = json['sub_categories'] as List? ?? [];
-    List<SubCategory> subCatsList = subCatsJson.map((i) => SubCategory.fromJson(i)).toList();
+  /// API already localises `name` via Accept-Language; raw relations only
+  /// carry name_en / name_gu, so pick the right one for the UI language.
+  String nameFor(String languageCode) {
+    if (languageCode == 'gu' && nameGu.isNotEmpty) return nameGu;
+    if (languageCode == 'en' && nameEn.isNotEmpty) return nameEn;
+    return name.isNotEmpty ? name : (nameEn.isNotEmpty ? nameEn : nameGu);
+  }
 
+  factory Category.fromJson(Map<String, dynamic> json) {
+    final id = asInt(json['id']);
     return Category(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 0,
-      name: json['name'] ?? json['name_en'] ?? '',
-      nameEn: json['name_en'] ?? '',
-      nameGu: json['name_gu'] ?? '',
-      slug: json['slug'] ?? '',
-      image: json['image'],
-      icon: json['icon'],
-      subCategories: subCatsList,
+      id: id,
+      name: asString(json['name'] ?? json['name_en']),
+      nameEn: asString(json['name_en']),
+      nameGu: asString(json['name_gu']),
+      slug: asString(json['slug']),
+      image: asStringOrNull(json['image_url'] ?? json['image']),
+      icon: asStringOrNull(json['icon']),
+      description: asStringOrNull(json['description'] ?? json['description_en']),
+      subCategories: mapList(
+        json['subcategories'] ?? json['sub_categories'],
+        (e) => SubCategory.fromJson(e, categoryId: id),
+      ),
     );
   }
 }
@@ -49,21 +63,27 @@ class SubCategory {
     required this.id,
     required this.categoryId,
     required this.name,
-    required this.nameEn,
-    required this.nameGu,
-    required this.slug,
+    this.nameEn = '',
+    this.nameGu = '',
+    this.slug = '',
     this.image,
   });
 
-  factory SubCategory.fromJson(Map<String, dynamic> json) {
+  String nameFor(String languageCode) {
+    if (languageCode == 'gu' && nameGu.isNotEmpty) return nameGu;
+    if (languageCode == 'en' && nameEn.isNotEmpty) return nameEn;
+    return name.isNotEmpty ? name : (nameEn.isNotEmpty ? nameEn : nameGu);
+  }
+
+  factory SubCategory.fromJson(Map<String, dynamic> json, {int? categoryId}) {
     return SubCategory(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 0,
-      categoryId: json['category_id'] is int ? json['category_id'] : int.tryParse(json['category_id'].toString()) ?? 0,
-      name: json['name'] ?? json['name_en'] ?? '',
-      nameEn: json['name_en'] ?? '',
-      nameGu: json['name_gu'] ?? '',
-      slug: json['slug'] ?? '',
-      image: json['image'],
+      id: asInt(json['id']),
+      categoryId: asInt(json['category_id'] ?? categoryId),
+      name: asString(json['name'] ?? json['name_en']),
+      nameEn: asString(json['name_en']),
+      nameGu: asString(json['name_gu']),
+      slug: asString(json['slug']),
+      image: asStringOrNull(json['image_url'] ?? json['image']),
     );
   }
 }

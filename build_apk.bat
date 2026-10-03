@@ -23,6 +23,15 @@ IF %ERRORLEVEL% NEQ 0 (
 echo [*] Flutter detected! Checking dependencies...
 cd /d "%~dp0\flutter_app"
 
+IF NOT EXIST "android\" (
+    echo [*] android\ folder not found - generating platform projects...
+    call flutter create --platforms=android,ios --org com.freshexpress .
+    echo.
+    echo [i] Remember to apply the AndroidManifest changes from flutter_app\platform_setup\README.md
+    echo     ^(INTERNET, location permissions, usesCleartextTraffic, url_launcher queries^).
+    echo.
+)
+
 echo [*] Fetching Flutter packages...
 call flutter pub get
 
