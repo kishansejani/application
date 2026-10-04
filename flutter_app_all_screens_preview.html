@@ -1,0 +1,2547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fresh Express - Flutter Mobile App All Screens UI Preview</title>
+  <!-- Google Fonts: Plus Jakarta Sans & Noto Sans Gujarati -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Gujarati:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      --primary: #16A34A;
+      --primary-dark: #15803D;
+      --primary-deep: #14532D;
+      --primary-light: #DCFCE7;
+      --accent: #F59E0B;
+      --accent-light: #FEF3C7;
+      --bg-page: #0F172A;
+      --surface-page: #1E293B;
+      --border-page: #334155;
+      --text-white: #F8FAFC;
+      --text-muted: #94A3B8;
+      
+      /* Mobile App Theme Tokens */
+      --app-bg: #F8FAFC;
+      --app-card: #FFFFFF;
+      --app-text: #0F172A;
+      --app-subtext: #64748B;
+      --app-border: #E2E8F0;
+      --app-green-badge: #DCFCE7;
+      --app-green-text: #15803D;
+      --app-red: #EF4444;
+      --app-red-light: #FEE2E2;
+      --app-blue: #2563EB;
+      --app-blue-light: #DBEAFE;
+      --app-amber: #D97706;
+      --app-amber-light: #FEF3C7;
+    }
+
+    .dark-mode {
+      --app-bg: #0C110E;
+      --app-card: #141A16;
+      --app-text: #F1F5F9;
+      --app-subtext: #94A3B8;
+      --app-border: #1E2922;
+      --app-green-badge: #064E3B;
+      --app-green-text: #4ADE80;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', 'Noto Sans Gujarati', sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-white);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Top Control Bar */
+    header.dashboard-header {
+      background: rgba(30, 41, 59, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-page);
+      padding: 14px 28px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-badge {
+      background: linear-gradient(135deg, #16A34A, #15803D);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .brand-text h1 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .brand-text p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn-group {
+      background: #0F172A;
+      border: 1px solid var(--border-page);
+      border-radius: 8px;
+      padding: 3px;
+      display: flex;
+      gap: 2px;
+    }
+
+    .btn-toggle {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-toggle.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .action-btn {
+      background: #334155;
+      color: white;
+      border: 1px solid #475569;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s ease;
+    }
+
+    .action-btn:hover {
+      background: #475569;
+    }
+
+    .action-btn.primary {
+      background: #16A34A;
+      border-color: #15803D;
+    }
+
+    .action-btn.primary:hover {
+      background: #15803D;
+    }
+
+    /* Category Navigator Tabs */
+    .flow-nav {
+      background: #1E293B;
+      border-bottom: 1px solid var(--border-page);
+      padding: 10px 28px;
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .flow-tab {
+      background: #0F172A;
+      border: 1px solid var(--border-page);
+      color: var(--text-muted);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .flow-tab:hover {
+      border-color: var(--primary);
+      color: white;
+    }
+
+    .flow-tab.active {
+      background: rgba(22, 163, 74, 0.15);
+      border-color: var(--primary);
+      color: #4ADE80;
+    }
+
+    .flow-tab .badge {
+      background: rgba(255,255,255,0.1);
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-size: 11px;
+    }
+
+    /* Main Container */
+    main.preview-container {
+      flex: 1;
+      padding: 28px;
+      max-width: 1700px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Grid Layout */
+    .screens-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 32px;
+      justify-items: center;
+    }
+
+    /* Screen Card Container */
+    .screen-card {
+      background: var(--surface-page);
+      border: 1px solid var(--border-page);
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .screen-card:hover {
+      transform: translateY(-4px);
+      border-color: #16A34A;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .screen-header-info {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .screen-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #F8FAFC;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .screen-tag {
+      background: #334155;
+      color: #94A3B8;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .screen-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Phone Device Mockup Frame */
+    .device-mockup {
+      width: 340px;
+      height: 690px;
+      background: var(--app-bg);
+      border-radius: 44px;
+      border: 10px solid #1E293B;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6), inset 0 0 0 2px rgba(255,255,255,0.1);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      color: var(--app-text);
+      font-size: 13px;
+    }
+
+    /* Phone Notch / Dynamic Island & Status Bar */
+    .status-bar {
+      height: 40px;
+      padding: 8px 18px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--app-text);
+      background: transparent;
+      z-index: 10;
+    }
+
+    .dynamic-island {
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90px;
+      height: 22px;
+      background: #000;
+      border-radius: 14px;
+      z-index: 15;
+    }
+
+    .status-icons {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+    }
+
+    /* Scrollable App Body */
+    .app-screen-body {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 70px;
+      scrollbar-width: none;
+    }
+
+    .app-screen-body::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* App Navigation Bar (Bottom) */
+    .app-bottom-nav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 62px;
+      background: var(--app-card);
+      border-top: 1px solid var(--app-border);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 20;
+      padding-bottom: 6px;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      color: var(--app-subtext);
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .nav-item.active {
+      color: var(--primary);
+    }
+
+    .nav-item.active .nav-icon-wrap {
+      background: var(--app-green-badge);
+      color: var(--primary);
+      padding: 4px 14px;
+      border-radius: 16px;
+    }
+
+    .nav-badge {
+      position: absolute;
+      top: -2px;
+      right: 2px;
+      background: #EF4444;
+      color: white;
+      font-size: 9px;
+      font-weight: 700;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Reusable In-App UI Components */
+    .app-topbar {
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--app-card);
+      border-bottom: 1px solid var(--app-border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .app-topbar-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--app-text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .app-btn-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--app-bg);
+      border: 1px solid var(--app-border);
+      color: var(--app-text);
+      cursor: pointer;
+    }
+
+    .app-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .badge-green { background: var(--app-green-badge); color: var(--app-green-text); }
+    .badge-amber { background: var(--app-amber-light); color: var(--app-amber); }
+    .badge-red { background: var(--app-red-light); color: var(--app-red); }
+    .badge-blue { background: var(--app-blue-light); color: var(--app-blue); }
+
+    .app-button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      width: 100%;
+      text-align: center;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);
+    }
+
+    .app-button.secondary {
+      background: transparent;
+      border: 1px solid var(--app-border);
+      color: var(--app-text);
+      box-shadow: none;
+    }
+
+    /* Screen Specific UI Elements */
+    
+    /* 1. Splash */
+    .splash-view {
+      height: 100%;
+      background: linear-gradient(180deg, #16A34A 0%, #14532D 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      color: white;
+    }
+
+    .splash-logo-box {
+      width: 90px;
+      height: 90px;
+      background: white;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+      margin-bottom: 20px;
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+    }
+
+    /* 2. Auth Screens */
+    .auth-container {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .auth-tab-switch {
+      background: var(--app-bg);
+      border: 1px solid var(--app-border);
+      border-radius: 12px;
+      padding: 4px;
+      display: flex;
+    }
+
+    .auth-tab-btn {
+      flex: 1;
+      padding: 8px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .auth-tab-btn.active {
+      background: var(--app-card);
+      color: var(--primary);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+
+    .input-field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .input-field-group label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--app-subtext);
+    }
+
+    .input-box {
+      background: var(--app-card);
+      border: 1px solid var(--app-border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .otp-boxes {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin: 16px 0;
+    }
+
+    .otp-digit {
+      width: 48px;
+      height: 52px;
+      border-radius: 12px;
+      border: 2px solid var(--primary);
+      background: var(--app-green-badge);
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .otp-digit.empty {
+      border-color: var(--app-border);
+      background: var(--app-card);
+      color: var(--app-text);
+    }
+
+    /* 3. Home Screen */
+    .home-header {
+      background: var(--app-card);
+      padding: 12px 16px 14px;
+      border-bottom: 1px solid var(--app-border);
+    }
+
+    .location-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .search-mockup {
+      background: var(--app-bg);
+      border: 1px solid var(--app-border);
+      border-radius: 12px;
+      padding: 9px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--app-subtext);
+      font-size: 12px;
+    }
+
+    .slot-banner {
+      background: linear-gradient(135deg, #16A34A, #15803D);
+      color: white;
+      margin: 12px 14px 6px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+    }
+
+    .hero-banner {
+      background: linear-gradient(135deg, #F59E0B, #EA580C);
+      color: white;
+      margin: 8px 14px;
+      padding: 14px;
+      border-radius: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .cat-circle-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      padding: 10px 14px;
+      text-align: center;
+    }
+
+    .cat-circle-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .cat-icon-circle {
+      width: 52px;
+      height: 52px;
+      border-radius: 18px;
+      background: var(--app-card);
+      border: 1px solid var(--app-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    }
+
+    .section-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px 6px;
+    }
+
+    .section-title-row h3 {
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .see-all-link {
+      color: var(--primary);
+      font-size: 11px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    /* Product Grid Cards */
+    .products-2col {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      padding: 6px 14px 14px;
+    }
+
+    .product-mini-card {
+      background: var(--app-card);
+      border: 1px solid var(--app-border);
+      border-radius: 14px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .prod-img-box {
+      width: 100%;
+      height: 90px;
+      background: var(--app-bg);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      margin-bottom: 6px;
+      position: relative;
+    }
+
+    .discount-pill {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      background: #E11D48;
+      color: white;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 2px 5px;
+      border-radius: 4px;
+    }
+
+    .fav-pill {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: rgba(255,255,255,0.85);
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94A3B8;
+      font-size: 10px;
+    }
+
+    .prod-title {
+      font-weight: 700;
+      font-size: 11px;
+      line-height: 1.2;
+      height: 28px;
+      overflow: hidden;
+    }
+
+    .prod-unit {
+      font-size: 10px;
+      color: var(--app-subtext);
+      margin: 2px 0 6px;
+    }
+
+    .prod-price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+    }
+
+    .price-main {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--app-text);
+    }
+
+    .price-strike {
+      font-size: 9px;
+      color: var(--app-subtext);
+      text-decoration: line-through;
+    }
+
+    .add-qty-btn {
+      background: var(--app-green-badge);
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      font-weight: 800;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .stepper-mini {
+      background: var(--primary);
+      color: white;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 6px;
+      font-weight: 800;
+      font-size: 11px;
+    }
+
+    /* Cart & Checkout Specifics */
+    .free-delivery-bar {
+      background: var(--app-card);
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--app-border);
+    }
+
+    .prog-track {
+      background: var(--app-border);
+      height: 6px;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .prog-fill {
+      background: var(--primary);
+      height: 100%;
+      width: 75%;
+    }
+
+    .cart-item-row {
+      background: var(--app-card);
+      border-radius: 12px;
+      border: 1px solid var(--app-border);
+      padding: 10px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin: 6px 14px;
+    }
+
+    .cart-item-img {
+      width: 50px;
+      height: 50px;
+      background: var(--app-bg);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .coupon-strip {
+      background: #FEF3C7;
+      border: 1px dashed #F59E0B;
+      padding: 10px 14px;
+      border-radius: 12px;
+      margin: 8px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #92400E;
+      font-weight: 700;
+      font-size: 11px;
+    }
+
+    .bill-details-card {
+      background: var(--app-card);
+      border: 1px solid var(--app-border);
+      border-radius: 14px;
+      padding: 12px;
+      margin: 8px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .bill-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--app-subtext);
+    }
+
+    .bill-row.total {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--app-text);
+      border-top: 1px dashed var(--app-border);
+      padding-top: 8px;
+    }
+
+    /* Checkout Step Boxes */
+    .step-box {
+      background: var(--app-card);
+      border: 1px solid var(--app-border);
+      border-radius: 14px;
+      padding: 12px;
+      margin: 6px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .step-title {
+      font-size: 12px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--app-text);
+    }
+
+    .step-num {
+      width: 18px;
+      height: 18px;
+      background: var(--primary);
+      color: white;
+      border-radius: 50%;
+      font-size: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Timeline Stepper for Tracking */
+    .tracking-timeline {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .timeline-node {
+      display: flex;
+      gap: 12px;
+      position: relative;
+    }
+
+    .timeline-node::before {
+      content: '';
+      position: absolute;
+      left: 11px;
+      top: 24px;
+      bottom: -16px;
+      width: 2px;
+      background: var(--app-border);
+    }
+
+    .timeline-node.active::before {
+      background: var(--primary);
+    }
+
+    .timeline-node:last-child::before {
+      display: none;
+    }
+
+    .timeline-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--app-border);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      z-index: 2;
+    }
+
+    .timeline-node.active .timeline-icon {
+      background: var(--primary);
+    }
+
+    .timeline-info h4 {
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .timeline-info p {
+      font-size: 10px;
+      color: var(--app-subtext);
+    }
+
+    /* Sticky Bottom Action in Mobile */
+    .sticky-bottom-action {
+      position: sticky;
+      bottom: 0;
+      background: var(--app-card);
+      border-top: 1px solid var(--app-border);
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+
+    /* Screen Feedback / Notes drawer */
+    .screen-notes {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px dashed #475569;
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 11px;
+      color: #CBD5E1;
+    }
+
+    .screen-notes textarea {
+      width: 100%;
+      background: #0F172A;
+      border: 1px solid #334155;
+      color: #F8FAFC;
+      border-radius: 6px;
+      padding: 6px;
+      font-size: 11px;
+      font-family: inherit;
+      resize: vertical;
+      margin-top: 6px;
+    }
+
+    /* Print / Export Styles */
+    @media print {
+      header.dashboard-header, .flow-nav {
+        display: none !important;
+      }
+      body {
+        background: white !important;
+        color: black !important;
+      }
+      .screens-grid {
+        display: block !important;
+      }
+      .screen-card {
+        page-break-inside: avoid;
+        margin-bottom: 40px;
+        border: 1px solid #ccc !important;
+        background: white !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Dashboard Bar -->
+  <header class="dashboard-header">
+    <div class="brand-title">
+      <div class="brand-badge">
+        <i data-lucide="smartphone"></i> FLUTTER APP
+      </div>
+      <div class="brand-text">
+        <h1>Fresh Express Grocery – Mobile App Screens UI</h1>
+        <p>Complete High-Fidelity UI Gallery & Review Mockups (18+ Mobile Screens)</p>
+      </div>
+    </div>
+
+    <div class="header-controls">
+      <!-- Theme Switcher -->
+      <div class="btn-group">
+        <button class="btn-toggle active" id="btn-theme-light" onclick="setAppTheme('light')">
+          <i data-lucide="sun" style="width:14px;height:14px;"></i> Light
+        </button>
+        <button class="btn-toggle" id="btn-theme-dark" onclick="setAppTheme('dark')">
+          <i data-lucide="moon" style="width:14px;height:14px;"></i> Dark
+        </button>
+      </div>
+
+      <!-- Language Switcher -->
+      <div class="btn-group">
+        <button class="btn-toggle active" id="btn-lang-en" onclick="setAppLanguage('en')">
+          English
+        </button>
+        <button class="btn-toggle" id="btn-lang-gu" onclick="setAppLanguage('gu')">
+          ગુજરાતી
+        </button>
+      </div>
+
+      <!-- Action Buttons -->
+      <button class="action-btn" onclick="window.print()">
+        <i data-lucide="printer" style="width:14px;height:14px;"></i> Print / Save PDF
+      </button>
+      <button class="action-btn primary" onclick="exportFeedback()">
+        <i data-lucide="download" style="width:14px;height:14px;"></i> Export Notes
+      </button>
+    </div>
+  </header>
+
+  <!-- Flow Filter Navigation -->
+  <nav class="flow-nav">
+    <button class="flow-tab active" onclick="filterCategory('all', this)">
+      All Screens <span class="badge">18</span>
+    </button>
+    <button class="flow-tab" onclick="filterCategory('auth', this)">
+      <i data-lucide="key-round" style="width:14px;height:14px;"></i> Auth & Onboarding <span class="badge">4</span>
+    </button>
+    <button class="flow-tab" onclick="filterCategory('shop', this)">
+      <i data-lucide="store" style="width:14px;height:14px;"></i> Home & Catalog <span class="badge">4</span>
+    </button>
+    <button class="flow-tab" onclick="filterCategory('order', this)">
+      <i data-lucide="shopping-bag" style="width:14px;height:14px;"></i> Cart & Checkout <span class="badge">3</span>
+    </button>
+    <button class="flow-tab" onclick="filterCategory('tracking', this)">
+      <i data-lucide="truck" style="width:14px;height:14px;"></i> Orders & Live Tracking <span class="badge">3</span>
+    </button>
+    <button class="flow-tab" onclick="filterCategory('account', this)">
+      <i data-lucide="user" style="width:14px;height:14px;"></i> Account, Wishlist & Offers <span class="badge">4</span>
+    </button>
+  </nav>
+
+  <!-- Main Screens Grid -->
+  <main class="preview-container">
+    <div class="screens-grid" id="screensGrid">
+
+      <!-- ================= 1. SPLASH SCREEN ================= -->
+      <div class="screen-card" data-cat="auth">
+        <div class="screen-header-info">
+          <div>
+            <div class="screen-title"><i data-lucide="sparkles" style="width:16px;height:16px;color:#16A34A;"></i> 1. Splash Screen</div>
+            <div class="screen-subtitle">lib/screens/splash_screen.dart</div>
+          </div>
+          <span class="screen-tag">Entry</span>
+        </div>
+
+        <div class="device-mockup">
+          <div class="dynamic-island"></div>
+          <div class="status-bar" style="color:white;">
+            <span>9:41</span>
+            <div class="status-icons">
+              <i data-lucide="wifi" style="width:12px;height:12px;"></i>
+              <i data-lucide="battery-medium" style="width:14px;height:14px;"></i>
+            </div>
+          </div>
+          <div class="app-screen-body splash-view">
+            <div class="splash-logo-box">
+              <span style="font-size:42px;">🥦</span>
+            </div>
+            <h2 style="font-size:22px;font-weight:800;margin-bottom:4px;letter-spacing:-0.5px;">Fresh Express</h2>
+            <p style="font-size:12px;opacity:0.9;margin-bottom:30px;">Farm Fresh Groceries in 2 Hours</p>
+            
+            <div style="width:140px;height:4px;background:rgba(255,255,255,0.25);border-radius:4px;overflow:hidden;margin-bottom:12px;">
+              <div style="width:60%;height:100%;background:white;border-radius:4px;"></div>
+            </div>
+            <span style="font-size:10px;opacity:0.75;">Connecting to store & session...</span>
+          </div>
+        </div>
+
+        <div class="screen-notes">
+          <strong>Review Notes:</strong>
+          <textarea placeholder="Write changes/feedback for Splash Screen here..."></textarea>
+        </div>
+      </div>
+
+      <!-- ================= 2. PHONE LOGIN SCREEN ================= -->
+      <div class="screen-card" data-cat="auth">
+        <div class="screen-header-info">
+          <div>
+            <div class="screen-title"><i data-lucide="smartphone" style="width:16px;height:16px;color:#16A34A;"></i> 2. Phone Login</div>
+            <div class="screen-subtitle">lib/screens/auth/phone_login_screen.dart</div>
+          </div>
+          <span class="screen-tag">Auth</span>
+        </div>
+
+        <div class="device-mockup">
+          <div class="dynamic-island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons"><i data-lucide="wifi" style="width:12px;height:12px;"></i><i data-lucide="battery-medium" style="width:14px;height:14px;"></i></div>
+          </div>
+          <div class="app-screen-body">
+            <div class="auth-container">
+              <div style="text-align:center;margin:15px 0 10px;">
+                <div style="width:54px;height:54px;background:var(--app-green-badge);color:var(--primary);border-radius:16px;display:inline-flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:8px;">
+                  🛒
+                </div>
+                <h2 style="font-size:18px;font-weight:800;">Welcome to Fresh Express</h2>
+                <p style="font-size:11px;color:var(--app-subtext);">Enter your phone number to continue</p>
+              </div>
+
+              <div class="auth-tab-switch">
+                <div class="auth-tab-btn active">Login</div>
+                <div class="auth-tab-btn">Register</div>
+              </div>
+
+              <div class="input-field-group">
+                <label>Mobile Number</label>
+                <div class="input-box">
+                  <span style="font-weight:700;color:var(--app-text);border-right:1px solid var(--app-border);padding-right:8px;">🇮🇳 +91</span>
+                  <span style="color:var(--app-text);font-weight:600;">98765 43210</span>
+                </div>
+              </div>
+
+              <button class="app-button" style="margin-top:8px;">
+                Send OTP <i data-lucide="arrow-right" style="width:14px;height:14px;"></i>
+              </button>
+
+              <div style="background:var(--app-bg);border:1px dashed var(--app-border);border-radius:10px;padding:10px;font-size:11px;color:var(--app-subtext);text-align:center;">
+                🔒 We will send you a 4-digit verification code.
+              </div>
+
+              <div style="margin-top:auto;text-align:center;font-size:10px;color:var(--app-subtext);padding-top:20px;">
+                By continuing, you agree to our <span style="color:var(--primary);font-weight:700;">Terms</span> & <span style="color:var(--primary);font-weight:700;">Privacy Policy</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="screen-notes">
+          <strong>Review Notes:</strong>
+          <textarea placeholder="Write changes/feedback for Phone Login here..."></textarea>
+        </div>
+      </div>
+
+      <!-- ================= 3. OTP VERIFICATION SCREEN ================= -->
+      <div class="screen-card" data-cat="auth">
+        <div class="screen-header-info">
+          <div>
+            <div class="screen-title"><i data-lucide="shield-check" style="width:16px;height:16px;color:#16A34A;"></i> 3. OTP Verification</div>
+            <div class="screen-subtitle">lib/screens/auth/otp_verify_screen.dart</div>
+          </div>
+          <span class="screen-tag">Security</span>
+        </div>
+
+        <div class="device-mockup">
+          <div class="dynamic-island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons"><i data-lucide="wifi" style="width:12px;height:12px;"></i><i data-lucide="battery-medium" style="width:14px;height:14px;"></i></div>
+          </div>
+          <div class="app-topbar">
+            <div class="app-btn-icon"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i></div>
+            <div class="app-topbar-title">Verify Phone</div>
+            <div style="width:32px;"></div>
+          </div>
+          <div class="app-screen-body">
+            <div class="auth-container" style="text-align:center;">
+              <div style="width:60px;height:60px;background:var(--app-green-badge);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin:10px auto 4px;">
+                <i data-lucide="shield-check" style="width:30px;height:30px;color:var(--primary);"></i>
+              </div>
+              <h2 style="font-size:17px;font-weight:800;">Verify with OTP</h2>
+              <p style="font-size:11px;color:var(--app-subtext);">Code sent to <strong>+91 98765 43210</strong> <span style="color:var(--primary);font-weight:700;cursor:pointer;">Edit</span></p>
+
+              <div class="otp-boxes">
+                <div class="otp-digit">4</div>
+                <div class="otp-digit">8</div>
+                <div class="otp-digit">2</div>
+                <div class="otp-digit empty"></div>
+              </div>
+
+              <div style="display:inline-flex;align-items:center;gap:6px;background:var(--app-amber-light);color:var(--app-amber);padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;margin:0 auto;">
+                <i data-lucide="info" style="width:12px;height:12px;"></i> Demo OTP Hint: 1234
+              </div>
+
+              <button class="app-button" style="margin-top:16px;">
+                Verify & Continue
+              </button>
+
+              <div style="display:flex;justify-content:center;align-items:center;gap:6px;font-size:11px;color:var(--app-subtext);margin-top:14px;">
+                <i data-lucide="clock" style="width:12px;height:12px;"></i> Resend code in <strong style="color:var(--primary);">00:24</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="screen-notes">
+          <strong>Review Notes:</strong>
+          <textarea placeholder="Write changes/feedback for OTP Verify here..."></textarea>
+        </div>
+      </div>
+
+      <!-- ================= 4. REGISTER SCREEN ================= -->
+      <div class="screen-card" data-cat="auth">
+        <div class="screen-header-info">
+          <div>
+            <div class="screen-title"><i data-lucide="user-plus" style="width:16px;height:16px;color:#16A34A;"></i> 4. Register Profile</div>
+            <div class="screen-subtitle">lib/screens/auth/register_screen.dart</div>
+          </div>
+          <span class="screen-tag">Auth</span>
+        </div>
+
+        <div class="device-mockup">
+          <div class="dynamic-island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons"><i data-lucide="wifi" style="width:12px;height:12px;"></i><i data-lucide="battery-medium" style="width:14px;height:14px;"></i></div>
+          </div>
+          <div class="app-topbar">
+            <div class="app-btn-icon"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i></div>
+            <div class="app-topbar-title">Create Account</div>
+            <div style="width:32px;"></div>
+          </div>
+          <div class="app-screen-body">
+            <div class="auth-container">
+              <div class="input-field-group">
+                <label>Full Name *</label>
+                <div class="input-box">
+                  <i data-lucide="user" style="width:14px;height:14px;color:var(--app-subtext);"></i>
+                  <span style="color:var(--app-text);">Rahul Sharma</span>
+                </div>
+              </div>
+
+              <div class="input-field-group">
+                <label>Mobile Number *</label>
+                <div class="input-box">
+                  <span style="font-weight:700;">+91</span>
+                  <span>98765 43210</span>
+                </div>
+              </div>
+
+              <div class="input-field-group">
+                <label>Email (Optional)</label>
+                <div class="input-box">
+                  <i data-lucide="mail" style="width:14px;height:14px;color:var(--app-subtext);"></i>
+                  <span style="color:var(--app-subtext);">rahul@gmail.com</span>
+                </div>
+              </div>
+
+              <div class="input-field-group">
+                <label>Preferred Language</label>
+                <div class="input-box" style="justify-content:space-between;">
+                  <span style="font-weight:600;">English / ગુજરાતી</span>
+                  <i data-lucide="chevron-down" style="width:14px;height:14px;color:var(--app-subtext);"></i>
+                </div>
+              </div>
+
+              <div style="display:flex;align-items:flex-start;gap:8px;font-size:11px;color:var(--app-subtext);margin:6px 0;">
+                <input type="checkbox" checked style="accent-color:var(--primary);margin-top:2px;">
+                <span>I agree to Fresh Express Terms of Service and Privacy Policy</span>
+              </div>
+
+              <button class="app-button">
+                Sign Up & Proceed
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="screen-notes">
+          <strong>Review Notes:</strong>
+          <textarea placeholder="Write changes/feedback for Register screen here..."></textarea>
+        </div>
+      </div>
+
+      <!-- ================= 5. HOME SCREEN ================= -->
+      <div class="screen-card" data-cat="shop">
+        <div class="screen-header-info">
+          <div>
+            <div class="screen-title"><i data-lucide="home" style="width:16px;height:16px;color:#16A34A;"></i> 5. Home Dashboard</div>
+            <div class="screen-subtitle">lib/screens/home/home_screen.dart</div>
+          </div>
+          <span class="screen-tag">Main</span>
+        </div>
+
+        <div class="device-mockup">
+          <div class="dynamic-island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons"><i data-lucide="wifi" style="width:12px;height:12px;"></i><i data-lucide="battery-medium" style="width:14px;height:14px;"></i></div>
+          </div>
+
+          <!-- Header Location & Search -->
+          <div class="home-header">
+            <div class="location-row">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="background:var(--app-green-badge);color:var(--primary);width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                  <i data-lucide="map-pin" style="width:14px;height:14px;"></i>
+                </div>
+                <div>
+                  <div style="font-size:10px;font-weight:700;color:var(--primary);text-transform:uppercase;">DELIVER TO</div>
+                  <div style="font-size:12px;font-weight:800;display:flex;align-items:center;gap:4px;">
+                    Home - Adajan, Surat <i data-lucide="chevron-down" style="width:12px;height:12px;"></i>
+                  </div>
+                </div>
+              </div>
+              <div class="app-btn-icon">
+                <i data-lucide="bell" style="width:16px;height:16px;"></i>
+              </div>
+            </div>
+
+            <div class="search-mockup">
+              <i data-lucide="search" style="width:14px;height:14px;"></i>
+              <span>Search fresh fruits, dairy, veggies...</span>
+            </div>
+          </div>
+
+          <div class="app-screen-body">
+            <!-- 2-Hour Delivery Banner -->
+            <div class="slot-banner">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <i data-lucide="zap" style="width:16px;height:16px;color:#FDE047;"></i>
+                <div>
+                  <div style="font-weight:800;">2-Hour Express Delivery</div>
+                  <div style="font-size:9px;opacity:0.9;">Order now, get it by 11:45 AM</div>
+                </div>
+              </div>
+              <span class="app-badge badge-green" style="background:white;color:#15803D;">Active</span>
+            </div>
+
+            <!-- Carousel Hero Promo -->
+            <div class="hero-banner">
+              <div>
+                <span style="background:rgba(0,0,0,0.25);padding:2px 6px;border-radius:4px;font-size:9px;font-weight:800;text-transform:uppercase;">Weekend Sale</span>
+                <h4 style="font-size:14px;font-weight:800;margin:4px 0 2px;">Fresh Organic Vegetables</h4>
+                <p style="font-size:10px;opacity:0.9;">Flat 30% OFF on first 3 orders</p>
+              </div>
+              <span style="font-size:32px;">🥑</span>
+            </div>
+
+            <!-- Categories Grid -->
+            <div class="section-title-row">
+              <h3>Shop by Category</h3>
+              <a href="#" class="see-all-link">See All</a>
+            </div>
+            <div class="cat-circle-grid">
+              <div class="cat-circle-item">
+                <div class="cat-icon-circle">🍎</div>
+                <span>Fruits</span>
+              </div>
+              <div class="cat-circle-item">
+                <div class="cat-icon-circle">🥦</div>
+                <span>Vegetables</span>
+              </div>
+              <div class="cat-circle-item">
+                <div class="cat-icon-circle">🥛</div>
+                <span>Dairy & Eggs</span>
+              </div>
+              <div class="cat-circle-item">
+                <div class="cat-icon-circle">🍞</div>
+                <span>Bakery</span>
+              </div>
+            </div>
+
+            <!-- Featured Products -->
+            <div class="section-title-row">
+              <h3>Fresh Arrivals</h3>
+              <a href="#" class="see-all-link">View (24)</a>
+            </div>
+
+            <div class="products-2col">
+              <!-- Item 1 -->
+              <div class="product-mini-card">
+                <span class="discount-pill">25% OFF</span>
+                <span class="fav-pill"><i data-lucide="heart" style="width:12px;height:12px;"></i></span>
+                <div class="prod-img-box">🍓</div>
+                <div class="prod-title">Fresh Organic Strawberries</div>
+                <div class="prod-unit">250g box</div>
+                <div class="prod-price-row">
+                  <div>
+                    <span class="price-main">₹89</span>
+                    <span class="price-strike">₹120</span>
+                  </div>
+                  <div class="stepper-mini">
+                    <span>-</span> <span>2</span> <span>+</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Item 2 -->
+              <div class="product-mini-card">
+                <span class="discount-pill" style="background:#16A34A;">FRESH</span>
+                <span class="fav-pill"><i data-lucide="heart" style="width:12px;height:12px;"></i></span>
+                <div class="prod-img-box">🥑</div>
+                <div class="prod-title">Hass Avocado Premium</div>
+                <div class="prod-unit">1 piece (200g)</div>
+                <div class="prod-price-row">
+                  <div>
+                    <span class="price-main">₹110</span>
+                  </div>
+                  <button class="add-qty-btn">+ ADD</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Navigation Bar -->
+          <div class="app-bottom-nav">
+            <div class="nav-item active">
+              <div class="nav-icon-wrap"><i data-lucide="home" style="width:18px;height:18px;"></i></div>
+              <span>Home</span>
+            </div>
+            <div class="nav-item">
+              <i data-lucide="grid" style="width:18px;height:18px;"></i>
+              <span>Categories</span>
+            </div>
+            <div class="nav-item">
+              <div class="nav-badge">2</div>
+              <i data-lucide="shopping-cart" style="width:18px;height:18px;"></i>
+              <span>Cart</span>
+            </div>
+            <div class="nav-item">
+              <i data-lucide="clock" style="width:18px;height:18px;"></i>
+              <span>Orders</span>
+            </div>
+            <div class="nav-item">
+              <i data-lucide="user" style="width:18px;height:18px;"></i>
+              <span>Profile</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="screen-notes">
+          <strong>Review Notes:</strong>
+          <textarea placeholder="Write changes/feedback for Home Dashboard here..."></textarea>
+        </div>
+      </div>
+
+      <!-- ================= 6. CATEGORIES SCREEN ================= -->
+      <div class="screen-card" data-cat="shop">
+        <div class="screen-header-info">
+          <div>
+            <div class="screen-title"><i data-lucide="grid" style="width:16px;height:16px;color:#16A34A;"></i> 6. Categories & Subcategories</div>
+            <div class="screen-subtitle">lib/screens/catalog/categories_screen.dart</div>
+          </div>
+          <span class="screen-tag">Catalog</span>
+        </div>
+
+        <div class="device-mockup">
+          <div class="dynamic-island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons"><i data-lucide="wifi" style="width:12px;height:12px;"></i><i data-lucide="battery-medium" style="width:14px;height:14px;"></i></div>
+          </div>
+          <div class="app-topbar">
+            <div class="app-topbar-title">Categories</div>
+            <div class="app-btn-icon"><i data-lucide="search" style="width:16px;height:16px;"></i></div>
+          </div>
+          <div class="app-screen-body">
+            <div style="padding:12px 14px;display:flex;flex-direction:column;gap:10px;">
+              <!-- Cat Card 1 -->
+              <div style="background:var(--app-card);border:1px solid var(--app-border);border-radius:14px;padding:12px;display:flex;justify-content:space-between;align-items:center;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <div style="width:50px;height:50px;background:#DCFCE7;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:26px;">🥦</div>
+                  <div>
+                    <h4 style="font-size:13px;font-weight:800;">Fresh Vegetables</h4>
+                    <p style="font-size:10px;color:var(--app-subtext);">Leafy, Roots, Gourds (42 items)</p>
+                  </div>
+                </div>
+                <i data-lucide="chevron-right" style="width:16px;height:16px;color:var(--app-subtext);"></i>
+              </div>
+
+              <!-- Cat Card 2 -->
+              <div style="background:var(--app-card);border:1px solid var(--app-border);border-radius:14px;padding:12px;display:flex;justify-content:space-between;align-items:center;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <div style="width:50px;height:50px;background:#FEF3C7;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:26px;">🍎</div>
+                  <div>
+                    <h4 style="font-size:13px;font-weight:800;">Organic Fruits</h4>
+                    <p style="font-size:10px;color:var(--app-subtext);">Seasonal, Exotic, Melons (35 items)</p>
+                  </div>
+                </div>
+                <i data-lucide="chevron-right" style="width:16px;height:16px;color:var(--app-subtext);"></i>
+              </div>
+
+              <!-- Cat Card 3 -->
+              <div style="background:var(--app-card);border:1px solid var(--app-border);border-radius:14px;padding:12px;display:flex;justify-content:space-between;align-items:center;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <div style="width:50px;height:50px;background:#DBEAFE;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:26px;">🥛</div>
+                  <div>
+                    <h4 style="font-size:13px;font-weight:800;">Dairy, Butter & Paneer</h4>
+                    <p style="font-size:10px;color:var(--app-subtext);">Milk, Curd, Cheese (28 items)</p>
+                  </div>
+                </div>
+                <i data-lucide="chevron-right" style="width:16px;height:16px;color:var(--app-subtext);"></i>
+              </div>
+
+              <!-- Cat Card 4 -->
+              <div style="background:var(--app-card);border:1px solid var(--app-border);border-radius:14px;padding:12px;display:flex;justify-content:space-between;align-items:center;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <div style="width:50px;height:50px;background:#FEE2E2;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:26px;">🥖</div>
+                  <div>
+                    <h4 style="font-size:13px;font-weight:800;">Bakery & Breads</h4>
+                    <p style="font-size:10px;color:var(--app-subtext);">Pav, Whole Wheat, Cookies (18 items)</p>
+                  </div>
+                </div>
+                <i data-lucide="chevron-right" style="width:16px;height:16px;color:var(--app-subtext);"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="app-bottom-nav">
+            <div class="nav-item"><i data-lucide="home" style="width:18px;height:18px;"></i><span>Home</span></div>
+            <div class="nav-item active"><div class="nav-icon-wrap"><i data-lucide="grid" style="width:18px;height:18px;"></i></div><span>Categories</span></div>
+            <div class="nav-item"><i data-lucide="shopping-cart" style="width:18px;height:18px;"></i><span>Cart</span></div>
+            <div class="nav-item"><i data-lucide="clock" style="width:18px;height:18px;"></i><span>Orders</span></div>
+            <div class="nav-item"><i data-lucide="user" style="width:18px;height:18px;"></i><span>Profile</span></div>
+          </div>
+        </div>
+
+        <div class="screen-notes">
+          <strong>Review Notes:</strong>
+          <textarea placeholder="Write changes/feedback for Categories screen here..."></textarea>
+        </div>
+      </div>
+
+      <!-- ================= 7. PRODUCT LISTING SCREEN ================= -->
+      <div class="screen-card" data-cat="shop">
+        <div class="screen-header-info">
+          <div>
+            <div class="screen-title"><i data-lucide="list-filter" style="width:16px;height:16px;color:#16A34A;"></i> 7. Product List & Filters</div>
+            <div class="screen-subtitle">lib/screens/catalog/product_list_screen.dart</div>
+          </div>
+          <span class="screen-tag">Catalog</span>
+        </div>
+
+        <div class="device-mockup">
+          <div class="dynamic-island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons"><i data-lucide="wifi" style="width:12px;height:12px;"></i><i data-lucide="battery-medium" style="width:14px;height:14px;"></i></div>
+          </div>
+          <div class="app-topbar">
+            <div class="app-btn-icon"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i></div>
+            <div class="app-topbar-title">Fresh Vegetables</div>
+            <div class="app-btn-icon"><i data-lucide="sliders-horizontal" style="width:16px;height:16px;"></i></div>
+          </div>
+
+          <!-- Filter Subcategory Chips -->
+          <div style="padding:8px 12px;background:var(--app-card);border-bottom:1px solid var(--app-border);display:flex;gap:6px;overflow-x:auto;">
+            <span style="background:var(--primary);color:white;padding:4px 10px;border-radius:14px;font-size:10px;font-weight:700;">All (42)</span>
+            <span style="background:var(--app-bg);border:1px solid var(--app-border);color:var(--app-text);padding:4px 10px;border-radius:14px;font-size:10px;font-weight:600;">Leafy (12)</span>
+            <span style="background:var(--app-bg);border:1px solid var(--app-border);color:var(--app-text);padding:4px 10px;border-radius:14px;font-size:10px;font-weight:600;">Root Veg (8)</span>
+            <span style="background:var(--app-bg);border:1px solid var(--app-border);color:var(--app-text);padding:4px 10px;border-radius:14px;font-size:10px;font-weight:600;">Gourds (9)</span>
+          </div>
+
+          <div class="app-screen-body">
+            <div class="products-2col" style="padding-top:12px;">
+              <div class="product-mini-card">
+                <span class="discount-pill">15% OFF</span>
+                <span class="fav-pill"><i data-lucide="heart" style="width:12px;height:12px;"></i></span>
+                <div class="prod-img-box">🍅</div>
+                <div class="prod-title">Fresh Hybrid Tomato</div>
+                <div class="prod-unit">1 kg pack</div>
+                <div class="prod-price-row">
+                  <div><span class="price-main">₹34</span> <span class="price-strike">₹40</span></div>
+                  <button class="add-qty-btn">+ ADD</button>
+                </div>
+              </div>
+
+              <div class="product-mini-card">
+                <span class="fav-pill"><i data-lucide="heart" style="width:12px;height:12px;"></i></span>
+                <div class="prod-img-box">🥔</div>
+                <div class="prod-title">Fresh Potato / Aloo</div>
+                <div class="prod-unit">1 kg pack</div>
+                <div class="prod-price-row">
+                  <div><span class="price-main">₹28</span></div>
+                  <button class="add-qty-btn">+ ADD</button>
+                </div>
+              </div>
+
+              <div class="product-mini-card">
+                <span class="fav-pill"><i data-lucide="heart" style="width:12px;height:12px;"></i></span>
+                <div class="prod-img-box">🥦</div>
+                <div class="prod-title">Fresh Green Broccoli</div>
+                <div class="prod-unit">500g</div>
+                <div class="prod-price-row">
+                  <div><span class="price-main">₹55</span></div>
+                  <div class="stepper-mini"><span>-</span> <span>1</span> <span>+</span></div>
+                </div>
+              </div>
+
+              <div class="product-mini-card">
+                <span class="fav-pill"><i data-lucide="heart" style="width:12px;height:12px;"></i></span>
+                <div class="prod-img-box">🥕</div>
+                <div class="prod-title">Orange Carrot Delhi</div>
+                <div class="prod-unit">500g</div>
+                <div class="prod-price-row">
+                  <div><span class="price-main">₹38</span></div>
+                  <button class="add-qty-btn">+ ADD</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="screen-notes">
+          <strong>Review Notes:</strong>
+          <textarea placeholder="Write changes/feedback for Product Listing here..."></textarea>
+        </div>
+      </div>
+
+      <!-- ================= 8. PRODUCT DETAIL SCREEN ================= -->
+      <div class="screen-card" data-cat="shop">
+        <div class="screen-header-info">
+          <div>
+            <div class="screen-title"><i data-lucide="eye" style="width:16px;height:16px;color:#16A34A;"></i> 8. Product Detail</div>
+            <div class="screen-subtitle">lib/screens/catalog/product_detail_screen.dart</div>
+          </div>
+          <span class="screen-tag">Detail</span>
+        </div>
+
+        <div class="device-mockup">
+          <div class="dynamic-island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons"><i data-lucide="wifi" style="width:12px;height:12px;"></i><i data-lucide="battery-medium" style="width:14px;height:14px;"></i></div>
+          </div>
+          <div class="app-topbar">
+            <div class="app-btn-icon"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i></div>
+            <div style="display:flex;gap:8px;">
+              <div class="app-btn-icon"><i data-lucide="share-2" style="width:16px;height:16px;"></i></div>
+              <div class="app-btn-icon"><i data-lucide="heart" style="width:16px;height:16px;color:#EF4444;"></i></div>
+            </div>
+          </div>
+
+          <div class="app-screen-body">
+            <!-- Hero Image Display -->
+            <div style="height:180px;background:var(--app-bg);display:flex;align-items:center;justify-content:center;font-size:75px;position:relative;">
+              🍓
+              <div style="position:absolute;bottom:8px;display:flex;gap:4px;">
+                <span style="width:16px;height:4px;background:var(--primary);border-radius:4px;"></span>
+                <span style="width:6px;height:4px;background:#CBD5E1;border-radius:4px;"></span>
+                <span style="width:6px;height:4px;background:#CBD5E1;border-radius:4px;"></span>
+              </div>
+            </div>
+
+            <div style="padding:14px;">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+                <span class="app-badge badge-green">In Stock</span>
+                <span class="app-badge badge-amber">⭐ 4.8 (128 reviews)</span>
+              </div>
+
+              <h2 style="font-size:16px;font-weight:800;line-height:1.3;">Fresh Organic Strawberries (Mahabaleshwar Special)</h2>
+              <div style="font-size:11px;color:var(--app-subtext);margin:3px 0 10px;">Pack of 250 grams</div>
+
+              <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:12px;">
+                <span style="font-size:18px;font-weight:800;color:var(--primary);">₹89</span>
+                <span style="font-size:12px;color:var(--app-subtext);text-decoration:line-through;">₹120</span>
+                <span class="app-badge badge-red" style="font-size:10px;">Save 25%</span>
+              </div>
+
+              <!-- Express Delivery Promise -->
+              <div style="background:var(--app-green-badge);border-radius:10px;padding:8px 12px;display:flex;align-items:center;gap:8px;font-size:11px;color:var(--app-green-text);margin-bottom:14px;">
+                <i data-lucide="truck" style="width:16px;height:16px;"></i>
+                <span>Get it in <strong>2 Hours</strong> (Express Delivery Available)</span>
+              </div>
+
+              <h4 style="font-size:12px;font-weight:700;margin-bottom:6px;">Product Highlights</h4>
+              <ul style="font-size:11px;color:var(--app-subtext);padding-left:16px;display:flex;flex-direction:column;gap:4px;">
+                <li>100% Pesticide-Free Farm Sourced</li>
+                <li>Rich in Vitamin C and Anti-oxidants</li>
+                <li>Handpicked & Cleaned in hygienic boxes</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Sticky Bottom CTA -->
+          <div class="sticky-bottom-action">
+            <div>
+              <div style="font-size:9px;color:var(--app-subtext);">TOTAL PRICE</div>
+              <div style="font-size:15px;font-weight:800;color:var(--app-text);">₹89</div>
+            </div>
+            <button class="app-button" style="width:160px;padding:10px;">
+              <i data-lucide="shopping-cart" style="width:14px;height:14px;"></i> Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <div class="screen-notes">
+          <strong>Review Notes:</strong>
+          <textarea placeholder="Write changes/feedback for Product Detail here..."></textarea>
+        </div>
+      </div>
+
+      <!-- ================= 9. CART SCREEN ================= -->
+      <div class="screen-card" data-cat="order">
+        <div class="screen-header-info">
+          <div>
+            <div class="screen-title"><i data-lucide="shopping-cart" style="width:16px;height:16px;color:#16A34A;"></i> 9. Shopping Cart</div>
+            <div class="screen-subtitle">lib/screens/cart/cart_screen.dart</div>
+          </div>
+          <span class="screen-tag">Checkout</span>
+        </div>
+
+        <div class="device-mockup">
+          <div class="dynamic-island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons"><i data-lucide="wifi" style="width:12px;height:12px;"></i><i data-lucide="battery-medium" style="width:14px;height:14px;"></i></div>
+          </div>
+          <div class="app-topbar">
+            <div class="app-btn-icon"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i></div>
+            <div class="app-topbar-title">My Cart (2 items)</div>
+            <div class="app-btn-icon"><i data-lucide="trash-2" style="width:16px;height:16px;color:#EF4444;"></i></div>
+          </div>
+
+          <div class="app-screen-body">
+            <!-- Free Delivery Tracker -->
+            <div class="free-delivery-bar">
+              <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;">
+                <span>🚚 Add ₹51 more for <strong>FREE Delivery</strong></span>
+                <span style="color:var(--primary);">₹199 / ₹250</span>
+              </div>
+              <div class="prog-track">
+                <div class="prog-fill"></div>
+              </div>
+            </div>
+
+            <!-- Cart Items -->
+            <div class="cart-item-row">
+              <div class="cart-item-img">🍓</div>
+              <div style="flex:1;">
+                <h4 style="font-size:11px;font-weight:700;">Organic Strawberries</h4>
+                <p style="font-size:10px;color:var(--app-subtext);">250g • ₹89</p>
+              </div>
+              <div class="stepper-mini">
+                <span>-</span> <span>2</span> <span>+</span>
+              </div>
+            </div>
+
+            <div class="cart-item-row">
+              <div class="cart-item-img">🥦</div>
+              <div style="flex:1;">
+                <h4 style="font-size:11px;font-weight:700;">Green Broccoli</h4>
+                <p style="font-size:10px;color:var(--app-subtext);">500g • ₹55</p>
+              </div>
+              <div class="stepper-mini">
+                <span>-</span> <span>1</span> <span>+</span>
+              </div>
+            </div>
+
+            <!-- Apply Coupon Prompt -->
+            <div class="coupon-strip">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <i data-lucide="tag" style="width:14px;height:14px;"></i>
+                <span>FRESH50 applied (₹50 saved)</span>
+              </div>
+              <span style="color:#DC2626;cursor:pointer;">Remove</span>
+            </div>
+
+            <!-- Bill Summary -->
+            <div class="bill-details-card">
+              <div style="font-size:12px;font-weight:800;margin-bottom:2px;">Bill Details</div>
+              <div class="bill-row"><span>Item Total</span> <span>₹233.00</span></div>
+              <div class="bill-row"><span>Delivery Fee</span> <span>₹29.00</span></div>
+              <div class="bill-row" style="color:var(--primary);font-weight:700;"><span>Coupon Discount</span> <span>-₹50.00</span></div>
+              <div class="bill-row total"><span>To Pay</span> <span>₹212.00</span></div>
+            </div>
+          </div>
+
+          <!-- Checkout CTA -->
+          <div class="sticky-bottom-action">
+            <div>
+              <div style="font-size:9px;color:var(--app-subtext);">TOTAL AMOUNT</div>
+              <div style="font-size:15px;font-weight:800;color:var(--app-text);">₹212.00</div>
+            </div>
+            <button class="app-button" style="width:160px;padding:10px;">
+              Checkout <i data-lucide="arrow-right" style="width:14px;height:14px;"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="screen-notes">
+          <strong>Review Notes:</strong>
+          <textarea placeholder="Write changes/feedback for Shopping Cart here..."></textarea>
+        </div>
+      </div>
+
+      <!-- ================= 10. CHECKOUT SCREEN ================= -->
+      <div class="screen-card" data-cat="order">
+        <div class="screen-header-info">
+          <div>
+            <div class="screen-title"><i data-lucide="credit-card" style="width:16px;height:16px;color:#16A34A;"></i> 10. Checkout & Delivery Slot</div>
+            <div class="screen-subtitle">lib/screens/checkout/checkout_screen.dart</div>
+          </div>
+          <span class="screen-tag">Payment</span>
+        </div>
+
+        <div class="device-mockup">
+          <div class="dynamic-island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons"><i data-lucide="wifi" style="width:12px;height:12px;"></i><i data-lucide="battery-medium" style="width:14px;height:14px;"></i></div>
+          </div>
+          <div class="app-topbar">
+            <div class="app-btn-icon"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i></div>
+            <div class="app-topbar-title">Order Checkout</div>
+            <div style="width:32px;"></div>
+          </div>
+
+          <div class="app-screen-body">
+            <!-- Step 1: Address -->
+            <div class="step-box">
+              <div class="step-title">
+                <span class="step-num">1</span> Delivery Address
+                <span style="margin-left:auto;color:var(--primary);font-size:10px;cursor:pointer;">Change</span>
+              </div>
+              <div style="font-size:11px;background:var(--app-bg);padding:8px;border-radius:8px;">
+                <div style="font-weight:700;">🏠 Home (Rahul Sharma)</div>
+                <div style="color:var(--app-subtext);">Flat 402, Green Palm Residency, Adajan, Surat</div>
+              </div>
+            </div>
+
+            <!-- Step 2: Slot -->
+            <div class="step-box">
+              <div class="step-title">
+                <span class="step-num">2</span> Delivery Speed & Slot
+              </div>
+              <div style="display:flex;gap:6px;">
+                <div style="flex:1;background:var(--app-green-badge);border:1px solid var(--primary);border-radius:8px;padding:8px;font-size:10px;color:var(--app-green-text);font-weight:700;">
+                  ⚡ 2-Hr Express<br><span style="font-size:9px;font-weight:500;">Within 120 Mins</span>
+                </div>
+                <div style="flex:1;background:var(--app-bg);border:1px solid var(--app-border);border-radius:8px;padding:8px;font-size:10px;color:var(--app-subtext);">
+                  📅 Tomorrow<br><span style="font-size:9px;">Morning 8-10 AM</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 3: Payment Mode -->
+            <div class="step-box">
+              <div class="step-title">
+                <span class="step-num">3</span> Payment Method
+              </div>
+              <div style="display:flex;flex-direction:column;gap:6px;font-size:11px;">
+                <label style="display:flex;align-items:center;gap:8px;background:var(--app-bg);padding:8px;border-radius:8px;">
+                  <input type="radio" name="pay" checked style="accent-color:var(--primary);">
+                  <strong>UPI / GPay / PhonePe</strong>
+                </label>
+                <label style="display:flex;align-items:center;gap:8px;background:var(--app-bg);padding:8px;border-radius:8px;">
+                  <input type="radio" name="pay" style="accent-color:var(--primary);">
+                  <span>Cash on Delivery (COD)</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="sticky-bottom-action">
+            <div>
+              <div style="font-size:9px;color:var(--app-subtext);">TOTAL TO PAY</div>
+              <div style="font-size:15px;font-weight:800;color:var(--app-text);">₹212.00</div>
+            </div>
+            <button class="app-button" style="width:160px;padding:10px;">
+              Place Order 🚀
+            </button>
+          </div>
+        </div>
+
+        <div class="screen-notes">
+          <strong>Review Notes:</strong>
+          <textarea placeholder="Write changes/feedback for Checkout screen here..."></textarea>
+        </div>
+      </div>
+
+      <!-- ================= 11. ORDER SUCCESS SCREEN ================= -->
+      <div class="screen-card" data-cat="order">
+        <div class="screen-header-info">
+          <div>
+            <div class="screen-title"><i data-lucide="check-circle-2" style="width:16px;height:16px;color:#16A34A;"></i> 11. Order Success</div>
+            <div class="screen-subtitle">lib/screens/checkout/order_success_screen.dart</div>
+          </div>
+          <span class="screen-tag">Success</span>
+        </div>
+
+        <div class="device-mockup">
+          <div class="dynamic-island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons"><i data-lucide="wifi" style="width:12px;height:12px;"></i><i data-lucide="battery-medium" style="width:14px;height:14px;"></i></div>
+          </div>
+          <div class="app-screen-body" style="padding:24px 16px;text-align:center;">
+            <div style="width:80px;height:80px;background:var(--app-green-badge);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin:30px auto 14px;">
+              <i data-lucide="check" style="width:44px;height:44px;color:var(--primary);stroke-width:3;"></i>
+            </div>
+            <h2 style="font-size:19px;font-weight:800;color:var(--app-text);">Order Placed Successfully!</h2>
+            <p style="font-size:11px;color:var(--app-subtext);margin:6px 0 20px;">Order #FE-892194 has been received</p>
+
+            <div style="background:var(--app-card);border:1px solid var(--app-border);border-radius:14px;padding:14px;text-align:left;display:flex;flex-direction:column;gap:8px;font-size:11px;">
+              <div style="display:flex;justify-content:space-between;">
+                <span style="color:var(--app-subtext);">Estimated Delivery:</span>
+                <strong>Today, 11:45 AM (Express)</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;">
+                <span style="color:var(--app-subtext);">Payment Status:</span>
+                <span class="app-badge badge-green">Paid via UPI</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;">
+                <span style="color:var(--app-subtext);">Total Amount:</span>
+                <strong>₹212.00</strong>
+              </div>
+            </div>
+
+            <button class="app-button" style="margin-top:24px;">
+              <i data-lucide="map-pin" style="width:14px;height:14px;"></i> Track Live Order
+            </button>
+            <button class="app-button secondary" style="margin-top:10px;">
+              Continue Shopping
+            </button>
+          </div>
+        </div>
+
+        <div class="screen-notes">
+          <strong>Review Notes:</strong>
+          <textarea placeholder="Write changes/feedback for Order Success here..."></textarea>
+        </div>
+      </div>
+
+      <!-- ================= 12. ORDERS LIST SCREEN ================= -->
+      <div class="screen-card" data-cat="tracking">
+        <div class="screen-header-info">
+          <div>
+            <div class="screen-title"><i data-lucide="package" style="width:16px;height:16px;color:#16A34A;"></i> 12. Order History</div>
+            <div class="screen-subtitle">lib/screens/orders/orders_screen.dart</div>
+          </div>
+          <span class="screen-tag">Orders</span>
+        </div>
+
+        <div class="device-mockup">
+          <div class="dynamic-island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons"><i data-lucide="wifi" style="width:12px;height:12px;"></i><i data-lucide="battery-medium" style="width:14px;height:14px;"></i></div>
+          </div>
+          <div class="app-topbar">
+            <div class="app-topbar-title">My Orders</div>
+            <div class="app-btn-icon"><i data-lucide="search" style="width:16px;height:16px;"></i></div>
+          </div>
+
+          <!-- Status Tabs -->
+          <div style="padding:8px 12px;background:var(--app-card);border-bottom:1px solid var(--app-border);display:flex;gap:6px;">
+            <span style="background:var(--primary);color:white;padding:4px 10px;border-radius:14px;font-size:10px;font-weight:700;">Active (1)</span>
+            <span style="background:var(--app-bg);border:1px solid var(--app-border);color:var(--app-text);padding:4px 10px;border-radius:14px;font-size:10px;font-weight:600;">Delivered</span>
+            <span style="background:var(--app-bg);border:1px solid var(--app-border);color:var(--app-text);padding:4px 10px;border-radius:14px;font-size:10px;font-weight:600;">Cancelled</span>
+          </div>
+
+          <div class="app-screen-body">
+            <div style="padding:10px 14px;display:flex;flex-direction:column;gap:10px;">
+              <!-- Active Card -->
+              <div style="background:var(--app-card);border:1px solid var(--app-border);border-radius:14px;padding:12px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                  <span style="font-weight:800;font-size:12px;">#FE-892194</span>
+                  <span class="app-badge badge-blue">Out For Delivery</span>
+                </div>
+                <div style="font-size:10px;color:var(--app-subtext);">Placed Today, 09:30 AM • 2 items</div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;border-top:1px solid var(--app-border);padding-top:8px;">
+                  <strong style="font-size:13px;">₹212.00</strong>
+                  <button class="add-qty-btn" style="background:var(--primary);color:white;">Track Status</button>
+                </div>
+              </div>
+
+              <!-- Delivered Card -->
+              <div style="background:var(--app-card);border:1px solid var(--app-border);border-radius:14px;padding:12px;opacity:0.9;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                  <span style="font-weight:800;font-size:12px;">#FE-841029</span>
+                  <span class="app-badge badge-green">Delivered</span>
+                </div>
+                <div style="font-size:10px;color:var(--app-subtext);">28 Sept 2026 • 5 items</div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;border-top:1px solid var(--app-border);padding-top:8px;">
+                  <strong style="font-size:13px;">₹490.00</strong>
+                  <button class="add-qty-btn">Reorder</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="app-bottom-nav">
+            <div class="nav-item"><i data-lucide="home" style="width:18px;height:18px;"></i><span>Home</span></div>
+            <div class="nav-item"><i data-lucide="grid" style="width:18px;height:18px;"></i><span>Categories</span></div>
+            <div class="nav-item"><i data-lucide="shopping-cart" style="width:18px;height:18px;"></i><span>Cart</span></div>
+            <div class="nav-item active"><div class="nav-icon-wrap"><i data-lucide="clock" style="width:18px;height:18px;"></i></div><span>Orders</span></div>
+            <div class="nav-item"><i data-lucide="user" style="width:18px;height:18px;"></i><span>Profile</span></div>
+          </div>
+        </div>
+
+        <div class="screen-notes">
+          <strong>Review Notes:</strong>
+          <textarea placeholder="Write changes/feedback for Orders List here..."></textarea>
+        </div>
+      </div>
+
+      <!-- ================= 13. LIVE TRACKING SCREEN ================= -->
+      <div class="screen-card" data-cat="tracking">
+        <div class="screen-header-info">
+          <div>
+            <div class="screen-title"><i data-lucide="map" style="width:16px;height:16px;color:#16A34A;"></i> 13. Live Order Tracking</div>
+            <div class="screen-subtitle">lib/screens/orders/order_track_screen.dart</div>
+          </div>
+          <span class="screen-tag">Live</span>
+        </div>
+
+        <div class="device-mockup">
+          <div class="dynamic-island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons"><i data-lucide="wifi" style="width:12px;height:12px;"></i><i data-lucide="battery-medium" style="width:14px;height:14px;"></i></div>
+          </div>
+          <div class="app-topbar">
+            <div class="app-btn-icon"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i></div>
+            <div class="app-topbar-title">Track Order #FE-892194</div>
+            <div class="app-btn-icon"><i data-lucide="refresh-cw" style="width:16px;height:16px;"></i></div>
+          </div>
+
+          <div class="app-screen-body">
+            <!-- Simulated Map Preview Area -->
+            <div style="height:120px;background:#CBD5E1;display:flex;align-items:center;justify-content:center;position:relative;background-image:radial-gradient(#94A3B8 1px, transparent 1px);background-size:12px 12px;">
+              <div style="background:white;padding:6px 12px;border-radius:20px;box-shadow:0 4px 12px rgba(0,0,0,0.15);font-size:10px;font-weight:700;display:flex;align-items:center;gap:6px;">
+                🛵 Delivery Valet is 1.2 km away
+              </div>
+            </div>
+
+            <!-- Delivery Partner Info -->
+            <div style="background:var(--app-card);border-bottom:1px solid var(--app-border);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:36px;height:36px;background:var(--app-green-badge);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;">👨‍🌾</div>
+                <div>
+                  <div style="font-size:11px;font-weight:800;">Vikram Patel</div>
+                  <div style="font-size:9px;color:var(--app-subtext);">Delivery Partner (⭐ 4.9)</div>
+                </div>
+              </div>
+              <button class="add-qty-btn" style="background:var(--primary);color:white;display:flex;align-items:center;gap:4px;">
+                <i data-lucide="phone" style="width:12px;height:12px;"></i> Call
+              </button>
+            </div>
+
+            <!-- Timeline Stepper -->
+            <div class="tracking-timeline">
+              <div class="timeline-node active">
+                <div class="timeline-icon">✓</div>
+                <div class="timeline-info">
+                  <h4>Order Placed & Confirmed</h4>
+                  <p>09:30 AM • We received your order</p>
+                </div>
+              </div>
+              <div class="timeline-node active">
+                <div class="timeline-icon">✓</div>
+                <div class="timeline-info">
+                  <h4>Packed Fresh at Store</h4>
+                  <p>09:42 AM • Items packed with hygiene seals</p>
+                </div>
+              </div>
+              <div class="timeline-node active">
+                <div class="timeline-icon">🛵</div>
+                <div class="timeline-info">
+                  <h4 style="color:var(--primary);">Out for Express Delivery</h4>
+                  <p>09:50 AM • Valet is on the way (Est. 10:15 AM)</p>
+                </div>
+              </div>
+              <div class="timeline-node">
+                <div class="timeline-icon">🏁</div>
+                <div class="timeline-info">
+                  <h4>Delivered to Doorstep</h4>
+                  <p>Pending</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="screen-notes">
+          <strong>Review Notes:</strong>
+          <textarea placeholder="Write changes/feedback for Live Tracking here..."></textarea>
+        </div>
+      </div>
+
+      <!-- ================= 14. ADDRESS MANAGEMENT SCREEN ================= -->
+      <div class="screen-card" data-cat="account">
+        <div class="screen-header-info">
+          <div>
+            <div class="screen-title"><i data-lucide="map-pin" style="width:16px;height:16px;color:#16A34A;"></i> 14. Address Book & Map</div>
+            <div class="screen-subtitle">lib/screens/addresses/addresses_screen.dart</div>
+          </div>
+          <span class="screen-tag">Address</span>
+        </div>
+
+        <div class="device-mockup">
+          <div class="dynamic-island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons"><i data-lucide="wifi" style="width:12px;height:12px;"></i><i data-lucide="battery-medium" style="width:14px;height:14px;"></i></div>
+          </div>
+          <div class="app-topbar">
+            <div class="app-btn-icon"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i></div>
+            <div class="app-topbar-title">Saved Addresses</div>
+            <div style="width:32px;"></div>
+          </div>
+
+          <div class="app-screen-body">
+            <div style="padding:12px 14px;display:flex;flex-direction:column;gap:10px;">
+              <button class="app-button secondary" style="border:1px dashed var(--primary);color:var(--primary);">
+                <i data-lucide="plus" style="width:16px;height:16px;"></i> Add New Address (Map Picker)
+              </button>
+
+              <!-- Address 1 -->
+              <div style="background:var(--app-card);border:2px solid var(--primary);border-radius:14px;padding:12px;position:relative;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                  <div style="display:flex;align-items:center;gap:6px;font-weight:800;font-size:12px;">
+                    🏠 Home <span class="app-badge badge-green">Default</span>
+                  </div>
+                  <i data-lucide="more-vertical" style="width:14px;height:14px;color:var(--app-subtext);"></i>
+                </div>
+                <div style="font-size:11px;color:var(--app-subtext);line-height:1.4;">
+                  Flat 402, Green Palm Residency, Near Honey Park Road, Adajan, Surat - 395009
+                </div>
+                <div style="font-size:10px;margin-top:6px;color:var(--app-text);font-weight:600;">
+                  📞 Phone: +91 98765 43210
+                </div>
+              </div>
+
+              <!-- Address 2 -->
+              <div style="background:var(--app-card);border:1px solid var(--app-border);border-radius:14px;padding:12px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                  <div style="display:flex;align-items:center;gap:6px;font-weight:800;font-size:12px;">
+                    💼 Office
+                  </div>
+                  <i data-lucide="more-vertical" style="width:14px;height:14px;color:var(--app-subtext);"></i>
+                </div>
+                <div style="font-size:11px;color:var(--app-subtext);line-height:1.4;">
+                  3rd Floor, IT Tower, Ring Road, Surat - 395002
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="screen-notes">
+          <strong>Review Notes:</strong>
+          <textarea placeholder="Write changes/feedback for Addresses here..."></textarea>
+        </div>
+      </div>
+
+      <!-- ================= 15. OFFERS & COUPONS SCREEN ================= -->
+      <div class="screen-card" data-cat="account">
+        <div class="screen-header-info">
+          <div>
+            <div class="screen-title"><i data-lucide="ticket" style="width:16px;height:16px;color:#16A34A;"></i> 15. Offers & Coupons</div>
+            <div class="screen-subtitle">lib/screens/offers/offers_screen.dart</div>
+          </div>
+          <span class="screen-tag">Offers</span>
+        </div>
+
+        <div class="device-mockup">
+          <div class="dynamic-island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons"><i data-lucide="wifi" style="width:12px;height:12px;"></i><i data-lucide="battery-medium" style="width:14px;height:14px;"></i></div>
+          </div>
+          <div class="app-topbar">
+            <div class="app-btn-icon"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i></div>
+            <div class="app-topbar-title">Coupons & Offers</div>
+            <div style="width:32px;"></div>
+          </div>
+
+          <div class="app-screen-body">
+            <div style="padding:12px 14px;display:flex;flex-direction:column;gap:12px;">
+              <!-- Coupon 1 -->
+              <div style="background:var(--app-card);border:1px dashed #16A34A;border-radius:14px;padding:12px;position:relative;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <span style="background:var(--app-green-badge);color:var(--primary);font-weight:800;padding:4px 8px;border-radius:6px;font-size:11px;letter-spacing:0.5px;">FRESH50</span>
+                  <button class="add-qty-btn">APPLY</button>
+                </div>
+                <div style="font-size:12px;font-weight:800;margin:8px 0 2px;">Flat ₹50 OFF on Orders above ₹199</div>
+                <div style="font-size:10px;color:var(--app-subtext);">Valid on Vegetables & Fruits • Expires in 3 days</div>
+              </div>
+
+              <!-- Coupon 2 -->
+              <div style="background:var(--app-card);border:1px dashed #F59E0B;border-radius:14px;padding:12px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <span style="background:#FEF3C7;color:#D97706;font-weight:800;padding:4px 8px;border-radius:6px;font-size:11px;letter-spacing:0.5px;">EXPRESSFREE</span>
+                  <button class="add-qty-btn">APPLY</button>
+                </div>
+                <div style="font-size:12px;font-weight:800;margin:8px 0 2px;">FREE Delivery on Any Order</div>
+                <div style="font-size:10px;color:var(--app-subtext);">No minimum order value required</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="screen-notes">
+          <strong>Review Notes:</strong>
+          <textarea placeholder="Write changes/feedback for Offers screen here..."></textarea>
+        </div>
+      </div>
+
+      <!-- ================= 16. WISHLIST SCREEN ================= -->
+      <div class="screen-card" data-cat="account">
+        <div class="screen-header-info">
+          <div>
+            <div class="screen-title"><i data-lucide="heart" style="width:16px;height:16px;color:#16A34A;"></i> 16. Wishlist</div>
+            <div class="screen-subtitle">lib/screens/wishlist/wishlist_screen.dart</div>
+          </div>
+          <span class="screen-tag">Saved</span>
+        </div>
+
+        <div class="device-mockup">
+          <div class="dynamic-island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons"><i data-lucide="wifi" style="width:12px;height:12px;"></i><i data-lucide="battery-medium" style="width:14px;height:14px;"></i></div>
+          </div>
+          <div class="app-topbar">
+            <div class="app-btn-icon"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i></div>
+            <div class="app-topbar-title">My Wishlist (2)</div>
+            <div style="width:32px;"></div>
+          </div>
+
+          <div class="app-screen-body">
+            <div class="products-2col" style="padding-top:12px;">
+              <div class="product-mini-card">
+                <span class="fav-pill" style="color:#EF4444;"><i data-lucide="heart" style="width:12px;height:12px;fill:#EF4444;"></i></span>
+                <div class="prod-img-box">🥑</div>
+                <div class="prod-title">Hass Avocado Premium</div>
+                <div class="prod-unit">1 piece (200g)</div>
+                <div class="prod-price-row">
+                  <span class="price-main">₹110</span>
+                  <button class="add-qty-btn">+ Cart</button>
+                </div>
+              </div>
+
+              <div class="product-mini-card">
+                <span class="fav-pill" style="color:#EF4444;"><i data-lucide="heart" style="width:12px;height:12px;fill:#EF4444;"></i></span>
+                <div class="prod-img-box">🍓</div>
+                <div class="prod-title">Fresh Strawberries</div>
+                <div class="prod-unit">250g box</div>
+                <div class="prod-price-row">
+                  <span class="price-main">₹89</span>
+                  <button class="add-qty-btn">+ Cart</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="screen-notes">
+          <strong>Review Notes:</strong>
+          <textarea placeholder="Write changes/feedback for Wishlist here..."></textarea>
+        </div>
+      </div>
+
+      <!-- ================= 17. PROFILE / SETTINGS SCREEN ================= -->
+      <div class="screen-card" data-cat="account">
+        <div class="screen-header-info">
+          <div>
+            <div class="screen-title"><i data-lucide="user" style="width:16px;height:16px;color:#16A34A;"></i> 17. Profile & Preferences</div>
+            <div class="screen-subtitle">lib/screens/profile/profile_screen.dart</div>
+          </div>
+          <span class="screen-tag">Account</span>
+        </div>
+
+        <div class="device-mockup">
+          <div class="dynamic-island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons"><i data-lucide="wifi" style="width:12px;height:12px;"></i><i data-lucide="battery-medium" style="width:14px;height:14px;"></i></div>
+          </div>
+
+          <div class="app-screen-body">
+            <!-- Profile Card -->
+            <div style="background:var(--app-card);padding:18px 16px;border-bottom:1px solid var(--app-border);display:flex;align-items:center;gap:12px;">
+              <div style="width:52px;height:52px;background:var(--app-green-badge);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--primary);font-weight:800;">
+                RS
+              </div>
+              <div style="flex:1;">
+                <h3 style="font-size:14px;font-weight:800;">Rahul Sharma</h3>
+                <p style="font-size:11px;color:var(--app-subtext);">+91 98765 43210</p>
+              </div>
+              <i data-lucide="edit-3" style="width:16px;height:16px;color:var(--app-subtext);cursor:pointer;"></i>
+            </div>
+
+            <!-- Stats Bar -->
+            <div style="display:flex;background:var(--app-card);border-bottom:1px solid var(--app-border);padding:10px 0;text-align:center;">
+              <div style="flex:1;border-right:1px solid var(--app-border);">
+                <div style="font-weight:800;font-size:13px;color:var(--primary);">12</div>
+                <div style="font-size:10px;color:var(--app-subtext);">Orders</div>
+              </div>
+              <div style="flex:1;border-right:1px solid var(--app-border);">
+                <div style="font-weight:800;font-size:13px;color:var(--primary);">4</div>
+                <div style="font-size:10px;color:var(--app-subtext);">Coupons</div>
+              </div>
+              <div style="flex:1;">
+                <div style="font-weight:800;font-size:13px;color:var(--primary);">2</div>
+                <div style="font-size:10px;color:var(--app-subtext);">Wishlist</div>
+              </div>
+            </div>
+
+            <!-- Settings Options -->
+            <div style="padding:10px 14px;display:flex;flex-direction:column;gap:8px;">
+              <div style="font-size:10px;font-weight:700;color:var(--app-subtext);text-transform:uppercase;margin-top:6px;">Preferences</div>
+
+              <div style="background:var(--app-card);border:1px solid var(--app-border);border-radius:12px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
+                <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;">
+                  <i data-lucide="languages" style="width:16px;height:16px;color:var(--primary);"></i> Language (ભાષા)
+                </div>
+                <span class="app-badge badge-green">English / ગુજરાતી</span>
+              </div>
+
+              <div style="background:var(--app-card);border:1px solid var(--app-border);border-radius:12px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
+                <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;">
+                  <i data-lucide="moon" style="width:16px;height:16px;color:var(--primary);"></i> Dark Theme
+                </div>
+                <input type="checkbox" style="accent-color:var(--primary);">
+              </div>
+
+              <div style="font-size:10px;font-weight:700;color:var(--app-subtext);text-transform:uppercase;margin-top:6px;">Help & Support</div>
+
+              <div style="background:var(--app-card);border:1px solid var(--app-border);border-radius:12px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
+                <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;">
+                  <i data-lucide="help-circle" style="width:16px;height:16px;color:var(--primary);"></i> FAQs & Support
+                </div>
+                <i data-lucide="chevron-right" style="width:14px;height:14px;color:var(--app-subtext);"></i>
+              </div>
+
+              <button class="app-button secondary" style="border-color:#FCA5A5;color:#DC2626;margin-top:10px;">
+                <i data-lucide="log-out" style="width:14px;height:14px;"></i> Log Out
+              </button>
+            </div>
+          </div>
+
+          <div class="app-bottom-nav">
+            <div class="nav-item"><i data-lucide="home" style="width:18px;height:18px;"></i><span>Home</span></div>
+            <div class="nav-item"><i data-lucide="grid" style="width:18px;height:18px;"></i><span>Categories</span></div>
+            <div class="nav-item"><i data-lucide="shopping-cart" style="width:18px;height:18px;"></i><span>Cart</span></div>
+            <div class="nav-item"><i data-lucide="clock" style="width:18px;height:18px;"></i><span>Orders</span></div>
+            <div class="nav-item active"><div class="nav-icon-wrap"><i data-lucide="user" style="width:18px;height:18px;"></i></div><span>Profile</span></div>
+          </div>
+        </div>
+
+        <div class="screen-notes">
+          <strong>Review Notes:</strong>
+          <textarea placeholder="Write changes/feedback for Profile screen here..."></textarea>
+        </div>
+      </div>
+
+      <!-- ================= 18. IN-APP WEBVIEW SCREEN ================= -->
+      <div class="screen-card" data-cat="account">
+        <div class="screen-header-info">
+          <div>
+            <div class="screen-title"><i data-lucide="globe" style="width:16px;height:16px;color:#16A34A;"></i> 18. In-App WebView & Policies</div>
+            <div class="screen-subtitle">lib/screens/webview/app_webview_screen.dart</div>
+          </div>
+          <span class="screen-tag">Browser</span>
+        </div>
+
+        <div class="device-mockup">
+          <div class="dynamic-island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <div class="status-icons"><i data-lucide="wifi" style="width:12px;height:12px;"></i><i data-lucide="battery-medium" style="width:14px;height:14px;"></i></div>
+          </div>
+          <div class="app-topbar">
+            <div class="app-btn-icon"><i data-lucide="x" style="width:16px;height:16px;"></i></div>
+            <div>
+              <div style="font-size:12px;font-weight:700;text-align:center;">Privacy & Terms</div>
+              <div style="font-size:9px;color:var(--app-subtext);display:flex;align-items:center;justify-content:center;gap:3px;">
+                <i data-lucide="lock" style="width:10px;height:10px;color:var(--primary);"></i> freshexpress.local
+              </div>
+            </div>
+            <div class="app-btn-icon"><i data-lucide="more-vertical" style="width:16px;height:16px;"></i></div>
+          </div>
+
+          <!-- Web Progress Bar -->
+          <div style="height:2px;background:var(--app-border);width:100%;">
+            <div style="height:100%;background:var(--primary);width:100%;"></div>
+          </div>
+
+          <div class="app-screen-body" style="padding:14px;background:white;color:#0F172A;">
+            <h3 style="font-size:14px;font-weight:800;margin-bottom:8px;">Fresh Express Policy & Terms</h3>
+            <p style="font-size:11px;color:#475569;line-height:1.5;margin-bottom:10px;">
+              Welcome to Fresh Express. We are committed to delivering 100% farm-fresh groceries directly from local farms in Surat to your kitchen within 2 hours.
+            </p>
+            <h4 style="font-size:12px;font-weight:700;margin-bottom:4px;">1. Quality & Return Guarantee</h4>
+            <p style="font-size:10px;color:#64748B;line-height:1.4;">
+              If any fruit or vegetable is not fresh upon arrival, return it on the spot with zero questions asked.
+            </p>
+          </div>
+        </div>
+
+        <div class="screen-notes">
+          <strong>Review Notes:</strong>
+          <textarea placeholder="Write changes/feedback for In-App WebView here..."></textarea>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // Theme Mode Controller
+    function setAppTheme(mode) {
+      const mockups = document.querySelectorAll('.device-mockup');
+      document.getElementById('btn-theme-light').classList.toggle('active', mode === 'light');
+      document.getElementById('btn-theme-dark').classList.toggle('active', mode === 'dark');
+
+      mockups.forEach(m => {
+        if (mode === 'dark') {
+          m.classList.add('dark-mode');
+        } else {
+          m.classList.remove('dark-mode');
+        }
+      });
+    }
+
+    // Language Switcher Controller
+    function setAppLanguage(lang) {
+      document.getElementById('btn-lang-en').classList.toggle('active', lang === 'en');
+      document.getElementById('btn-lang-gu').classList.toggle('active', lang === 'gu');
+
+      if (lang === 'gu') {
+        alert('Gujarati UI translation preview activated across all Flutter mockup strings (ગુજરાતી ભાષા સક્રિય).');
+      }
+    }
+
+    // Category Filter
+    function filterCategory(cat, tabElement) {
+      document.querySelectorAll('.flow-tab').forEach(t => t.classList.remove('active'));
+      tabElement.classList.add('active');
+
+      const cards = document.querySelectorAll('.screen-card');
+      cards.forEach(c => {
+        if (cat === 'all' || c.getAttribute('data-cat') === cat) {
+          c.style.display = 'flex';
+        } else {
+          c.style.display = 'none';
+        }
+      });
+    }
+
+    // Export Feedback Function
+    function exportFeedback() {
+      const cards = document.querySelectorAll('.screen-card');
+      let notes = '=== Fresh Express Flutter App UI Review & Changes List ===\n\n';
+      let hasNotes = false;
+
+      cards.forEach(card => {
+        const title = card.querySelector('.screen-title').innerText.trim();
+        const text = card.querySelector('textarea').value.trim();
+        if (text) {
+          hasNotes = true;
+          notes += `[${title}]\nChanges Needed: ${text}\n-----------------------------------\n\n`;
+        }
+      });
+
+      if (!hasNotes) {
+        notes += 'No specific notes typed yet. You can type changes into any screen box and click Export Notes again!';
+      }
+
+      const blob = new Blob([notes], { type: 'text/plain;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'flutter_app_ui_changes_notes.txt';
+      a.click();
+    }
+  </script>
+</body>
+</html>
