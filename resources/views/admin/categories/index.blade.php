@@ -34,7 +34,7 @@
         <table id="categoriesTable" class="w-full" data-export-title="Categories">
             <thead>
                 <tr>
-                    <th>Order</th>
+                    <th style="width: 70px;">Sr. No</th>
                     <th>Category</th>
                     <th class="export-only">Slug</th>
                     <th>Subcategories</th>
@@ -48,7 +48,7 @@
                 @foreach($categories as $category)
                     <tr>
                         <td data-order="{{ $category->sort_order }}" data-export="{{ $category->sort_order }}">
-                            <span class="badge badge-neutral font-mono">#{{ $category->sort_order }}</span>
+                            <span class="badge badge-neutral font-mono font-bold">{{ $category->sort_order }}</span>
                         </td>
                         <td data-export="{{ $category->name_en }}{{ $category->name_gu ? ' / '.$category->name_gu : '' }}">
                             <div class="flex items-center gap-3 min-w-[14rem]">

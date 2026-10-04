@@ -48,7 +48,7 @@
         <table id="slidersTable" class="w-full" data-export-title="Home sliders">
             <thead>
                 <tr>
-                    <th>Order</th>
+                    <th style="width: 70px;">Sr. No</th>
                     <th>Banner</th>
                     <th class="export-only">Subtitle</th>
                     <th>Badge</th>
@@ -67,7 +67,7 @@
                     @endphp
                     <tr>
                         <td data-order="{{ $slider->sort_order }}" data-export="{{ $slider->sort_order }}">
-                            <span class="badge badge-neutral font-mono">#{{ $slider->sort_order }}</span>
+                            <span class="badge badge-neutral font-mono font-bold">{{ $slider->sort_order }}</span>
                         </td>
                         <td data-export="{{ $slider->title_en ?: 'Untitled banner' }}{{ $slider->title_gu ? ' / '.$slider->title_gu : '' }}">
                             <div class="flex items-center gap-3 min-w-[16rem]">

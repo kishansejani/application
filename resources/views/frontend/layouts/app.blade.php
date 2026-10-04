@@ -267,91 +267,88 @@
         </div>
 
         <!-- Main navigation (desktop) -->
-        <nav class="hidden lg:block border-t border-slate-100 dark:border-slate-800/80" aria-label="{{ __('messages.categories') }}">
-            <div class="max-w-7xl mx-auto px-8 h-12 flex items-center gap-1 text-[13px] font-semibold">
-                <!-- All categories (mega menu) -->
-                <div class="fx-dropdown shrink-0">
-                    <button type="button" data-dropdown-toggle aria-expanded="false" aria-haspopup="menu" class="fx-allcat-btn">
-                        <i class="ph-bold ph-squares-four"></i>{{ __('messages.all_categories') }}<i class="ph-bold ph-caret-down text-xs opacity-70 fx-caret"></i>
-                    </button>
-                    <div class="fx-dropdown-menu fx-mega !left-0 !right-auto !p-0" role="menu">
-                        <div class="flex items-center justify-between px-5 pt-4 pb-2">
-                            <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">{{ __('messages.shop_by_category') }}</p>
-                            <a href="{{ route('categories.index') }}" class="text-[12px] font-bold text-brand-700 dark:text-brand-400 hover:underline inline-flex items-center gap-1">{{ __('messages.browse_all_categories') }}<i class="ph-bold ph-arrow-right"></i></a>
-                        </div>
-                        <div class="grid grid-cols-3 gap-1 px-3 pb-3">
-                            @foreach($navCategories as $navCat)
-                                <div class="fx-mega-col">
-                                    <a href="{{ route('categories.show', $navCat->slug) }}" class="fx-mega-head group" role="menuitem">
-                                        <span class="fx-ico-tile w-10 h-10 rounded-xl text-[15px] shrink-0"><i class="{{ $navCat->icon ?: 'fa-solid fa-layer-group' }}"></i></span>
-                                        <span class="min-w-0">
-                                            <span class="block text-[13px] font-bold text-slate-800 dark:text-slate-100 group-hover:text-brand-700 dark:group-hover:text-brand-400 leading-snug">{{ $navCat->localized_name }}</span>
-                                            <span class="block text-[11px] text-slate-400 font-medium">{{ __('messages.subcategories_count', ['count' => $navCat->subCategories->count()]) }}</span>
-                                        </span>
-                                    </a>
-                                    @if($navCat->subCategories->count())
-                                        <ul class="mt-1 ml-[3.25rem] space-y-0.5">
-                                            @foreach($navCat->subCategories->take(5) as $navSub)
-                                                <li><a href="{{ route('subcategories.show', $navSub->slug) }}" class="fx-mega-sub" role="menuitem">{{ $navSub->localized_name }}</a></li>
-                                            @endforeach
-                                        </ul>
-                                    @endif
-                                </div>
-                            @endforeach
-                        </div>
-                        <div class="flex items-center justify-between gap-3 px-5 py-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/40 rounded-b-2xl text-[12px]">
-                            <span class="inline-flex items-center gap-1.5 text-slate-500 dark:text-slate-400 font-medium"><i class="ph ph-clock text-base"></i>{{ __('messages.order_cutoff_note') }}</span>
-                            <a href="{{ route('pages.offers') }}" class="inline-flex items-center gap-1.5 font-bold text-amber-700 dark:text-amber-400 hover:underline"><i class="ph-fill ph-seal-percent"></i>{{ __('messages.offers') }}</a>
+        <nav class="hidden lg:block border-t border-slate-100 dark:border-slate-800/80 bg-white/70 dark:bg-slate-900/70 backdrop-blur" aria-label="{{ __('messages.menu') }}">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-12 flex items-center justify-between gap-3 text-[13px] font-bold">
+                <!-- Left & Center Navigation -->
+                <div class="flex items-center gap-1 sm:gap-2 min-w-0 overflow-x-auto no-scrollbar">
+                    <!-- All categories (mega menu dropdown) -->
+                    <div class="fx-dropdown shrink-0">
+                        <button type="button" data-dropdown-toggle aria-expanded="false" aria-haspopup="menu" class="fx-allcat-btn flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-brand-50 hover:bg-brand-100 dark:bg-brand-500/10 dark:hover:bg-brand-500/20 text-brand-700 dark:text-brand-300 font-extrabold whitespace-nowrap transition-colors">
+                            <i class="ph-bold ph-squares-four text-base"></i><span>{{ __('messages.all_categories') }}</span><i class="ph-bold ph-caret-down text-xs opacity-70 fx-caret"></i>
+                        </button>
+                        <div class="fx-dropdown-menu fx-mega !left-0 !right-auto !p-0" role="menu">
+                            <div class="flex items-center justify-between px-5 pt-4 pb-2">
+                                <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">{{ __('messages.shop_by_category') }}</p>
+                                <a href="{{ route('categories.index') }}" class="text-[12px] font-bold text-brand-700 dark:text-brand-400 hover:underline inline-flex items-center gap-1">{{ __('messages.browse_all_categories') }}<i class="ph-bold ph-arrow-right"></i></a>
+                            </div>
+                            <div class="grid grid-cols-3 gap-1 px-3 pb-3">
+                                @foreach($navCategories as $navCat)
+                                    <div class="fx-mega-col">
+                                        <a href="{{ route('categories.show', $navCat->slug) }}" class="fx-mega-head group" role="menuitem">
+                                            <span class="fx-ico-tile w-10 h-10 rounded-xl text-[15px] shrink-0"><i class="{{ $navCat->icon ?: 'fa-solid fa-layer-group' }}"></i></span>
+                                            <span class="min-w-0">
+                                                <span class="block text-[13px] font-bold text-slate-800 dark:text-slate-100 group-hover:text-brand-700 dark:group-hover:text-brand-400 leading-snug">{{ $navCat->localized_name }}</span>
+                                                <span class="block text-[11px] text-slate-400 font-medium">{{ __('messages.subcategories_count', ['count' => $navCat->subCategories->count()]) }}</span>
+                                            </span>
+                                        </a>
+                                        @if($navCat->subCategories->count())
+                                            <ul class="mt-1 ml-[3.25rem] space-y-0.5">
+                                                @foreach($navCat->subCategories->take(5) as $navSub)
+                                                    <li><a href="{{ route('subcategories.show', $navSub->slug) }}" class="fx-mega-sub" role="menuitem">{{ $navSub->localized_name }}</a></li>
+                                                @endforeach
+                                            </ul>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                            <div class="flex items-center justify-between gap-3 px-5 py-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/40 rounded-b-2xl text-[12px]">
+                                <span class="inline-flex items-center gap-1.5 text-slate-500 dark:text-slate-400 font-medium"><i class="ph ph-clock text-base"></i>{{ __('messages.order_cutoff_note') }}</span>
+                                <a href="{{ route('pages.offers') }}" class="inline-flex items-center gap-1.5 font-bold text-amber-700 dark:text-amber-400 hover:underline"><i class="ph-fill ph-seal-percent"></i>{{ __('messages.offers') }}</a>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <span class="w-px h-5 bg-slate-200 dark:bg-slate-700 mx-1.5 shrink-0" aria-hidden="true"></span>
+                    <span class="w-px h-5 bg-slate-200 dark:bg-slate-700 mx-1 shrink-0" aria-hidden="true"></span>
 
-                <!-- Home + category links; links that don't fit move into "More" (store.js) -->
-                <div class="fx-prio flex items-center gap-0.5 min-w-0" data-prio-nav>
-                    <a href="{{ route('home') }}" class="fx-nav-link {{ request()->routeIs('home') ? 'is-active' : '' }}"><i class="ph ph-house"></i>{{ __('messages.home') }}</a>
-                    @foreach($navCategories as $navCat)
-                        @php $isCat = request()->routeIs('categories.show') && request()->route('category')?->slug === $navCat->slug; @endphp
-                        <a href="{{ route('categories.show', $navCat->slug) }}" data-prio-item="{{ $loop->index }}" @if($loop->index >= 3) hidden @endif class="fx-nav-link {{ $isCat ? 'is-active' : '' }}">
-                            <i class="{{ $navCat->icon ?: 'fa-solid fa-layer-group' }} text-[12px]"></i>{{ $navCat->localized_name }}
+                    <!-- Clean Structured Nav Menu Links -->
+                    <div class="flex items-center gap-0.5 sm:gap-1">
+                        <a href="{{ route('home') }}" class="fx-nav-link flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 whitespace-nowrap transition-colors {{ request()->routeIs('home') ? '!text-brand-600 dark:!text-brand-400 !bg-brand-50 dark:!bg-brand-500/10' : '' }}">
+                            <i class="ph ph-house text-base"></i><span>{{ __('messages.home') }}</span>
                         </a>
-                    @endforeach
-                </div>
 
-                <!-- More -->
-                <div class="fx-dropdown shrink-0">
-                    <button type="button" data-dropdown-toggle aria-expanded="false" aria-haspopup="menu" class="fx-nav-link">
-                        <i class="ph ph-dots-three-circle"></i>{{ __('messages.more') }}<i class="ph-bold ph-caret-down text-[10px] opacity-70 fx-caret"></i>
-                    </button>
-                    <div class="fx-dropdown-menu fx-more-menu" role="menu">
-                        <div class="fx-more-col" data-prio-more-section @if($navCategories->count() <= 3) hidden @endif>
-                            <p class="fx-menu-heading">{{ __('messages.more_categories') }}</p>
-                            @foreach($navCategories as $navCat)
-                                <a href="{{ route('categories.show', $navCat->slug) }}" data-prio-more-item="{{ $loop->index }}" @if($loop->index < 3) hidden @endif class="fx-menu-item" role="menuitem"><i class="{{ $navCat->icon ?: 'fa-solid fa-layer-group' }} !text-[13px] w-[1.05rem] text-center"></i>{{ $navCat->localized_name }}</a>
-                            @endforeach
-                        </div>
-                        <div class="fx-more-col">
-                            <p class="fx-menu-heading">{{ __('messages.explore') }}</p>
-                            @auth
-                                <a href="{{ route('orders.index') }}" class="fx-menu-item xl:!hidden" role="menuitem"><i class="ph ph-receipt"></i>{{ __('messages.my_orders') }}</a>
-                            @endauth
-                            <a href="{{ route('wishlist.index') }}" class="fx-menu-item" role="menuitem"><i class="ph ph-heart"></i>{{ __('messages.wishlist') }}<span data-wishlist-count data-count="{{ $wishCount }}" class="fx-menu-count">{{ $wishCount }}</span></a>
-                            <a href="{{ route('categories.index') }}" class="fx-menu-item" role="menuitem"><i class="ph ph-squares-four"></i>{{ __('messages.all_categories') }}</a>
-                            @foreach($infoLinks as [$infoHref, $infoIcon, $infoLabel])
-                                <a href="{{ $infoHref }}" class="fx-menu-item" role="menuitem"><i class="ph {{ $infoIcon }}"></i>{{ $infoLabel }}</a>
-                            @endforeach
-                        </div>
+                        <a href="{{ route('products.index') }}" class="fx-nav-link flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 whitespace-nowrap transition-colors {{ request()->routeIs('products.index') && !request('category') ? '!text-brand-600 dark:!text-brand-400 !bg-brand-50 dark:!bg-brand-500/10' : '' }}">
+                            <i class="ph ph-storefront text-base"></i><span>{{ __('messages.all_products') }}</span>
+                        </a>
+
+                        <a href="{{ route('categories.index') }}" class="fx-nav-link flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 whitespace-nowrap transition-colors {{ request()->routeIs('categories.*', 'subcategories.*') ? '!text-brand-600 dark:!text-brand-400 !bg-brand-50 dark:!bg-brand-500/10' : '' }}">
+                            <i class="ph ph-squares-four text-base"></i><span>{{ __('messages.categories') }}</span>
+                        </a>
+
+                        <a href="{{ route('pages.offers') }}" class="fx-nav-offers flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 dark:bg-amber-500/10 dark:hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 font-extrabold whitespace-nowrap transition-colors {{ request()->routeIs('pages.offers') ? 'ring-2 ring-amber-400' : '' }}">
+                            <i class="ph-fill ph-seal-percent text-base"></i><span>{{ __('messages.offers_and_deals') }}</span>
+                        </a>
+
+                        @if($activePageSlugs->contains('about-us'))
+                            <a href="{{ route('pages.show', 'about-us') }}" class="fx-nav-link flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 whitespace-nowrap transition-colors {{ request()->is('page/about-us*') ? '!text-brand-600 dark:!text-brand-400 !bg-brand-50 dark:!bg-brand-500/10' : '' }}">
+                                <i class="ph ph-info text-base"></i><span>{{ __('messages.about_us') }}</span>
+                            </a>
+                        @endif
+
+                        <a href="{{ route('order.track') }}" class="fx-nav-link flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 whitespace-nowrap transition-colors {{ request()->routeIs('order.track') ? '!text-brand-600 dark:!text-brand-400 !bg-brand-50 dark:!bg-brand-500/10' : '' }}">
+                            <i class="ph ph-package text-base"></i><span>{{ __('messages.track_order') }}</span>
+                        </a>
+
+                        <a href="#fxSupport" class="fx-nav-link flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 whitespace-nowrap transition-colors">
+                            <i class="ph ph-headset text-base"></i><span>{{ __('messages.contact_help') }}</span>
+                        </a>
                     </div>
                 </div>
 
-                <div class="ml-auto flex items-center gap-1 shrink-0 pl-2">
-                    <a href="{{ route('pages.offers') }}" class="fx-nav-offers {{ request()->routeIs('pages.offers') ? 'is-active' : '' }}"><i class="ph-fill ph-seal-percent"></i>{{ __('messages.offers') }}</a>
-                    <a href="{{ route('order.track') }}" class="fx-nav-link {{ request()->routeIs('order.track') ? 'is-active' : '' }}"><i class="ph ph-package"></i>{{ __('messages.track_order') }}</a>
-                    @auth
-                        <a href="{{ route('orders.index') }}" class="fx-nav-link hidden xl:inline-flex {{ request()->routeIs('orders.*', 'order.show') ? 'is-active' : '' }}"><i class="ph ph-receipt"></i>{{ __('messages.my_orders') }}</a>
-                    @endauth
-                    <span class="fx-cutoff" data-prio-extra hidden><i class="ph ph-clock"></i>{{ __('messages.order_cutoff_note') }}</span>
+                <!-- Right Side Express Badge & User Orders -->
+                <div class="flex items-center gap-2 shrink-0">
+                    <span class="inline-flex items-center gap-1.5 text-xs text-brand-700 dark:text-brand-300 font-extrabold bg-brand-50 dark:bg-brand-900/40 border border-brand-200 dark:border-brand-700/50 px-3 py-1 rounded-full shadow-xs whitespace-nowrap">
+                        <i class="ph-fill ph-lightning text-amber-500 text-sm"></i>{{ $gu ? '૨ કલાક સુપરફાસ્ટ ડિલિવરી' : '2-Hour Express Delivery' }}
+                    </span>
                 </div>
             </div>
         </nav>
@@ -545,13 +542,18 @@
                     @php
                         $mmLinks = [
                             [route('home'), 'ph-house', __('messages.home'), request()->routeIs('home')],
-                            [route('categories.index'), 'ph-squares-four', __('messages.all_categories'), request()->routeIs('categories.index')],
-                            [route('pages.offers'), 'ph-seal-percent', __('messages.offers'), request()->routeIs('pages.offers')],
-                            [route('order.track'), 'ph-package', __('messages.track_order'), request()->routeIs('order.track')],
+                            [route('products.index'), 'ph-storefront', __('messages.all_products'), request()->routeIs('products.index') && !request('category')],
+                            [route('categories.index'), 'ph-squares-four', __('messages.categories'), request()->routeIs('categories.index')],
+                            [route('pages.offers'), 'ph-seal-percent', __('messages.offers_and_deals'), request()->routeIs('pages.offers')],
                         ];
+                        if ($activePageSlugs->contains('about-us')) {
+                            $mmLinks[] = [route('pages.show', 'about-us'), 'ph-info', __('messages.about_us'), request()->is('page/about-us*')];
+                        }
+                        $mmLinks[] = [route('order.track'), 'ph-package', __('messages.track_order'), request()->routeIs('order.track')];
+                        $mmLinks[] = ['#fxSupport', 'ph-headset', __('messages.contact_help'), false];
                     @endphp
                     @foreach($mmLinks as [$href, $ic, $label, $on])
-                        <a href="{{ $href }}" class="fx-menu-item !py-2.5 {{ $on ? 'is-current' : '' }}"><i class="ph {{ $ic }}"></i>{{ $label }}</a>
+                        <a href="{{ $href }}" @if(str_starts_with($href, '#')) data-close="mobileMenu" data-scroll-to="{{ $href }}" @endif class="fx-menu-item !py-2.5 {{ $on ? 'is-current' : '' }}"><i class="ph {{ $ic }}"></i>{{ $label }}</a>
                     @endforeach
                     @auth
                         <a href="{{ route('orders.index') }}" class="fx-menu-item !py-2.5 {{ request()->routeIs('orders.*', 'order.show') ? 'is-current' : '' }}"><i class="ph ph-receipt"></i>{{ __('messages.my_orders') }}</a>
@@ -697,6 +699,459 @@
 
     <div id="fxToasts" aria-live="polite"></div>
 
+    <!-- ===================== LIVE CUSTOMIZER WIDGET & DRAWER ===================== -->
+    <!-- Floating Draggable Customizer Button -->
+    <div id="customizerWidget" class="customizer-widget" style="position:fixed;bottom:28px;right:28px;z-index:99999;touch-action:none;user-select:none;">
+        <!-- Continuous Seamless Radar Aura Waves (No breaks) -->
+        <div class="customizer-radar-wave wave-1"></div>
+        <div class="customizer-radar-wave wave-2"></div>
+        <div class="customizer-radar-wave wave-3"></div>
+        <div class="customizer-breathing-core"></div>
+
+        <button type="button" id="customizerBtn" onclick="window.toggleCustomizerDrawer && window.toggleCustomizerDrawer(event)" class="customizer-circle-btn" aria-label="Open Customizer" title="Customize Theme & Layout">
+            <i class="ph-duotone ph-gear-six customizer-gear"></i>
+        </button>
+    </div>
+
+    <!-- Customizer Drawer Modal -->
+    <div id="customizerDrawer" class="customizer-backdrop is-hidden" aria-hidden="true">
+        <div class="customizer-panel" role="dialog" aria-modal="true" aria-label="Customizer">
+            <!-- Header -->
+            <div class="customizer-header">
+                <div class="flex items-center gap-2.5 font-black text-slate-800 dark:text-white text-base">
+                    <i class="ph-duotone ph-gear-six text-2xl text-emerald-600 dark:text-emerald-400"></i>
+                    <span class="text-base font-extrabold tracking-tight">{{ __('messages.customizer') ?? 'Customizer' }}</span>
+                </div>
+                <button type="button" id="customizerClose" onclick="window.closeCustomizerDrawer && window.closeCustomizerDrawer()" class="customizer-close-btn" aria-label="Close Customizer">
+                    <i class="ph-bold ph-x text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Body Options -->
+            <div class="customizer-body">
+                <!-- 1. APPEARANCE -->
+                <div class="customizer-section">
+                    <label class="customizer-label">
+                        <i class="ph ph-sun text-sm"></i> {{ __('messages.appearance') ?? 'APPEARANCE' }}
+                    </label>
+                    <div class="grid grid-cols-3 gap-2.5">
+                        <button type="button" class="customizer-opt-btn" data-cust-theme="light">
+                            <i class="ph ph-sun text-xl text-amber-500"></i>
+                            <span>{{ __('messages.light') }}</span>
+                            <i class="ph-bold ph-check opt-check"></i>
+                        </button>
+                        <button type="button" class="customizer-opt-btn" data-cust-theme="dark">
+                            <i class="ph ph-moon text-xl text-indigo-400"></i>
+                            <span>{{ __('messages.dark') }}</span>
+                            <i class="ph-bold ph-check opt-check"></i>
+                        </button>
+                        <button type="button" class="customizer-opt-btn" data-cust-theme="system">
+                            <i class="ph ph-desktop text-xl text-slate-400"></i>
+                            <span>{{ __('messages.system') ?? 'Auto' }}</span>
+                            <i class="ph-bold ph-check opt-check"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. LANGUAGE -->
+                <div class="customizer-section">
+                    <label class="customizer-label">
+                        <i class="ph ph-translate text-sm"></i> {{ __('messages.language') }}
+                    </label>
+                    <div class="space-y-2">
+                        <a href="{{ route('lang.switch', 'en') }}" class="customizer-lang-btn {{ app()->getLocale() === 'en' ? 'is-active' : '' }}">
+                            <div class="flex items-center gap-2.5">
+                                <span class="font-mono text-xs font-black bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-md">US</span>
+                                <span class="font-bold text-sm text-slate-900 dark:text-white">English</span>
+                            </div>
+                            @if(app()->getLocale() === 'en')
+                                <i class="ph-bold ph-check text-emerald-600 dark:text-emerald-400 text-base"></i>
+                            @endif
+                        </a>
+                        <a href="{{ route('lang.switch', 'gu') }}" class="customizer-lang-btn {{ app()->getLocale() === 'gu' ? 'is-active' : '' }}">
+                            <div class="flex items-center gap-2.5">
+                                <span class="font-mono text-xs font-black bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-md">GU</span>
+                                <span class="font-bold text-sm text-slate-900 dark:text-white">ગુજરાતી (Gujarati)</span>
+                            </div>
+                            @if(app()->getLocale() === 'gu')
+                                <i class="ph-bold ph-check text-emerald-600 dark:text-emerald-400 text-base"></i>
+                            @endif
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 4. VIEW OPTIONS -->
+                <div class="customizer-section">
+                    <label class="customizer-label">
+                        <i class="ph ph-arrows-out text-sm"></i> {{ __('messages.view_options') ?? 'VIEW OPTIONS' }}
+                    </label>
+                    <button type="button" id="fullscreenToggleBtn" class="customizer-full-btn">
+                        <i class="ph ph-corners-out text-lg"></i>
+                        <span id="fullscreenLabel">{{ __('messages.fullscreen') ?? 'Go Full Screen' }}</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Footer Tag -->
+            <div class="customizer-footer">
+                <span>FreshExpress v2.0</span>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Floating Draggable Widget */
+        .customizer-widget {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .customizer-circle-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: #1b5e52; /* Dark teal matching screenshot */
+            color: #ffffff;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 10px 25px rgba(27, 94, 82, 0.45), 0 4px 12px rgba(0, 0, 0, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            cursor: grab;
+            position: relative;
+            z-index: 5;
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s, box-shadow 0.2s;
+        }
+
+        .customizer-circle-btn:active {
+            cursor: grabbing;
+            transform: scale(0.94);
+        }
+
+        /* Faster, Crisp Clockwise Right Spin on Hover */
+        .customizer-gear {
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+
+        .customizer-circle-btn:hover .customizer-gear {
+            animation: spinGearFastClockwise 0.55s linear infinite;
+        }
+
+        @keyframes spinGearFastClockwise {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Seamless Continuous Zoom-in / Zoom-out Radar Aura Wave Effect (No breaks) */
+        .customizer-breathing-core {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: rgba(27, 94, 82, 0.5);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 1;
+            animation: customizerCoreGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes customizerCoreGlow {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.7;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1.35);
+                opacity: 0.25;
+            }
+        }
+
+        .customizer-radar-wave {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: rgba(27, 94, 82, 0.45);
+            transform: translate(-50%, -50%) scale(1);
+            pointer-events: none;
+            z-index: 2;
+            animation: customizerContinuousPulse 3s cubic-bezier(0.1, 0.6, 0.2, 1) infinite;
+        }
+
+        .customizer-radar-wave.wave-1 { animation-delay: 0s; }
+        .customizer-radar-wave.wave-2 { animation-delay: 1s; }
+        .customizer-radar-wave.wave-3 { animation-delay: 2s; }
+
+        @keyframes customizerContinuousPulse {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.85;
+            }
+            50% {
+                opacity: 0.4;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(2.4);
+                opacity: 0;
+            }
+        }
+
+        /* Customizer Backdrop & Drawer Panel */
+        .customizer-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 999999;
+            display: flex;
+            justify-content: flex-end;
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.25s;
+        }
+
+        .customizer-backdrop.is-hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .customizer-panel {
+            width: 330px;
+            max-width: 90vw;
+            height: 100%;
+            background: #ffffff;
+            box-shadow: -10px 0 40px rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: column;
+            transform: translateX(0);
+            transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .customizer-backdrop.is-hidden .customizer-panel {
+            transform: translateX(100%);
+        }
+
+        .dark .customizer-panel {
+            background: #0f172a;
+            color: #ffffff;
+            border-left: 1px solid #1e293b;
+        }
+
+        .customizer-header {
+            padding: 20px 22px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .dark .customizer-header {
+            border-color: #1e293b;
+        }
+
+        .customizer-close-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .customizer-close-btn:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+            border-color: #cbd5e1;
+        }
+
+        .dark .customizer-close-btn:hover {
+            background: #1e293b;
+            color: #ffffff;
+            border-color: #334155;
+        }
+
+        .customizer-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .customizer-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .customizer-label {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .customizer-opt-btn {
+            padding: 14px 10px;
+            border-radius: 12px;
+            border: 1.5px solid #e2e8f0;
+            background: #f8fafc;
+            color: #334155;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .dark .customizer-opt-btn {
+            background: #1e293b;
+            border-color: #334155;
+            color: #cbd5e1;
+        }
+
+        .customizer-opt-btn:hover {
+            border-color: #10b981;
+            color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .dark .customizer-opt-btn:hover {
+            background: rgba(16, 185, 129, 0.1);
+            color: #34d399;
+        }
+
+        .customizer-opt-btn.is-active {
+            border-color: #10b981 !important;
+            background: #ecfdf5 !important;
+            color: #059669 !important;
+            box-shadow: 0 0 0 1px #10b981;
+        }
+
+        .dark .customizer-opt-btn.is-active {
+            background: rgba(16, 185, 129, 0.18) !important;
+            color: #34d399 !important;
+        }
+
+        .opt-check {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            font-size: 11px;
+            color: #10b981;
+            display: none;
+        }
+
+        .customizer-opt-btn.is-active .opt-check {
+            display: block;
+        }
+
+        .customizer-lang-btn {
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1.5px solid #e2e8f0;
+            background: #f8fafc;
+            color: #334155;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .dark .customizer-lang-btn {
+            background: #1e293b;
+            border-color: #334155;
+            color: #cbd5e1;
+        }
+
+        .customizer-lang-btn:hover {
+            border-color: #10b981;
+        }
+
+        .customizer-lang-btn.is-active {
+            border-color: #10b981 !important;
+            background: #ecfdf5 !important;
+            color: #059669 !important;
+            box-shadow: 0 0 0 1px #10b981;
+        }
+
+        .dark .customizer-lang-btn.is-active {
+            background: rgba(16, 185, 129, 0.18) !important;
+            color: #34d399 !important;
+        }
+
+        .customizer-full-btn {
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1.5px solid #e2e8f0;
+            background: #f8fafc;
+            color: #334155;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .dark .customizer-full-btn {
+            background: #1e293b;
+            border-color: #334155;
+            color: #cbd5e1;
+        }
+
+        .customizer-full-btn:hover {
+            border-color: #10b981;
+            color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .dark .customizer-full-btn:hover {
+            background: rgba(16, 185, 129, 0.1);
+            color: #34d399;
+        }
+
+        .customizer-footer {
+            padding: 16px 22px;
+            border-top: 1px solid #e2e8f0;
+            font-size: 11px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-align: center;
+        }
+
+        .dark .customizer-footer {
+            border-color: #1e293b;
+        }
+    </style>
+
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -721,6 +1176,200 @@
     </script>
     <script src="{{ asset('assets/shared/fx-select.js') }}?v=1"></script>
     <script src="{{ asset('assets/front/store.js') }}?v=4"></script>
+    <script>
+        // ==================== STORE LIVE CUSTOMIZER CONTROLLER ====================
+        (function() {
+            var hasMoved = false;
+
+            window.openCustomizerDrawer = function() {
+                var drawer = document.getElementById('customizerDrawer');
+                if (drawer) {
+                    drawer.classList.remove('is-hidden');
+                    drawer.setAttribute('aria-hidden', 'false');
+                    syncActiveStates();
+                }
+            };
+
+            window.closeCustomizerDrawer = function() {
+                var drawer = document.getElementById('customizerDrawer');
+                if (drawer) {
+                    drawer.classList.add('is-hidden');
+                    drawer.setAttribute('aria-hidden', 'true');
+                }
+            };
+
+            window.toggleCustomizerDrawer = function(e) {
+                if (hasMoved) return;
+                var drawer = document.getElementById('customizerDrawer');
+                if (!drawer) return;
+                if (drawer.classList.contains('is-hidden')) {
+                    window.openCustomizerDrawer();
+                } else {
+                    window.closeCustomizerDrawer();
+                }
+            };
+
+            function syncActiveStates() {
+                var currentTheme = localStorage.getItem('theme') || localStorage.getItem('admin_theme_mode') || 'system';
+                document.querySelectorAll('[data-cust-theme]').forEach(function(el) {
+                    var val = el.getAttribute('data-cust-theme');
+                    el.classList.toggle('is-active', val === currentTheme);
+                });
+
+                var currentDir = document.documentElement.getAttribute('dir') || 'ltr';
+                document.querySelectorAll('[data-cust-dir]').forEach(function(el) {
+                    var val = el.getAttribute('data-cust-dir');
+                    el.classList.toggle('is-active', val === currentDir);
+                });
+
+                var fsBtn = document.getElementById('fullscreenToggleBtn');
+                var fsLabel = document.getElementById('fullscreenLabel');
+                if (fsBtn && fsLabel) {
+                    var isFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
+                    fsLabel.textContent = isFs ? 'Exit Full Screen' : 'Go Full Screen';
+                    var icon = fsBtn.querySelector('i');
+                    if (icon) icon.className = isFs ? 'ph ph-corners-in text-lg' : 'ph ph-corners-out text-lg';
+                }
+            }
+
+            function initLiveCustomizer() {
+                var widget = document.getElementById('customizerWidget');
+                var btn = document.getElementById('customizerBtn');
+                var drawer = document.getElementById('customizerDrawer');
+                var closeBtn = document.getElementById('customizerClose');
+                var fsBtn = document.getElementById('fullscreenToggleBtn');
+                if (!widget || !btn || !drawer) return;
+
+                // 1. Restore saved position if valid
+                try {
+                    var savedX = localStorage.getItem('customizer_pos_x');
+                    var savedY = localStorage.getItem('customizer_pos_y');
+                    if (savedX !== null && savedY !== null) {
+                        var x = Math.max(10, Math.min(window.innerWidth - 65, parseInt(savedX, 10)));
+                        var y = Math.max(10, Math.min(window.innerHeight - 65, parseInt(savedY, 10)));
+                        widget.style.left = x + 'px';
+                        widget.style.top = y + 'px';
+                        widget.style.right = 'auto';
+                        widget.style.bottom = 'auto';
+                    }
+                } catch(e) {}
+
+                // 2. Drag & Drop logic (Mouse & Touch)
+                var isDragging = false;
+                var startX = 0, startY = 0;
+                var initialLeft = 0, initialTop = 0;
+
+                function onPointerDown(e) {
+                    if (e.type === 'mousedown' && e.button !== 0) return;
+                    var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                    var clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                    
+                    var rect = widget.getBoundingClientRect();
+                    startX = clientX;
+                    startY = clientY;
+                    initialLeft = rect.left;
+                    initialTop = rect.top;
+                    isDragging = true;
+                    hasMoved = false;
+
+                    document.addEventListener('mousemove', onPointerMove, { passive: false });
+                    document.addEventListener('mouseup', onPointerUp);
+                    document.addEventListener('touchmove', onPointerMove, { passive: false });
+                    document.addEventListener('touchend', onPointerUp);
+                }
+
+                function onPointerMove(e) {
+                    if (!isDragging) return;
+                    var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                    var clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                    var dx = clientX - startX;
+                    var dy = clientY - startY;
+
+                    if (Math.hypot(dx, dy) > 6) {
+                        hasMoved = true;
+                        if (e.cancelable) e.preventDefault();
+                        
+                        var newX = initialLeft + dx;
+                        var newY = initialTop + dy;
+                        newX = Math.max(10, Math.min(window.innerWidth - widget.offsetWidth - 10, newX));
+                        newY = Math.max(10, Math.min(window.innerHeight - widget.offsetHeight - 10, newY));
+
+                        widget.style.left = newX + 'px';
+                        widget.style.top = newY + 'px';
+                        widget.style.right = 'auto';
+                        widget.style.bottom = 'auto';
+                    }
+                }
+
+                function onPointerUp(e) {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    document.removeEventListener('mousemove', onPointerMove);
+                    document.removeEventListener('mouseup', onPointerUp);
+                    document.removeEventListener('touchmove', onPointerMove);
+                    document.removeEventListener('touchend', onPointerUp);
+
+                    if (hasMoved) {
+                        try {
+                            var rect = widget.getBoundingClientRect();
+                            localStorage.setItem('customizer_pos_x', Math.round(rect.left));
+                            localStorage.setItem('customizer_pos_y', Math.round(rect.top));
+                        } catch(e) {}
+                        setTimeout(function() { hasMoved = false; }, 80);
+                    }
+                }
+
+                btn.addEventListener('mousedown', onPointerDown);
+                btn.addEventListener('touchstart', onPointerDown, { passive: true });
+
+                drawer.addEventListener('click', function(e) {
+                    if (e.target === drawer) window.closeCustomizerDrawer();
+                });
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && !drawer.classList.contains('is-hidden')) window.closeCustomizerDrawer();
+                });
+
+                // 3. Theme
+                document.querySelectorAll('[data-cust-theme]').forEach(function(themeBtn) {
+                    themeBtn.addEventListener('click', function() {
+                        var mode = themeBtn.getAttribute('data-cust-theme');
+                        localStorage.setItem('theme', mode);
+                        localStorage.setItem('admin_theme_mode', mode);
+                        var dark = mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                        document.documentElement.classList.toggle('dark', dark);
+                        syncActiveStates();
+                    });
+                // 4. Fullscreen
+                if (fsBtn) {
+                    fsBtn.addEventListener('click', function() {
+                        if (document.fullscreenElement || document.webkitFullscreenElement) {
+                            if (document.exitFullscreen) document.exitFullscreen();
+                            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+                        } else {
+                            var elem = document.documentElement;
+                            if (elem.requestFullscreen) elem.requestFullscreen();
+                            else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+                        }
+                    });
+                    document.addEventListener('fullscreenchange', syncActiveStates);
+                    document.addEventListener('webkitfullscreenchange', syncActiveStates);
+                }
+
+                try {
+                    var savedDir = localStorage.getItem('customizer_direction');
+                    if (savedDir) document.documentElement.setAttribute('dir', savedDir);
+                } catch(e) {}
+
+                syncActiveStates();
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initLiveCustomizer);
+            } else {
+                initLiveCustomizer();
+            }
+        })();
+    </script>
     @stack('scripts')
 </body>
 </html>

@@ -214,7 +214,7 @@
                             @php $sm = $statusMeta[$order->order_status] ?? [ucfirst($order->order_status), '#94a3b8', 'badge-neutral']; @endphp
                             <tr>
                                 <td>
-                                    <a href="{{ route('admin.orders.show', $order) }}" class="font-bold text-slate-900 dark:text-white hover:underline">#{{ $order->order_number }}</a>
+                                    <a href="{{ route('admin.orders.show', $order) }}" class="font-bold text-slate-900 dark:text-white hover:underline">{{ $order->order_number }}</a>
                                     <span class="block text-[11px] text-slate-400">{{ $order->created_at->format('d M, h:i A') }}</span>
                                 </td>
                                 <td>

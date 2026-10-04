@@ -92,7 +92,7 @@
                 </label>
                 @if($user)
                     <dl class="text-[12px] space-y-1 pt-3 border-t border-slate-100 dark:border-slate-700">
-                        <div class="flex justify-between"><dt class="text-slate-500">User ID</dt><dd class="font-mono font-bold text-slate-700 dark:text-slate-200">#{{ $user->id }}</dd></div>
+                        <div class="flex justify-between"><dt class="text-slate-500">User ID</dt><dd class="font-mono font-bold text-slate-700 dark:text-slate-200">{{ $user->id }}</dd></div>
                         <div class="flex justify-between"><dt class="text-slate-500">Registered</dt><dd class="font-semibold text-slate-700 dark:text-slate-200">{{ $user->created_at?->format('d M Y') }}</dd></div>
                     </dl>
                 @endif

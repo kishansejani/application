@@ -377,18 +377,33 @@ a.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); b
 .btn.is-loading::before { content: ""; width: 14px; height: 14px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: spin .7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Icon action buttons in tables */
-.act { display: inline-flex; align-items: center; gap: .35rem; }
+/* Icon action buttons in tables (Ultra-premium tinted badges) */
+.act { display: inline-flex; align-items: center; gap: .45rem; }
 .act-btn {
-    width: 32px; height: 32px; border-radius: 9px; display: inline-grid; place-items: center; font-size: 15px;
-    color: var(--muted); background: transparent; border: 1px solid var(--line); cursor: pointer; text-decoration: none;
-    transition: background .15s, color .15s, border-color .15s;
+    width: 34px; height: 34px; border-radius: 10px; display: inline-grid; place-items: center; font-size: 15px;
+    color: #0284c7; background: #f0f9ff; border: 1px solid #bae6fd; cursor: pointer; text-decoration: none;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    transition: all .2s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.act-btn:hover { background: var(--surface-2); color: var(--ink); border-color: var(--line-strong); }
-.act-btn.is-edit:hover { background: #eef2ff; color: #4338ca; border-color: #c7d2fe; }
-.act-btn.is-danger:hover { background: #fff1f2; color: #e11d48; border-color: #fecdd3; }
-.dark .act-btn.is-edit:hover { background: rgba(99,102,241,.15); color: #a5b4fc; border-color: rgba(99,102,241,.4); }
-.dark .act-btn.is-danger:hover { background: rgba(244,63,94,.12); color: #fda4af; border-color: rgba(244,63,94,.4); }
+.act-btn:hover { background: #0284c7; color: #ffffff; border-color: #0284c7; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3); }
+
+.act-btn.is-edit { color: #059669; background: #ecfdf5; border-color: #a7f3d0; }
+.act-btn.is-edit:hover { background: #059669; color: #ffffff; border-color: #059669; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(5, 150, 105, 0.3); }
+
+.act-btn.is-danger { color: #e11d48; background: #fff1f2; border-color: #fecdd3; }
+.act-btn.is-danger:hover { background: #e11d48; color: #ffffff; border-color: #e11d48; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(225, 29, 72, 0.3); }
+
+.act-btn.is-info { color: #4f46e5; background: #eef2ff; border-color: #c7d2fe; }
+.act-btn.is-info:hover { background: #4f46e5; color: #ffffff; border-color: #4f46e5; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3); }
+
+.dark .act-btn { background: rgba(14, 165, 233, 0.12); color: #38bdf8; border-color: rgba(14, 165, 233, 0.28); }
+.dark .act-btn:hover { background: #0284c7; color: #ffffff; border-color: #0284c7; }
+.dark .act-btn.is-edit { background: rgba(16, 185, 129, 0.12); color: #34d399; border-color: rgba(16, 185, 129, 0.28); }
+.dark .act-btn.is-edit:hover { background: #059669; color: #ffffff; border-color: #059669; }
+.dark .act-btn.is-danger { background: rgba(244, 63, 94, 0.12); color: #fb7185; border-color: rgba(244, 63, 94, 0.28); }
+.dark .act-btn.is-danger:hover { background: #e11d48; color: #ffffff; border-color: #e11d48; }
+.dark .act-btn.is-info { background: rgba(99, 102, 241, 0.12); color: #a5b4fc; border-color: rgba(99, 102, 241, 0.28); }
+.dark .act-btn.is-info:hover { background: #4f46e5; color: #ffffff; border-color: #4f46e5; }
 
 /* Badges / pills */
 .badge { display: inline-flex; align-items: center; gap: .3rem; height: 22px; padding: 0 .55rem; border-radius: 999px; font-size: 11px; font-weight: 700; white-space: nowrap; }
@@ -807,8 +822,11 @@ a.stat-card:hover, .stat-card:hover { transform: translateY(-3px); border-color:
     .stat-value { font-size: 1.4rem; }
     .stat-card .stat-icon { width: 38px; height: 38px; font-size: 19px; border-radius: 12px; }
     .stat-label { font-size: 10.5px; }
-    
+}
+
 /* ==========================================================================
+   v2.1 — Premium icon system: one colour at rest, accent colour on hover
+   ========================================================================== */
    v2.1 — Premium icon system: one colour at rest, accent colour on hover
    ========================================================================== */
 :root { --icon: #64748b; --icon-hover: var(--btn-accent-bg, #10b981); --icon-ease: cubic-bezier(.34, 1.56, .64, 1); }
@@ -872,3 +890,164 @@ div.dt-buttons .dt-button.btn-colvis:hover i { color: #7c3aed; }
 .dataTables_wrapper .dataTables_length .fx-sel { height: 36px; padding: 0 .55rem 0 .7rem; border-radius: 10px; font-size: 12.5px; font-weight: 700; width: auto; min-width: 74px; }
 .filter-bar .fx-sel { height: 38px !important; border-radius: 11px !important; font-size: 12.5px !important; }
 .pdf-dialog .fx-sel { width: 100%; height: 40px; display: flex !important; }
+
+/* ==========================================================================
+   Toast Notifications System
+   ========================================================================== */
+.toast-stack {
+    position: fixed;
+    top: 1.25rem;
+    right: 1.25rem;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    pointer-events: none;
+    max-width: 380px;
+    width: calc(100vw - 2.5rem);
+}
+.toast {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    background: #ffffff;
+    color: #1e293b;
+    border-radius: 14px;
+    box-shadow: 0 12px 30px -6px rgba(15, 23, 42, 0.18), 0 4px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    pointer-events: auto;
+    overflow: hidden;
+    animation: toast-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transition: transform 0.2s, opacity 0.2s;
+}
+.dark .toast {
+    background: #1e293b;
+    color: #f1f5f9;
+    border-color: rgba(51, 65, 85, 0.9);
+    box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.45);
+}
+.toast.is-leaving {
+    animation: toast-out 0.2s ease forwards;
+}
+@keyframes toast-in {
+    from { opacity: 0; transform: translateY(-12px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes toast-out {
+    from { opacity: 1; transform: translateY(0) scale(1); }
+    to { opacity: 0; transform: translateY(-8px) scale(0.96); }
+}
+.toast-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+.toast-success .toast-icon { background: #dcfce7; color: #16a34a; }
+.dark .toast-success .toast-icon { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+.toast-error .toast-icon { background: #fee2e2; color: #dc2626; }
+.dark .toast-error .toast-icon { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+.toast-warning .toast-icon { background: #fef3c7; color: #d97706; }
+.dark .toast-warning .toast-icon { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+.toast-info .toast-icon { background: #e0f2fe; color: #0284c7; }
+.dark .toast-info .toast-icon { background: rgba(14, 165, 233, 0.2); color: #38bdf8; }
+
+.toast-body {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+    word-break: break-word;
+}
+.toast-body strong {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+.toast-close {
+    background: transparent;
+    border: 0;
+    padding: 2px;
+    color: #94a3b8;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: color 0.15s, background 0.15s;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+.toast-close:hover {
+    color: #334155;
+    background: #f1f5f9;
+}
+.dark .toast-close:hover {
+    color: #f8fafc;
+    background: #334155;
+}
+.toast-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: currentColor;
+    opacity: 0.35;
+    transform-origin: left;
+    animation: toast-timer linear forwards;
+}
+.toast-success .toast-bar { color: #16a34a; }
+.toast-error .toast-bar { color: #dc2626; }
+.toast-warning .toast-bar { color: #d97706; }
+.toast-info .toast-bar { color: #0284c7; }
+@keyframes toast-timer {
+    from { transform: scaleX(1); }
+    to { transform: scaleX(0); }
+}
+
+/* ==========================================================================
+   Notification Filter Tabs & Cards
+   ========================================================================== */
+.notif-filter-tab {
+    padding: 0.35rem 0.65rem;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+}
+.notif-filter-tab:hover {
+    color: #0f172a;
+    background: #f1f5f9;
+}
+.dark .notif-filter-tab:hover {
+    color: #f8fafc;
+    background: rgba(51, 65, 85, 0.5);
+}
+.notif-filter-tab.is-active {
+    color: #059669;
+    background: #ecfdf5;
+}
+.dark .notif-filter-tab.is-active {
+    color: #34d399;
+    background: rgba(16, 185, 129, 0.15);
+}
+.notif-card {
+    cursor: pointer;
+    text-decoration: none;
+}
+.notif-card.is-read {
+    opacity: 0.72;
+}
+.notif-card.is-read .notif-dot {
+    display: none !important;
+}
+

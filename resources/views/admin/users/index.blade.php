@@ -71,7 +71,7 @@
                                 <span class="w-10 h-10 rounded-xl flex items-center justify-center font-extrabold text-[13px] shrink-0 {{ $user->role === 'super_admin' ? 'tone-violet' : ($user->role === 'admin' ? 'tone-blue' : 'tone-slate') }}">{{ $initials }}</span>
                                 <div class="min-w-0">
                                     <a href="{{ route('admin.users.edit', $user) }}" class="block font-bold text-slate-900 dark:text-white hover:underline leading-snug">{{ $user->name }}</a>
-                                    <span class="block font-mono text-[10.5px] text-slate-400 mt-0.5">ID #{{ $user->id }}@if($isSelf) · You @endif</span>
+                                    <span class="block font-mono text-[10.5px] text-slate-400 mt-0.5">ID {{ $user->id }}@if($isSelf) · You @endif</span>
                                 </div>
                             </div>
                         </td>
