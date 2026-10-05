@@ -24,7 +24,7 @@
         <div class="filter-bar">
             <form action="{{ route('admin.subcategories.index') }}" method="GET" class="flex flex-wrap items-center gap-2.5" data-no-loading>
                 @if(request('status'))<input type="hidden" name="status" value="{{ request('status') }}">@endif
-                <select name="category_id" onchange="this.form.submit()" class="form-select w-auto min-w-[13rem]" aria-label="Filter by category">
+                <select name="category_id" onchange="this.form.submit()" class="form-select w-auto min-w-[13rem]" aria-label="Filter by category" data-search>
                     <option value="">All categories</option>
                     @foreach($categories as $cat)
                         <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name_en }} ({{ $cat->name_gu }})</option>

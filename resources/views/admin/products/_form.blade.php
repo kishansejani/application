@@ -217,7 +217,7 @@
             <div class="card-body space-y-4">
                 <div>
                     <label for="categorySelect" class="form-label">Category <span class="text-rose-500">*</span></label>
-                    <select id="categorySelect" name="category_id" required class="form-select w-full">
+                    <select id="categorySelect" name="category_id" required class="form-select w-full" data-search>
                         @unless($isEdit)<option value="">Choose a category</option>@endunless
                         @foreach($categories as $cat)
                             <option value="{{ $cat->id }}" {{ (string) $selectedCat === (string) $cat->id ? 'selected' : '' }}>{{ $cat->name_en }} ({{ $cat->name_gu }})</option>
@@ -227,7 +227,7 @@
                 </div>
                 <div>
                     <label for="subCategorySelect" class="form-label">Subcategory</label>
-                    <select id="subCategorySelect" name="sub_category_id" class="form-select w-full">
+                    <select id="subCategorySelect" name="sub_category_id" class="form-select w-full" data-search>
                         <option value="">No subcategory</option>
                         @unless($reloadSubs)
                             @foreach($subCategories as $sub)

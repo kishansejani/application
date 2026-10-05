@@ -31,7 +31,7 @@
                     <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
                     <input type="search" name="search" value="{{ request('search') }}" placeholder="Name, phone or email" class="form-control !pl-9" aria-label="Search users">
                 </div>
-                <select name="role" onchange="this.form.submit()" class="form-select w-auto min-w-[10rem]" aria-label="Role">
+                <select name="role" onchange="this.form.submit()" class="form-select w-auto min-w-[10rem]" aria-label="Role" data-search>
                     <option value="">All roles</option>
                     @foreach($roles as $r)
                         <option value="{{ $r->name }}" {{ request('role') == $r->name ? 'selected' : '' }}>{{ $r->display_name }}</option>

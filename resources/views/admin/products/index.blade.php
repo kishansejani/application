@@ -24,7 +24,7 @@
     <div class="card table-card">
         <div class="filter-bar">
             <form action="{{ route('admin.products.index') }}" method="GET" class="flex flex-wrap items-center gap-2.5" data-no-loading>
-                <select name="category_id" onchange="this.form.submit()" class="form-select w-auto min-w-[11rem]">
+                <select name="category_id" onchange="this.form.submit()" class="form-select w-auto min-w-[11rem]" data-search aria-label="Filter by category">
                     <option value="">All categories</option>
                     @foreach($categories as $cat)
                         <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name_en }}</option>

@@ -75,7 +75,7 @@
             <div class="card-body space-y-4">
                 <div>
                     <label for="userRole" class="form-label">Role <span class="text-rose-500">*</span></label>
-                    <select id="userRole" name="role_id" required class="form-select w-full{{ $err('role_id') }}">
+                    <select id="userRole" name="role_id" required class="form-select w-full{{ $err('role_id') }}" data-search>
                         @foreach($roles as $r)
                             <option value="{{ $r->id }}" {{ (string) $selectedRole === (string) $r->id ? 'selected' : '' }}>{{ $r->display_name }} ({{ $r->name }})</option>
                         @endforeach

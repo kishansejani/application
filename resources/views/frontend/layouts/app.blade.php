@@ -77,7 +77,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 
     <!-- Storefront components (loaded before Tailwind so utilities win) -->
-    <link rel="stylesheet" href="{{ asset('assets/shared/fx-select.css') }}?v=1">
+    <link rel="stylesheet" href="{{ asset('assets/shared/fx-select.css') }}?v=2.2.0">
     <link rel="stylesheet" href="{{ asset('assets/front/store.css') }}?v=4">
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -1174,7 +1174,7 @@
             i18n: @json($fxI18n)
         };
     </script>
-    <script src="{{ asset('assets/shared/fx-select.js') }}?v=1"></script>
+    <script src="{{ asset('assets/shared/fx-select.js') }}?v=2.2.0"></script>
     <script src="{{ asset('assets/front/store.js') }}?v=4"></script>
     <script>
         // ==================== STORE LIVE CUSTOMIZER CONTROLLER ====================

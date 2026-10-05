@@ -34,7 +34,7 @@ Stock & Inventory
             </div>
             <form action="{{ route('admin.stock.index') }}" method="GET" class="flex flex-wrap items-center gap-2.5 sm:ml-auto" data-no-loading>
                 @if($filter)<input type="hidden" name="filter" value="{{ $filter }}">@endif
-                <select name="category_id" onchange="this.form.submit()" class="form-select w-auto min-w-[11rem]" aria-label="Filter by category">
+                <select name="category_id" onchange="this.form.submit()" class="form-select w-auto min-w-[11rem]" aria-label="Filter by category" data-search>
                     <option value="">All categories</option>
                     @foreach($categories as $cat)
                         <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name_en }}</option>

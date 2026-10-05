@@ -100,21 +100,21 @@
                     </div>
                     <div class="link-target hidden" data-for="category">
                         <label for="target_category" class="form-label">Category</label>
-                        <select id="target_category" name="target_id" class="form-select w-full" disabled>
+                        <select id="target_category" name="target_id" class="form-select w-full" disabled data-search>
                             <option value="">Choose a category</option>
                             @foreach($categories as $c)<option value="{{ $c->id }}" {{ $linkType === 'category' && (string) $targetId === (string) $c->id ? 'selected' : '' }}>{{ $c->name_en }}</option>@endforeach
                         </select>
                     </div>
                     <div class="link-target hidden" data-for="product">
                         <label for="target_product" class="form-label">Product</label>
-                        <select id="target_product" name="target_id" class="form-select w-full" disabled>
+                        <select id="target_product" name="target_id" class="form-select w-full" disabled data-search>
                             <option value="">Choose a product</option>
                             @foreach($products as $p)<option value="{{ $p->id }}" {{ $linkType === 'product' && (string) $targetId === (string) $p->id ? 'selected' : '' }}>{{ $p->name_en }} ({{ $p->unit }})</option>@endforeach
                         </select>
                     </div>
                     <div class="link-target hidden" data-for="offer">
                         <label for="target_offer" class="form-label">Offer</label>
-                        <select id="target_offer" name="target_id" class="form-select w-full" disabled>
+                        <select id="target_offer" name="target_id" class="form-select w-full" disabled data-search>
                             <option value="">Choose an offer</option>
                             @foreach($offers as $o)<option value="{{ $o->id }}" {{ $linkType === 'offer' && (string) $targetId === (string) $o->id ? 'selected' : '' }}>{{ $o->title_en }}{{ $o->code ? ' · '.$o->code : '' }}</option>@endforeach
                         </select>

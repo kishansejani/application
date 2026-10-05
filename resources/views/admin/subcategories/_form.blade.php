@@ -27,7 +27,7 @@
                         <span class="w-[42px] h-[42px] shrink-0 rounded-xl flex items-center justify-center text-lg bg-violet-50 text-violet-600 border border-violet-100 dark:bg-violet-500/10 dark:text-violet-300 dark:border-violet-500/20">
                             <i id="parentIcon" class="fa-solid fa-layer-group"></i>
                         </span>
-                        <select id="category_id" name="category_id" required class="form-select w-full">
+                        <select id="category_id" name="category_id" required class="form-select w-full" data-search>
                             @unless($isEdit)<option value="">Choose a category</option>@endunless
                             @if($parentMissing)
                                 <option value="{{ $subcategory->category_id }}" data-icon="{{ $subcategory->category->icon }}" selected>{{ $subcategory->category->name_en }} ({{ $subcategory->category->name_gu }}) — inactive</option>

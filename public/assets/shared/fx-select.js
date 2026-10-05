@@ -10,10 +10,11 @@
     'use strict';
     if (window.FxSelect) return;
 
-    var SEARCH_THRESHOLD = 8;
+    var SEARCH_THRESHOLD = 3;
     var CHECK = '<svg viewBox="0 0 256 256" aria-hidden="true"><path fill="currentColor" d="M232.49 80.49l-128 128a12 12 0 0 1-17 0l-56-56a12 12 0 1 1 17-17L96 183 215.51 63.51a12 12 0 0 1 17 17Z"/></svg>';
     var CARET = '<svg viewBox="0 0 256 256" aria-hidden="true"><path fill="currentColor" d="M213.66 101.66l-80 80a8 8 0 0 1-11.32 0l-80-80a8 8 0 0 1 11.32-11.32L128 164.69l74.34-74.35a8 8 0 0 1 11.32 11.32Z"/></svg>';
     var SEARCH = '<svg viewBox="0 0 256 256" aria-hidden="true"><path fill="currentColor" d="M229.66 218.34l-50.07-50.06a88.11 88.11 0 1 0-11.31 11.31l50.06 50.07a8 8 0 0 0 11.32-11.32ZM40 112a72 72 0 1 1 72 72 72.08 72.08 0 0 1-72-72Z"/></svg>';
+    var CLEAR = '<svg viewBox="0 0 256 256" aria-hidden="true"><path fill="currentColor" d="M205.66 194.34a8 8 0 0 1-11.32 11.32L128 139.31l-66.34 66.35a8 8 0 0 1-11.32-11.32L116.69 128 50.34 61.66a8 8 0 0 1 11.32-11.32L128 116.69l66.34-66.35a8 8 0 0 1 11.32 11.32L139.31 128Z"/></svg>';
     var GU = { 'Search…': 'શોધો…', 'No matches': 'કોઈ પરિણામ નથી' };
     function tr(str) {
         if (window.__ && window.__ !== tr) { var v = window.__(str); if (v && v !== str) return v; }
@@ -108,11 +109,14 @@
         if (this.sel.disabled) return;
         if (openInst && openInst !== this) openInst.close();
         openInst = this;
-        var self = this, many = this.sel.options.length > SEARCH_THRESHOLD || this.sel.hasAttribute('data-search');
+        var self = this;
+        var hasSearchAttr = this.sel.hasAttribute('data-search') && this.sel.getAttribute('data-search') !== 'false';
+        var isNoSearch = this.sel.hasAttribute('data-no-search') || this.sel.getAttribute('data-search') === 'false';
+        var many = !isNoSearch && (hasSearchAttr || this.sel.options.length > SEARCH_THRESHOLD);
         var p = document.createElement('div');
         p.className = 'fx-sel-panel';
         if (document.documentElement.classList.contains('dark')) p.classList.add('is-dark');
-        p.innerHTML = (many ? '<div class="fx-sel-search">' + SEARCH + '<input type="text" placeholder="' + esc(this.sel.getAttribute('data-search-placeholder') || tr('Search…')) + '" autocomplete="off" spellcheck="false"></div>' : '') +
+        p.innerHTML = (many ? '<div class="fx-sel-search">' + SEARCH + '<input type="text" placeholder="' + esc(this.sel.getAttribute('data-search-placeholder') || tr('Search…')) + '" autocomplete="off" spellcheck="false"><button type="button" class="fx-sel-clear hidden" aria-label="Clear search">' + CLEAR + '</button></div>' : '') +
             '<ul class="fx-sel-list" role="listbox" id="' + this.id + '"></ul>';
         document.body.appendChild(p);
         this.panel = p;
@@ -125,8 +129,24 @@
         requestAnimationFrame(function () { p.classList.add('is-visible'); });
 
         var input = p.querySelector('.fx-sel-search input');
+        var clearBtn = p.querySelector('.fx-sel-clear');
         if (input) {
-            input.addEventListener('input', function () { self.query = input.value.trim().toLowerCase(); self.renderList(); });
+            input.addEventListener('input', function () {
+                self.query = input.value.trim().toLowerCase();
+                if (clearBtn) clearBtn.classList.toggle('hidden', !self.query);
+                self.renderList();
+            });
+            if (clearBtn) {
+                clearBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    input.value = '';
+                    self.query = '';
+                    clearBtn.classList.add('hidden');
+                    self.renderList();
+                    input.focus();
+                });
+            }
             input.addEventListener('keydown', function (e) { self.onListKey(e); });
             setTimeout(function () { input.focus(); }, 10);
         } else {
@@ -164,26 +184,42 @@
 
     Inst.prototype.renderList = function () {
         if (!this.list) return;
-        var q = this.query, html = '', pos = 0, sel = this.sel, self = this;
+        var q = (this.query || '').trim().toLowerCase();
+        var words = q ? q.split(/\s+/).filter(Boolean) : [];
+        var html = '', pos = 0, sel = this.sel, self = this;
         this.visible = [];
         var pendingGroup = null;
         this.options().forEach(function (item) {
             if (item.group !== undefined) { pendingGroup = item.group; return; }
-            var o = item.opt, text = o.getAttribute('data-label') || o.text;
-            if (q && text.toLowerCase().indexOf(q) === -1) return;
+            var o = item.opt;
+            var text = (o.getAttribute('data-label') || o.text || '').trim();
+            var val = (o.value || '').trim();
+            var hint = (o.getAttribute('data-hint') || '').trim();
+            var searchTerms = (o.getAttribute('data-search-terms') || '').trim();
+
+            if (words.length > 0) {
+                var searchTarget = (text + ' ' + val + ' ' + hint + ' ' + searchTerms).toLowerCase();
+                var matches = words.every(function (w) { return searchTarget.indexOf(w) !== -1; });
+                if (!matches) return;
+            }
+
             if (pendingGroup !== null) { html += '<li class="fx-sel-group" role="presentation">' + esc(pendingGroup) + '</li>'; pendingGroup = null; }
             var selected = o.index === sel.selectedIndex;
             var label = esc(text);
-            if (q) {
+            if (q && text.toLowerCase().indexOf(q) !== -1) {
                 var i = text.toLowerCase().indexOf(q);
                 label = esc(text.slice(0, i)) + '<mark>' + esc(text.slice(i, i + q.length)) + '</mark>' + esc(text.slice(i + q.length));
             }
-            var hint = o.getAttribute('data-hint');
             html += '<li role="option" data-i="' + o.index + '" data-pos="' + pos + '" class="fx-sel-opt' + (selected ? ' is-selected' : '') + (item.disabled ? ' is-disabled' : '') + (item.grouped ? ' is-grouped' : '') + (o.value === '' ? ' is-placeholder' : '') + '" aria-selected="' + selected + '"' + (item.disabled ? ' aria-disabled="true"' : '') + '>' +
                 '<span class="fx-sel-text">' + (label || '&nbsp;') + (hint ? '<small>' + esc(hint) + '</small>' : '') + '</span><span class="fx-sel-check">' + CHECK + '</span></li>';
             self.visible.push(o.index);
             pos++;
         });
+        if (!pos) html = '<li class="fx-sel-empty">' + esc(tr('No matches')) + '</li>';
+        this.list.innerHTML = html;
+        var cur = this.visible.indexOf(sel.selectedIndex);
+        this.setActive(cur === -1 ? 0 : cur, true);
+    };
         if (!pos) html = '<li class="fx-sel-empty">' + esc(tr('No matches')) + '</li>';
         this.list.innerHTML = html;
         var cur = this.visible.indexOf(sel.selectedIndex);
