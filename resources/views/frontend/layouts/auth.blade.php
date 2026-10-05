@@ -22,7 +22,46 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/bold/style.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css">
-    <link rel="stylesheet" href="{{ asset('assets/front/store.css') }}?v=3">
+    @php
+        $sysSettings = \App\Models\Setting::getAllSettings();
+        $fBrandPri   = $sysSettings['front_brand_primary'] ?? '#059669';
+        $fBrandHov   = $sysSettings['front_brand_hover'] ?? '#047857';
+        $fBrandLt    = $sysSettings['front_brand_light'] ?? '#ecfdf5';
+        $fAccent     = $sysSettings['front_accent_color'] ?? '#10b981';
+        $fBtnPriBg   = $sysSettings['front_btn_primary_bg'] ?? $fBrandPri;
+        $fBtnPriTxt  = $sysSettings['front_btn_primary_text'] ?? '#ffffff';
+        $fBtnPriHov  = $sysSettings['front_btn_primary_hover'] ?? $fBrandHov;
+
+        $fdBrandPri  = $sysSettings['front_dark_brand_primary'] ?? '#34d399';
+        $fdBrandHov  = $sysSettings['front_dark_brand_hover'] ?? '#6ee7b7';
+        $fdBrandLt   = $sysSettings['front_dark_brand_light'] ?? '#064e3b';
+        $fdAccent    = $sysSettings['front_dark_accent_color'] ?? '#10b981';
+        $fdBtnPriBg  = $sysSettings['front_dark_btn_primary_bg'] ?? '#059669';
+        $fdBtnPriTxt = $sysSettings['front_dark_btn_primary_text'] ?? '#ffffff';
+        $fdBtnPriHov = $sysSettings['front_dark_btn_primary_hover'] ?? '#10b981';
+    @endphp
+
+    <link rel="stylesheet" href="{{ asset('assets/front/store.css') }}?v=5">
+    <style>
+        :root {
+            --fx-brand-primary: {{ $fBrandPri }};
+            --fx-brand-hover: {{ $fBrandHov }};
+            --fx-brand-light: {{ $fBrandLt }};
+            --fx-accent-color: {{ $fAccent }};
+            --fx-btn-primary-bg: {{ $fBtnPriBg }};
+            --fx-btn-primary-hover: {{ $fBtnPriHov }};
+            --fx-btn-primary-text: {{ $fBtnPriTxt }};
+        }
+        html.dark {
+            --fx-brand-primary: {{ $fdBrandPri }};
+            --fx-brand-hover: {{ $fdBrandHov }};
+            --fx-brand-light: {{ $fdBrandLt }};
+            --fx-accent-color: {{ $fdAccent }};
+            --fx-btn-primary-bg: {{ $fdBtnPriBg }};
+            --fx-btn-primary-hover: {{ $fdBtnPriHov }};
+            --fx-btn-primary-text: {{ $fdBtnPriTxt }};
+        }
+    </style>
     @stack('styles')
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -32,8 +71,32 @@
             theme: {
                 extend: {
                     colors: {
-                        brand: { 50: '#ecfdf5', 100: '#d1fae5', 200: '#a7f3d0', 300: '#6ee7b7', 400: '#34d399', 500: '#10b981', 600: '#059669', 700: '#047857', 800: '#065f46', 900: '#064e3b', 950: '#022c22' },
-                        primary: { 50: '#ecfdf5', 100: '#d1fae5', 200: '#a7f3d0', 300: '#6ee7b7', 400: '#34d399', 500: '#10b981', 600: '#059669', 700: '#047857', 800: '#065f46', 900: '#064e3b', 950: '#022c22' }
+                        brand: {
+                            50: '{{ $fBrandLt }}',
+                            100: 'color-mix(in srgb, {{ $fBrandPri }} 15%, #ffffff)',
+                            200: 'color-mix(in srgb, {{ $fBrandPri }} 30%, #ffffff)',
+                            300: 'color-mix(in srgb, {{ $fBrandPri }} 50%, #ffffff)',
+                            400: 'color-mix(in srgb, {{ $fBrandPri }} 75%, #ffffff)',
+                            500: '{{ $fAccent }}',
+                            600: '{{ $fBrandPri }}',
+                            700: '{{ $fBrandHov }}',
+                            800: 'color-mix(in srgb, {{ $fBrandPri }} 80%, #000000)',
+                            900: 'color-mix(in srgb, {{ $fBrandPri }} 60%, #000000)',
+                            950: 'color-mix(in srgb, {{ $fBrandPri }} 40%, #000000)',
+                        },
+                        primary: {
+                            50: '{{ $fBrandLt }}',
+                            100: 'color-mix(in srgb, {{ $fBrandPri }} 15%, #ffffff)',
+                            200: 'color-mix(in srgb, {{ $fBrandPri }} 30%, #ffffff)',
+                            300: 'color-mix(in srgb, {{ $fBrandPri }} 50%, #ffffff)',
+                            400: 'color-mix(in srgb, {{ $fBrandPri }} 75%, #ffffff)',
+                            500: '{{ $fAccent }}',
+                            600: '{{ $fBrandPri }}',
+                            700: '{{ $fBrandHov }}',
+                            800: 'color-mix(in srgb, {{ $fBrandPri }} 80%, #000000)',
+                            900: 'color-mix(in srgb, {{ $fBrandPri }} 60%, #000000)',
+                            950: 'color-mix(in srgb, {{ $fBrandPri }} 40%, #000000)',
+                        }
                     },
                     fontFamily: {
                         sans: ['"Plus Jakarta Sans"', '"Hind Vadodara"', 'system-ui', 'sans-serif']

@@ -5,17 +5,31 @@
    drawers, safe areas and print rules. Dark mode = `html.dark`.
    ========================================================================== */
 :root {
-    --fx-brand-50: var(--fx-brand-light, #eff6ff);
-    --fx-brand-100: color-mix(in srgb, var(--fx-brand-primary, #2563eb) 15%, #ffffff);
-    --fx-brand-500: var(--fx-accent-color, #3b82f6);
-    --fx-brand-600: var(--fx-brand-primary, #2563eb);
-    --fx-brand-700: var(--fx-brand-hover, #1d4ed8);
+    --fx-brand-primary: #059669;
+    --fx-brand-hover: #047857;
+    --fx-brand-light: #ecfdf5;
+    --fx-accent-color: #10b981;
+    --fx-btn-primary-bg: #059669;
+    --fx-btn-primary-hover: #047857;
+    --fx-btn-primary-text: #ffffff;
+    --fx-brand-50: var(--fx-brand-light, #ecfdf5);
+    --fx-brand-100: color-mix(in srgb, var(--fx-brand-primary, #059669) 15%, #ffffff);
+    --fx-brand-500: var(--fx-accent-color, #10b981);
+    --fx-brand-600: var(--fx-brand-primary, #059669);
+    --fx-brand-700: var(--fx-brand-hover, #047857);
     --fx-bg: #f6f8f7; --fx-surface: #ffffff; --fx-surface-2: #f8fafc;
     --fx-border: #e2e8f0; --fx-text: #0f172a; --fx-muted: #64748b;
     --fx-tabbar-h: 64px;
     color-scheme: light;
 }
 html.dark {
+    --fx-brand-primary: #34d399;
+    --fx-brand-hover: #6ee7b7;
+    --fx-brand-light: #064e3b;
+    --fx-accent-color: #10b981;
+    --fx-btn-primary-bg: #059669;
+    --fx-btn-primary-hover: #10b981;
+    --fx-btn-primary-text: #ffffff;
     --fx-bg: #020617; --fx-surface: #0f172a; --fx-surface-2: #111c31;
     --fx-border: #1e293b; --fx-text: #f1f5f9; --fx-muted: #94a3b8;
     color-scheme: dark;

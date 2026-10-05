@@ -49,12 +49,12 @@
         <div>
             <div class="flex items-center justify-between mb-1.5">
                 <label for="password" class="fx-label !mb-0">Password</label>
-                <a href="{{ route('password.forgot') }}" class="text-[12px] font-bold text-brand-700 dark:text-brand-400 hover:underline">Forgot password?</a>
+                <a href="{{ route('password.forgot') }}" class="text-[12px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline">Forgot password?</a>
             </div>
             <div class="relative">
                 <i class="ph ph-lock-simple absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg pointer-events-none"></i>
                 <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="••••••••"
-                       class="fx-input !h-12 !pl-11 !pr-12 @error('password') is-invalid @enderror">
+                       class="fx-input !h-12 !pl-11 !pr-12 focus:!border-emerald-500 focus:!ring-emerald-500/20 @error('password') is-invalid @enderror">
                 <button type="button" data-toggle-password="password" class="absolute right-1.5 top-1/2 -translate-y-1/2 w-9 h-9 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 flex items-center justify-center" aria-label="Show password" aria-pressed="false">
                     <i class="ph ph-eye text-lg"></i>
                 </button>
@@ -64,12 +64,14 @@
         </div>
 
         <label class="flex items-center gap-2.5 cursor-pointer select-none">
-            <input type="checkbox" name="remember" class="w-4 h-4 rounded accent-emerald-600" {{ old('remember') ? 'checked' : '' }}>
+            <input type="checkbox" name="remember" class="w-4 h-4 rounded text-emerald-600 accent-emerald-600 cursor-pointer" {{ old('remember') ? 'checked' : '' }}>
             <span class="text-[13px] font-semibold text-slate-600 dark:text-slate-300">Keep me signed in</span>
         </label>
 
-        <button type="submit" class="fx-btn fx-btn-primary fx-btn-lg w-full !h-12">
-            <i class="ph-bold ph-sign-in"></i><span>Sign in to dashboard</span>
+        <button type="submit" class="w-full h-12 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:from-emerald-700 active:to-teal-700 text-white font-extrabold text-[14.5px] shadow-lg shadow-emerald-600/25 hover:shadow-emerald-600/35 transition-all duration-200 flex items-center justify-center gap-2 relative overflow-hidden group/btn">
+            <span class="absolute inset-0 w-1/2 h-full bg-white/20 skew-x-12 -translate-x-full group-hover/btn:translate-x-[300%] transition-transform duration-700 pointer-events-none"></span>
+            <i class="ph-bold ph-sign-in text-lg"></i>
+            <span>Sign in to dashboard</span>
         </button>
     </form>
 
@@ -77,7 +79,7 @@
     <div class="mt-6 rounded-2xl border border-dashed border-amber-300 dark:border-amber-500/40 bg-amber-50/70 dark:bg-amber-500/5 p-4">
         <div class="flex items-center justify-between gap-3">
             <p class="text-[12px] font-extrabold uppercase tracking-wider text-amber-700 dark:text-amber-300 flex items-center gap-1.5"><i class="ph-fill ph-key"></i>Demo credentials</p>
-            <button type="button" id="useDemoBtn" class="fx-btn fx-btn-sm bg-amber-500 hover:bg-amber-600 text-white">Use demo</button>
+            <button type="button" id="useDemoBtn" class="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-bold text-xs shadow-sm transition-all">Use demo</button>
         </div>
         <dl class="mt-3 grid grid-cols-[auto,1fr] gap-x-3 gap-y-1.5 text-[13px]">
             <dt class="text-slate-500 dark:text-slate-400">Email</dt><dd class="font-mono font-bold text-slate-800 dark:text-slate-100 break-all">superadmin@grocery.com</dd>
@@ -85,7 +87,7 @@
         </dl>
     </div>
 
-    <p class="mt-8 text-center text-[12px] text-slate-400">Not staff? <a href="{{ route('home') }}" class="font-bold text-slate-600 dark:text-slate-300 hover:text-brand-700">Return to the storefront</a></p>
+    <p class="mt-8 text-center text-[12px] text-slate-400">Not staff? <a href="{{ route('home') }}" class="font-bold text-emerald-600 dark:text-emerald-400 hover:underline">Return to the storefront</a></p>
 @endsection
 
 @push('scripts')

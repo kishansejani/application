@@ -133,6 +133,15 @@ class CheckoutController extends Controller
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
             'notes' => 'nullable|string',
+        ], [
+            'customer_name.required' => __('messages.validation.name_required') ?: 'Please enter your full name.',
+            'customer_phone.required' => __('messages.validation.phone_required') ?: 'Please enter your 10-digit mobile number.',
+            'customer_phone.regex' => __('messages.validation.phone_invalid') ?: 'Please enter a valid 10-digit mobile number.',
+            'house_no.required_without' => __('messages.validation.house_required') ?: 'Please enter your House / Flat / Building number.',
+            'street_address.required_without' => __('messages.validation.street_required') ?: 'Please enter your Street / Area / Locality.',
+            'city.required_without' => __('messages.validation.city_required') ?: 'Please enter your City.',
+            'pincode.required_without' => __('messages.validation.pincode_required') ?: 'Please enter a valid 6-digit Pincode.',
+            'pincode.regex' => __('messages.validation.pincode_invalid') ?: 'Pincode must be exactly 6 digits.',
         ]);
 
         $cartItems = $this->getCartItems();

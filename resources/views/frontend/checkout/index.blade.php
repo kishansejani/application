@@ -26,7 +26,7 @@
         <span class="hidden sm:inline-flex items-center gap-1.5 text-[12px] font-semibold text-slate-500 dark:text-slate-400"><i class="ph-fill ph-lock-simple text-emerald-500"></i>{{ $gu ? 'સુરક્ષિત ચેકઆઉટ' : 'Secure checkout' }}</span>
     </div>
 
-    <form id="checkoutForm" action="{{ route('checkout.place_order') }}" method="POST" data-loading>
+    <form id="checkoutForm" action="{{ route('checkout.place_order') }}" method="POST" data-loading novalidate>
         @csrf
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-8 items-start">
@@ -56,7 +56,8 @@
                         <div>
                             <label for="customer_name" class="fx-label">{{ $gu ? 'પૂરું નામ' : 'Full name' }} <span class="text-rose-500">*</span></label>
                             <input type="text" id="customer_name" name="customer_name" value="{{ old('customer_name', Auth::user()?->name) }}" required autocomplete="name" placeholder="{{ __('messages.ph_name') }}" class="fx-input @error('customer_name') is-invalid @enderror">
-                            @error('customer_name')<p class="text-xs font-semibold text-rose-600 mt-1">{{ $message }}</p>@enderror
+                            <p id="err_customer_name" class="text-xs font-semibold text-rose-600 dark:text-rose-400 mt-1.5 flex items-center gap-1 hidden"><i class="ph-fill ph-warning-circle"></i><span></span></p>
+                            @error('customer_name')<p class="text-xs font-semibold text-rose-600 dark:text-rose-400 mt-1.5 flex items-center gap-1"><i class="ph-fill ph-warning-circle"></i>{{ $message }}</p>@enderror
                         </div>
                         <div>
                             <label for="customer_phone" class="fx-label">{{ $gu ? '૧૦ અંકનો મોબાઇલ નંબર' : '10-digit mobile number' }} <span class="text-rose-500">*</span></label>
@@ -64,7 +65,8 @@
                                 <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[13px] font-bold text-slate-400">+91</span>
                                 <input type="tel" id="customer_phone" name="customer_phone" value="{{ old('customer_phone', Auth::user()?->phone) }}" required pattern="[0-9]{10}" inputmode="numeric" maxlength="10" autocomplete="tel-national" placeholder="9876543210" class="fx-input !pl-12 font-mono @error('customer_phone') is-invalid @enderror">
                             </div>
-                            @error('customer_phone')<p class="text-xs font-semibold text-rose-600 mt-1">{{ $message }}</p>@enderror
+                            <p id="err_customer_phone" class="text-xs font-semibold text-rose-600 dark:text-rose-400 mt-1.5 flex items-center gap-1 hidden"><i class="ph-fill ph-warning-circle"></i><span></span></p>
+                            @error('customer_phone')<p class="text-xs font-semibold text-rose-600 dark:text-rose-400 mt-1.5 flex items-center gap-1"><i class="ph-fill ph-warning-circle"></i>{{ $message }}</p>@enderror
                         </div>
                     </div>
                 </section>
@@ -106,11 +108,15 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label for="inputHouseNo" class="fx-label">{{ __('messages.house_no') }} <span class="text-rose-500">*</span></label>
-                                <input type="text" id="inputHouseNo" name="house_no" value="{{ old('house_no') }}" placeholder="{{ __('messages.ph_house') }}" class="fx-input" data-new-required>
+                                <input type="text" id="inputHouseNo" name="house_no" value="{{ old('house_no') }}" placeholder="{{ __('messages.ph_house') }}" class="fx-input @error('house_no') is-invalid @enderror" data-new-required>
+                                <p id="err_inputHouseNo" class="text-xs font-semibold text-rose-600 dark:text-rose-400 mt-1.5 flex items-center gap-1 hidden"><i class="ph-fill ph-warning-circle"></i><span></span></p>
+                                @error('house_no')<p class="text-xs font-semibold text-rose-600 dark:text-rose-400 mt-1.5 flex items-center gap-1"><i class="ph-fill ph-warning-circle"></i>{{ $message }}</p>@enderror
                             </div>
                             <div>
                                 <label for="inputStreet" class="fx-label">{{ __('messages.street_address') }} <span class="text-rose-500">*</span></label>
-                                <input type="text" id="inputStreet" name="street_address" value="{{ old('street_address') }}" placeholder="{{ __('messages.ph_street') }}" class="fx-input" data-new-required>
+                                <input type="text" id="inputStreet" name="street_address" value="{{ old('street_address') }}" placeholder="{{ __('messages.ph_street') }}" class="fx-input @error('street_address') is-invalid @enderror" data-new-required>
+                                <p id="err_inputStreet" class="text-xs font-semibold text-rose-600 dark:text-rose-400 mt-1.5 flex items-center gap-1 hidden"><i class="ph-fill ph-warning-circle"></i><span></span></p>
+                                @error('street_address')<p class="text-xs font-semibold text-rose-600 dark:text-rose-400 mt-1.5 flex items-center gap-1"><i class="ph-fill ph-warning-circle"></i>{{ $message }}</p>@enderror
                             </div>
                             <div>
                                 <label for="inputLandmark" class="fx-label">{{ __('messages.landmark') }}</label>
@@ -118,11 +124,15 @@
                             </div>
                             <div>
                                 <label for="inputCity" class="fx-label">{{ __('messages.city') }} <span class="text-rose-500">*</span></label>
-                                <input type="text" id="inputCity" name="city" value="{{ old('city', 'Ahmedabad') }}" class="fx-input" data-new-required>
+                                <input type="text" id="inputCity" name="city" value="{{ old('city', 'Ahmedabad') }}" class="fx-input @error('city') is-invalid @enderror" data-new-required>
+                                <p id="err_inputCity" class="text-xs font-semibold text-rose-600 dark:text-rose-400 mt-1.5 flex items-center gap-1 hidden"><i class="ph-fill ph-warning-circle"></i><span></span></p>
+                                @error('city')<p class="text-xs font-semibold text-rose-600 dark:text-rose-400 mt-1.5 flex items-center gap-1"><i class="ph-fill ph-warning-circle"></i>{{ $message }}</p>@enderror
                             </div>
                             <div>
                                 <label for="inputPincode" class="fx-label">{{ __('messages.pincode') }} <span class="text-rose-500">*</span></label>
-                                <input type="text" id="inputPincode" name="pincode" value="{{ old('pincode', '380054') }}" pattern="[0-9]{6}" inputmode="numeric" maxlength="6" class="fx-input font-mono" data-new-required>
+                                <input type="text" id="inputPincode" name="pincode" value="{{ old('pincode', '380054') }}" pattern="[0-9]{6}" inputmode="numeric" maxlength="6" class="fx-input font-mono @error('pincode') is-invalid @enderror" data-new-required>
+                                <p id="err_inputPincode" class="text-xs font-semibold text-rose-600 dark:text-rose-400 mt-1.5 flex items-center gap-1 hidden"><i class="ph-fill ph-warning-circle"></i><span></span></p>
+                                @error('pincode')<p class="text-xs font-semibold text-rose-600 dark:text-rose-400 mt-1.5 flex items-center gap-1"><i class="ph-fill ph-warning-circle"></i>{{ $message }}</p>@enderror
                             </div>
                             <div>
                                 <label for="inputAddrType" class="fx-label">{{ __('messages.address_type') }}</label>
@@ -265,11 +275,121 @@
 @push('scripts')
 @php
     $ckT = $gu
-        ? ['enter' => 'કૃપા કરીને કૂપન કોડ દાખલ કરો', 'invalid' => 'અમાન્ય કૂપન કોડ', 'removed' => 'કૂપન દૂર કર્યું', 'not_found' => 'નકશા પર સ્થાન મળ્યું નહીં', 'gps' => 'GPS સ્થાન પિન થયું!', 'gps_fail' => 'સ્થાન મેળવી શકાયું નહીં', 'confirmed' => 'સ્થાન કન્ફર્મ થયું અને સરનામું અપડેટ થયું!']
-        : ['enter' => 'Please enter a coupon code', 'invalid' => 'Invalid coupon code', 'removed' => 'Coupon removed', 'not_found' => 'Location not found on map', 'gps' => 'GPS location pinned!', 'gps_fail' => 'Could not get your location', 'confirmed' => 'Map location confirmed & address updated!'];
+        ? [
+            'enter' => 'કૃપા કરીને કૂપન કોડ દાખલ કરો',
+            'invalid' => 'અમાન્ય કૂપન કોડ',
+            'removed' => 'કૂપન દૂર કર્યું',
+            'not_found' => 'નકશા પર સ્થાન મળ્યું નહીં',
+            'gps' => 'GPS સ્થાન પિન થયું!',
+            'gps_fail' => 'સ્થાન મેળવી શકાયું નહીં',
+            'confirmed' => 'સ્થાન કન્ફર્મ થયું અને સરનામું અપડેટ થયું!',
+            'err_name' => 'કૃપા કરીને પૂરું નામ દાખલ કરો.',
+            'err_phone' => 'કૃપા કરીને માન્ય ૧૦ અંકનો મોબાઇલ નંબર દાખલ કરો.',
+            'err_house' => 'કૃપા કરીને ફ્લેટ / મકાન / બિલ્ડિંગ નંબર દાખલ કરો.',
+            'err_street' => 'કૃપા કરીને શેરી / વિસ્તાર / સોસાયટીનું નામ દાખલ કરો.',
+            'err_city' => 'કૃપા કરીને શહેરનું નામ દાખલ કરો.',
+            'err_pincode' => 'કૃપા કરીને ૬ અંકનો પિનકોડ દાખલ કરો.',
+            'err_summary' => 'કૃપા કરીને જરૂરી વિગતો યોગ્ય રીતે ભરો.'
+          ]
+        : [
+            'enter' => 'Please enter a coupon code',
+            'invalid' => 'Invalid coupon code',
+            'removed' => 'Coupon removed',
+            'not_found' => 'Location not found on map',
+            'gps' => 'GPS location pinned!',
+            'gps_fail' => 'Could not get your location',
+            'confirmed' => 'Map location confirmed & address updated!',
+            'err_name' => 'Please enter your full name.',
+            'err_phone' => 'Please enter a valid 10-digit mobile number.',
+            'err_house' => 'Please enter House / Flat / Building No.',
+            'err_street' => 'Please enter Street / Area / Locality.',
+            'err_city' => 'Please enter City.',
+            'err_pincode' => 'Please enter a valid 6-digit Pincode.',
+            'err_summary' => 'Please fill all required delivery details.'
+          ];
 @endphp
 <script>
     const CK_T = @json($ckT);
+
+    // ---------- Client-Side Form Validation ----------
+    $('#checkoutForm').on('submit', function (e) {
+        let isValid = true;
+        let firstInvalid = null;
+
+        function markError(el, msg) {
+            const $el = $(el);
+            $el.addClass('is-invalid');
+            const errId = 'err_' + $el.attr('id');
+            const $err = $('#' + errId);
+            if ($err.length) {
+                $err.find('span').text(msg);
+                $err.removeClass('hidden');
+            }
+            if (!firstInvalid) firstInvalid = $el;
+            isValid = false;
+        }
+
+        // Reset previous errors
+        $('.is-invalid').removeClass('is-invalid');
+        $('[id^="err_"]').addClass('hidden');
+
+        // 1. Customer Name
+        const name = ($('#customer_name').val() || '').trim();
+        if (!name || name.length < 2) {
+            markError('#customer_name', CK_T.err_name);
+        }
+
+        // 2. Customer Phone (10 digits)
+        const phone = ($('#customer_phone').val() || '').trim();
+        if (!phone || !/^[6-9][0-9]{9}$/.test(phone)) {
+            markError('#customer_phone', CK_T.err_phone);
+        }
+
+        // 3. Delivery Address (if manual/new is active)
+        const hasSavedSelected = $('input[name="selected_address_id"]:checked').length && $('input[name="selected_address_id"]:checked').val() !== '';
+        if (!hasSavedSelected) {
+            const house = ($('#inputHouseNo').val() || '').trim();
+            if (!house) {
+                markError('#inputHouseNo', CK_T.err_house);
+            }
+
+            const street = ($('#inputStreet').val() || '').trim();
+            if (!street) {
+                markError('#inputStreet', CK_T.err_street);
+            }
+
+            const city = ($('#inputCity').val() || '').trim();
+            if (!city) {
+                markError('#inputCity', CK_T.err_city);
+            }
+
+            const pincode = ($('#inputPincode').val() || '').trim();
+            if (!pincode || !/^[0-9]{6}$/.test(pincode)) {
+                markError('#inputPincode', CK_T.err_pincode);
+            }
+        }
+
+        if (!isValid) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            if (typeof toastr !== 'undefined') {
+                toastr.error(CK_T.err_summary);
+            }
+            if (firstInvalid) {
+                $('html, body').animate({
+                    scrollTop: firstInvalid.offset().top - 120
+                }, 350);
+                firstInvalid.focus();
+            }
+            return false;
+        }
+    });
+
+    // Real-time error removal on typing
+    $(document).on('input change', 'input, select, textarea', function () {
+        $(this).removeClass('is-invalid');
+        $('#err_' + $(this).attr('id')).addClass('hidden');
+    });
 
     // ---------- Address mode (saved vs new) ----------
     function syncAddressMode() {
