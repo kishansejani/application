@@ -76,9 +76,153 @@
     <!-- Leaflet (map address picker) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 
-    <!-- Storefront components (loaded before Tailwind so utilities win) -->
-    <link rel="stylesheet" href="{{ asset('assets/shared/fx-select.css') }}?v=2.2.0">
-    <link rel="stylesheet" href="{{ asset('assets/front/store.css') }}?v=4">
+    @php
+        $sysSettings = \App\Models\Setting::getAllSettings();
+        
+        // Light mode colors
+        $fBrandPri   = $sysSettings['front_brand_primary'] ?? '#059669';
+        $fBrandHov   = $sysSettings['front_brand_hover'] ?? '#047857';
+        $fBrandLt    = $sysSettings['front_brand_light'] ?? '#ecfdf5';
+        $fAccent     = $sysSettings['front_accent_color'] ?? '#10b981';
+        $fBtnPriBg   = $sysSettings['front_btn_primary_bg'] ?? '#059669';
+        $fBtnPriTxt  = $sysSettings['front_btn_primary_text'] ?? '#ffffff';
+        $fBtnPriHov  = $sysSettings['front_btn_primary_hover'] ?? '#047857';
+        $fBtnAccBg   = $sysSettings['front_btn_accent_bg'] ?? '#10b981';
+        $fBtnAccTxt  = $sysSettings['front_btn_accent_text'] ?? '#ffffff';
+        $fTopBg      = $sysSettings['front_topbar_bg'] ?? '#064e3b';
+        $fTopTxt     = $sysSettings['front_topbar_text'] ?? '#ecfdf5';
+        $fHeadBg     = $sysSettings['front_header_bg'] ?? '#ffffff';
+        $fBodyBg     = $sysSettings['front_body_bg'] ?? '#f6f8f7';
+        $fCardBg     = $sysSettings['front_card_bg'] ?? '#ffffff';
+        $fCardBrd    = $sysSettings['front_card_border'] ?? '#e2e8f0';
+        $fFootBg     = $sysSettings['front_footer_bg'] ?? '#0f172a';
+        $fFootTxt    = $sysSettings['front_footer_text'] ?? '#94a3b8';
+        $fTxtPri     = $sysSettings['front_text_primary'] ?? '#0f172a';
+        $fTxtMut     = $sysSettings['front_text_muted'] ?? '#64748b';
+        $fInpBg      = $sysSettings['front_input_bg'] ?? '#ffffff';
+        $fInpBrd     = $sysSettings['front_input_border'] ?? '#cbd5e1';
+        $fDropBg     = $sysSettings['front_dropdown_bg'] ?? '#ffffff';
+
+        // Dark mode colors
+        $fdBrandPri  = $sysSettings['front_dark_brand_primary'] ?? '#34d399';
+        $fdBrandHov  = $sysSettings['front_dark_brand_hover'] ?? '#6ee7b7';
+        $fdBrandLt   = $sysSettings['front_dark_brand_light'] ?? '#064e3b';
+        $fdAccent    = $sysSettings['front_dark_accent_color'] ?? '#10b981';
+        $fdBtnPriBg  = $sysSettings['front_dark_btn_primary_bg'] ?? '#059669';
+        $fdBtnPriTxt = $sysSettings['front_dark_btn_primary_text'] ?? '#ffffff';
+        $fdBtnPriHov = $sysSettings['front_dark_btn_primary_hover'] ?? '#10b981';
+        $fdBodyBg    = $sysSettings['front_dark_body_bg'] ?? '#020617';
+        $fdCardBg    = $sysSettings['front_dark_card_bg'] ?? '#0f172a';
+        $fdCardBrd   = $sysSettings['front_dark_card_border'] ?? '#1e293b';
+        $fdHeadBg    = $sysSettings['front_dark_header_bg'] ?? '#0b1120';
+        $fdTopBg     = $sysSettings['front_dark_topbar_bg'] ?? '#020617';
+        $fdTopTxt    = $sysSettings['front_dark_topbar_text'] ?? '#94a3b8';
+        $fdFootBg    = $sysSettings['front_dark_footer_bg'] ?? '#020617';
+        $fdFootTxt   = $sysSettings['front_dark_footer_text'] ?? '#64748b';
+        $fdTxtPri    = $sysSettings['front_dark_text_primary'] ?? '#f1f5f9';
+        $fdTxtMut    = $sysSettings['front_dark_text_muted'] ?? '#94a3b8';
+        $fdInpBg     = $sysSettings['front_dark_input_bg'] ?? '#0b1324';
+        $fdInpBrd    = $sysSettings['front_dark_input_border'] ?? '#334155';
+        $fdDropBg    = $sysSettings['front_dark_dropdown_bg'] ?? '#0f172a';
+    @endphp
+
+    <!-- Storefront components (loaded before inline style overrides and Tailwind) -->
+    <link rel="stylesheet" href="{{ asset('assets/shared/fx-select.css') }}?v=4.0.0">
+    <link rel="stylesheet" href="{{ asset('assets/front/store.css') }}?v=5.0.0">
+
+    <style>
+        :root {
+            --fx-brand-primary: {{ $fBrandPri }};
+            --fx-brand-hover: {{ $fBrandHov }};
+            --fx-brand-light: {{ $fBrandLt }};
+            --fx-accent-color: {{ $fAccent }};
+            --fx-btn-primary-bg: {{ $fBtnPriBg }};
+            --fx-btn-primary-text: {{ $fBtnPriTxt }};
+            --fx-btn-primary-hover: {{ $fBtnPriHov }};
+            --fx-btn-accent-bg: {{ $fBtnAccBg }};
+            --fx-btn-accent-text: {{ $fBtnAccTxt }};
+            --fx-topbar-bg: {{ $fTopBg }};
+            --fx-topbar-text: {{ $fTopTxt }};
+            --fx-header-bg: {{ $fHeadBg }};
+            --fx-body-bg: {{ $fBodyBg }};
+            --fx-card-bg: {{ $fCardBg }};
+            --fx-card-border: {{ $fCardBrd }};
+            --fx-footer-bg: {{ $fFootBg }};
+            --fx-footer-text: {{ $fFootTxt }};
+            --fx-text-primary: {{ $fTxtPri }};
+            --fx-text-muted: {{ $fTxtMut }};
+            --fx-input-bg: {{ $fInpBg }};
+            --fx-input-border: {{ $fInpBrd }};
+            --fx-dropdown-bg: {{ $fDropBg }};
+
+            /* Core storefront component bindings */
+            --fx-bg: var(--fx-body-bg);
+            --fx-surface: var(--fx-card-bg);
+            --fx-surface-2: var(--fx-brand-light);
+            --fx-border: var(--fx-card-border);
+            --fx-text: var(--fx-text-primary);
+            --fx-muted: var(--fx-text-muted);
+            --fx-brand-50: var(--fx-brand-light);
+            --fx-brand-100: color-mix(in srgb, var(--fx-brand-primary) 15%, #ffffff);
+            --fx-brand-500: var(--fx-accent-color);
+            --fx-brand-600: var(--fx-brand-primary);
+            --fx-brand-700: var(--fx-brand-hover);
+            --btn-accent-bg: var(--fx-btn-accent-bg);
+
+            /* FxSelect dropdown bindings */
+            --fxs-accent: var(--fx-brand-primary);
+            --fxs-accent-text: var(--fx-brand-hover);
+            --fxs-accent-soft: color-mix(in srgb, var(--fx-brand-primary) 12%, transparent);
+            --fxs-accent-ring: color-mix(in srgb, var(--fx-brand-primary) 22%, transparent);
+            --fxs-panel-bg: var(--fx-dropdown-bg);
+        }
+
+        html.dark {
+            --fx-brand-primary: {{ $fdBrandPri }};
+            --fx-brand-hover: {{ $fdBrandHov }};
+            --fx-brand-light: {{ $fdBrandLt }};
+            --fx-accent-color: {{ $fdAccent }};
+            --fx-btn-primary-bg: {{ $fdBtnPriBg }};
+            --fx-btn-primary-text: {{ $fdBtnPriTxt }};
+            --fx-btn-primary-hover: {{ $fdBtnPriHov }};
+            --fx-btn-accent-bg: {{ $fdBtnPriBg }};
+            --fx-btn-accent-text: {{ $fdBtnPriTxt }};
+            --fx-topbar-bg: {{ $fdTopBg }};
+            --fx-topbar-text: {{ $fdTopTxt }};
+            --fx-header-bg: {{ $fdHeadBg }};
+            --fx-body-bg: {{ $fdBodyBg }};
+            --fx-card-bg: {{ $fdCardBg }};
+            --fx-card-border: {{ $fdCardBrd }};
+            --fx-footer-bg: {{ $fdFootBg }};
+            --fx-footer-text: {{ $fdFootTxt }};
+            --fx-text-primary: {{ $fdTxtPri }};
+            --fx-text-muted: {{ $fdTxtMut }};
+            --fx-input-bg: {{ $fdInpBg }};
+            --fx-input-border: {{ $fdInpBrd }};
+            --fx-dropdown-bg: {{ $fdDropBg }};
+
+            /* Dark storefront component bindings */
+            --fx-bg: var(--fx-body-bg);
+            --fx-surface: var(--fx-card-bg);
+            --fx-surface-2: rgba(30, 41, 59, 0.6);
+            --fx-border: var(--fx-card-border);
+            --fx-text: var(--fx-text-primary);
+            --fx-muted: var(--fx-text-muted);
+            --fx-brand-50: var(--fx-brand-light);
+            --fx-brand-100: color-mix(in srgb, var(--fx-brand-primary) 20%, #0f172a);
+            --fx-brand-500: var(--fx-accent-color);
+            --fx-brand-600: var(--fx-brand-primary);
+            --fx-brand-700: var(--fx-brand-hover);
+            --btn-accent-bg: var(--fx-brand-primary);
+
+            /* FxSelect dark dropdown bindings */
+            --fxs-accent: var(--fx-brand-primary);
+            --fxs-accent-text: var(--fx-brand-primary);
+            --fxs-accent-soft: color-mix(in srgb, var(--fx-brand-primary) 18%, transparent);
+            --fxs-accent-ring: color-mix(in srgb, var(--fx-brand-primary) 30%, transparent);
+            --fxs-panel-bg: var(--fx-dropdown-bg);
+        }
+    </style>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -90,8 +234,25 @@
             theme: {
                 extend: {
                     colors: {
-                        brand: { 50: '#ecfdf5', 100: '#d1fae5', 200: '#a7f3d0', 300: '#6ee7b7', 400: '#34d399', 500: '#10b981', 600: '#059669', 700: '#047857', 800: '#065f46', 900: '#064e3b', 950: '#022c22' },
-                        primary: { 50: '#ecfdf5', 100: '#d1fae5', 200: '#a7f3d0', 300: '#6ee7b7', 400: '#34d399', 500: '#10b981', 600: '#059669', 700: '#047857', 800: '#065f46', 900: '#064e3b', 950: '#022c22' }
+                        brand: {
+                            50: 'var(--fx-brand-light, #ecfdf5)',
+                            100: 'color-mix(in srgb, var(--fx-brand-primary, #059669) 15%, #ffffff)',
+                            200: 'color-mix(in srgb, var(--fx-brand-primary, #059669) 30%, #ffffff)',
+                            300: 'color-mix(in srgb, var(--fx-brand-primary, #059669) 50%, #ffffff)',
+                            400: 'color-mix(in srgb, var(--fx-brand-primary, #059669) 75%, #ffffff)',
+                            500: 'var(--fx-accent-color, #10b981)',
+                            600: 'var(--fx-brand-primary, #059669)',
+                            700: 'var(--fx-brand-hover, #047857)',
+                            800: 'color-mix(in srgb, var(--fx-brand-primary, #059669) 80%, #000000)',
+                            900: 'color-mix(in srgb, var(--fx-brand-primary, #059669) 60%, #000000)',
+                            950: 'color-mix(in srgb, var(--fx-brand-primary, #059669) 40%, #000000)',
+                        },
+                        primary: {
+                            50: 'var(--fx-brand-light, #ecfdf5)',
+                            500: 'var(--fx-accent-color, #10b981)',
+                            600: 'var(--fx-brand-primary, #059669)',
+                            700: 'var(--fx-brand-hover, #047857)',
+                        }
                     },
                     fontFamily: {
                         sans: ['"Plus Jakarta Sans"', '"Hind Vadodara"', 'system-ui', 'sans-serif']
@@ -692,8 +853,8 @@
         </div>
     </div>
 
-    <!-- Back to top -->
-    <button type="button" id="fxBackToTop" class="fixed right-4 z-40 w-11 h-11 rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xl flex items-center justify-center opacity-0 pointer-events-none translate-y-3 transition-all fx-above-tabbar mb-4 lg:mb-6" aria-label="{{ $gu ? 'ઉપર જાઓ' : 'Back to top' }}">
+    <!-- Back to top (Positioned above the floating settings icon) -->
+    <button type="button" id="fxBackToTop" class="fixed right-7 z-40 w-11 h-11 rounded-full bg-brand-600 text-white hover:bg-brand-700 shadow-xl flex items-center justify-center opacity-0 pointer-events-none translate-y-3 transition-all fx-above-tabbar mb-24 lg:mb-28" aria-label="{{ $gu ? 'ઉપર જાઓ' : 'Back to top' }}">
         <i class="ph-bold ph-arrow-up text-lg"></i>
     </button>
 
@@ -701,7 +862,7 @@
 
     <!-- ===================== LIVE CUSTOMIZER WIDGET & DRAWER ===================== -->
     <!-- Floating Draggable Customizer Button -->
-    <div id="customizerWidget" class="customizer-widget" style="position:fixed;bottom:28px;right:28px;z-index:99999;touch-action:none;user-select:none;">
+    <div id="customizerWidget" class="customizer-widget" style="position:fixed;bottom:24px;right:24px;z-index:99999;touch-action:none;user-select:none;">
         <!-- Continuous Seamless Radar Aura Waves (No breaks) -->
         <div class="customizer-radar-wave wave-1"></div>
         <div class="customizer-radar-wave wave-2"></div>
@@ -719,7 +880,7 @@
             <!-- Header -->
             <div class="customizer-header">
                 <div class="flex items-center gap-2.5 font-black text-slate-800 dark:text-white text-base">
-                    <i class="ph-duotone ph-gear-six text-2xl text-emerald-600 dark:text-emerald-400"></i>
+                    <i class="ph-duotone ph-gear-six text-2xl text-brand-600 dark:text-brand-400"></i>
                     <span class="text-base font-extrabold tracking-tight">{{ __('messages.customizer') ?? 'Customizer' }}</span>
                 </div>
                 <button type="button" id="customizerClose" onclick="window.closeCustomizerDrawer && window.closeCustomizerDrawer()" class="customizer-close-btn" aria-label="Close Customizer">
@@ -765,7 +926,7 @@
                                 <span class="font-bold text-sm text-slate-900 dark:text-white">English</span>
                             </div>
                             @if(app()->getLocale() === 'en')
-                                <i class="ph-bold ph-check text-emerald-600 dark:text-emerald-400 text-base"></i>
+                                <i class="ph-bold ph-check text-brand-600 dark:text-brand-400 text-base"></i>
                             @endif
                         </a>
                         <a href="{{ route('lang.switch', 'gu') }}" class="customizer-lang-btn {{ app()->getLocale() === 'gu' ? 'is-active' : '' }}">
@@ -774,7 +935,7 @@
                                 <span class="font-bold text-sm text-slate-900 dark:text-white">ગુજરાતી (Gujarati)</span>
                             </div>
                             @if(app()->getLocale() === 'gu')
-                                <i class="ph-bold ph-check text-emerald-600 dark:text-emerald-400 text-base"></i>
+                                <i class="ph-bold ph-check text-brand-600 dark:text-brand-400 text-base"></i>
                             @endif
                         </a>
                     </div>
@@ -805,16 +966,17 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            cursor: grab;
         }
 
         .customizer-circle-btn {
             width: 52px;
             height: 52px;
             border-radius: 50%;
-            background: #1b5e52; /* Dark teal matching screenshot */
+            background: var(--fx-brand-primary, #2563eb);
             color: #ffffff;
-            border: 2px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 10px 25px rgba(27, 94, 82, 0.45), 0 4px 12px rgba(0, 0, 0, 0.25);
+            border: 2px solid rgba(255, 255, 255, 0.45);
+            box-shadow: 0 10px 25px color-mix(in srgb, var(--fx-brand-primary, #2563eb) 45%, transparent), 0 4px 12px rgba(0, 0, 0, 0.25);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -853,7 +1015,7 @@
             width: 52px;
             height: 52px;
             border-radius: 50%;
-            background: rgba(27, 94, 82, 0.5);
+            background: color-mix(in srgb, var(--fx-brand-primary, #2563eb) 50%, transparent);
             transform: translate(-50%, -50%);
             pointer-events: none;
             z-index: 1;
@@ -878,7 +1040,7 @@
             width: 52px;
             height: 52px;
             border-radius: 50%;
-            background: rgba(27, 94, 82, 0.45);
+            background: color-mix(in srgb, var(--fx-brand-primary, #2563eb) 45%, transparent);
             transform: translate(-50%, -50%) scale(1);
             pointer-events: none;
             z-index: 2;
@@ -1174,7 +1336,7 @@
             i18n: @json($fxI18n)
         };
     </script>
-    <script src="{{ asset('assets/shared/fx-select.js') }}?v=2.2.0"></script>
+    <script src="{{ asset('assets/shared/fx-select.js') }}?v=3.0.0"></script>
     <script src="{{ asset('assets/front/store.js') }}?v=4"></script>
     <script>
         // ==================== STORE LIVE CUSTOMIZER CONTROLLER ====================
@@ -1198,6 +1360,11 @@
                 }
             };
 
+            var isDragging = false;
+            var hasMoved = false;
+            var startX = 0, startY = 0;
+            var initialLeft = 0, initialTop = 0;
+
             window.toggleCustomizerDrawer = function(e) {
                 if (hasMoved) return;
                 var drawer = document.getElementById('customizerDrawer');
@@ -1214,12 +1381,6 @@
                 document.querySelectorAll('[data-cust-theme]').forEach(function(el) {
                     var val = el.getAttribute('data-cust-theme');
                     el.classList.toggle('is-active', val === currentTheme);
-                });
-
-                var currentDir = document.documentElement.getAttribute('dir') || 'ltr';
-                document.querySelectorAll('[data-cust-dir]').forEach(function(el) {
-                    var val = el.getAttribute('data-cust-dir');
-                    el.classList.toggle('is-active', val === currentDir);
                 });
 
                 var fsBtn = document.getElementById('fullscreenToggleBtn');
@@ -1245,8 +1406,10 @@
                     var savedX = localStorage.getItem('customizer_pos_x');
                     var savedY = localStorage.getItem('customizer_pos_y');
                     if (savedX !== null && savedY !== null) {
-                        var x = Math.max(10, Math.min(window.innerWidth - 65, parseInt(savedX, 10)));
-                        var y = Math.max(10, Math.min(window.innerHeight - 65, parseInt(savedY, 10)));
+                        var maxW = Math.max(10, window.innerWidth - 65);
+                        var maxH = Math.max(10, window.innerHeight - 65);
+                        var x = Math.max(10, Math.min(maxW, parseInt(savedX, 10)));
+                        var y = Math.max(10, Math.min(maxH, parseInt(savedY, 10)));
                         widget.style.left = x + 'px';
                         widget.style.top = y + 'px';
                         widget.style.right = 'auto';
@@ -1254,15 +1417,12 @@
                     }
                 } catch(e) {}
 
-                // 2. Drag & Drop logic (Mouse & Touch)
-                var isDragging = false;
-                var startX = 0, startY = 0;
-                var initialLeft = 0, initialTop = 0;
-
+                // 2. Universal Drag & Drop (Mouse + Touch)
                 function onPointerDown(e) {
                     if (e.type === 'mousedown' && e.button !== 0) return;
                     var clientX = e.touches ? e.touches[0].clientX : e.clientX;
                     var clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                    if (clientX === undefined) return;
                     
                     var rect = widget.getBoundingClientRect();
                     startX = clientX;
@@ -1282,17 +1442,19 @@
                     if (!isDragging) return;
                     var clientX = e.touches ? e.touches[0].clientX : e.clientX;
                     var clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                    if (clientX === undefined) return;
+
                     var dx = clientX - startX;
                     var dy = clientY - startY;
 
-                    if (Math.hypot(dx, dy) > 6) {
+                    if (Math.hypot(dx, dy) > 5) {
                         hasMoved = true;
                         if (e.cancelable) e.preventDefault();
                         
                         var newX = initialLeft + dx;
                         var newY = initialTop + dy;
-                        newX = Math.max(10, Math.min(window.innerWidth - widget.offsetWidth - 10, newX));
-                        newY = Math.max(10, Math.min(window.innerHeight - widget.offsetHeight - 10, newY));
+                        newX = Math.max(8, Math.min(window.innerWidth - widget.offsetWidth - 8, newX));
+                        newY = Math.max(8, Math.min(window.innerHeight - widget.offsetHeight - 8, newY));
 
                         widget.style.left = newX + 'px';
                         widget.style.top = newY + 'px';
@@ -1315,12 +1477,12 @@
                             localStorage.setItem('customizer_pos_x', Math.round(rect.left));
                             localStorage.setItem('customizer_pos_y', Math.round(rect.top));
                         } catch(e) {}
-                        setTimeout(function() { hasMoved = false; }, 80);
+                        setTimeout(function() { hasMoved = false; }, 120);
                     }
                 }
 
                 btn.addEventListener('mousedown', onPointerDown);
-                btn.addEventListener('touchstart', onPointerDown, { passive: true });
+                btn.addEventListener('touchstart', onPointerDown, { passive: false });
 
                 drawer.addEventListener('click', function(e) {
                     if (e.target === drawer) window.closeCustomizerDrawer();
@@ -1329,7 +1491,7 @@
                     if (e.key === 'Escape' && !drawer.classList.contains('is-hidden')) window.closeCustomizerDrawer();
                 });
 
-                // 3. Theme
+                // 3. Theme switch buttons
                 document.querySelectorAll('[data-cust-theme]').forEach(function(themeBtn) {
                     themeBtn.addEventListener('click', function() {
                         var mode = themeBtn.getAttribute('data-cust-theme');
@@ -1339,7 +1501,9 @@
                         document.documentElement.classList.toggle('dark', dark);
                         syncActiveStates();
                     });
-                // 4. Fullscreen
+                });
+
+                // 4. Fullscreen toggle
                 if (fsBtn) {
                     fsBtn.addEventListener('click', function() {
                         if (document.fullscreenElement || document.webkitFullscreenElement) {
@@ -1354,11 +1518,6 @@
                     document.addEventListener('fullscreenchange', syncActiveStates);
                     document.addEventListener('webkitfullscreenchange', syncActiveStates);
                 }
-
-                try {
-                    var savedDir = localStorage.getItem('customizer_direction');
-                    if (savedDir) document.documentElement.setAttribute('dir', savedDir);
-                } catch(e) {}
 
                 syncActiveStates();
             }

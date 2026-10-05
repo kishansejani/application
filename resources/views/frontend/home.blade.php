@@ -49,7 +49,7 @@
 
                                     <!-- Action Buttons & Quick Stats -->
                                     <div class="pt-2 sm:pt-3 flex flex-wrap items-center gap-3">
-                                        <a href="{{ route('products.index') }}" class="fx-btn !bg-emerald-500 hover:!bg-emerald-600 !text-white !font-extrabold !px-7 !py-3.5 !rounded-2xl !text-sm sm:!text-base shadow-xl shadow-emerald-600/40 hover:shadow-emerald-600/60 hover:-translate-y-0.5 transition-all flex items-center gap-2">
+                                        <a href="{{ route('products.index') }}" class="fx-btn fx-btn-primary !font-extrabold !px-7 !py-3.5 !rounded-2xl !text-sm sm:!text-base shadow-xl shadow-brand-600/30 hover:-translate-y-0.5 transition-all flex items-center gap-2">
                                             <span>{{ __('messages.start_shopping') }}</span><i class="ph-bold ph-arrow-right"></i>
                                         </a>
 
@@ -81,17 +81,17 @@
                 @if($sliders->count() > 1)
                     <div class="absolute bottom-4 sm:bottom-6 left-5 sm:left-10 lg:left-14 flex items-center gap-2 z-10">
                         @foreach($sliders as $slider)
-                            <button type="button" data-dot class="fx-dot {{ $loop->first ? 'is-active' : '' }} !h-2.5 !w-7 !rounded-full !bg-white/40 [&.is-active]:!bg-emerald-400 [&.is-active]:!w-10 transition-all" aria-label="{{ __('messages.slide', ['n' => $loop->iteration]) }}"></button>
+                            <button type="button" data-dot class="fx-dot {{ $loop->first ? 'is-active' : '' }} !h-2.5 !w-7 !rounded-full !bg-white/40 [&.is-active]:!bg-brand-500 [&.is-active]:!w-10 transition-all" aria-label="{{ __('messages.slide', ['n' => $loop->iteration]) }}"></button>
                         @endforeach
                     </div>
                     <div class="hidden sm:flex absolute bottom-5 right-6 gap-2.5 z-10">
-                        <button type="button" data-prev class="w-11 h-11 rounded-2xl bg-slate-900/60 hover:bg-emerald-600 backdrop-blur-md border border-white/20 text-white flex items-center justify-center transition-all shadow-lg hover:scale-105" aria-label="{{ __('messages.prev_slide') }}"><i class="ph-bold ph-caret-left text-lg"></i></button>
-                        <button type="button" data-next class="w-11 h-11 rounded-2xl bg-slate-900/60 hover:bg-emerald-600 backdrop-blur-md border border-white/20 text-white flex items-center justify-center transition-all shadow-lg hover:scale-105" aria-label="{{ __('messages.next_slide') }}"><i class="ph-bold ph-caret-right text-lg"></i></button>
+                        <button type="button" data-prev class="w-11 h-11 rounded-2xl bg-slate-900/60 hover:bg-brand-600 backdrop-blur-md border border-white/20 text-white flex items-center justify-center transition-all shadow-lg hover:scale-105" aria-label="{{ __('messages.prev_slide') }}"><i class="ph-bold ph-caret-left text-lg"></i></button>
+                        <button type="button" data-next class="w-11 h-11 rounded-2xl bg-slate-900/60 hover:bg-brand-600 backdrop-blur-md border border-white/20 text-white flex items-center justify-center transition-all shadow-lg hover:scale-105" aria-label="{{ __('messages.next_slide') }}"><i class="ph-bold ph-caret-right text-lg"></i></button>
                     </div>
                 @endif
             </div>
         @else
-            <div class="rounded-3xl bg-gradient-to-br from-brand-600 to-teal-700 text-white p-8 sm:p-14 shadow-2xl">
+            <div class="rounded-3xl bg-gradient-to-br from-brand-600 to-brand-800 text-white p-8 sm:p-14 shadow-2xl">
                 <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight max-w-xl">{{ __('messages.tagline') }}</h2>
                 <a href="{{ route('products.index') }}" class="mt-6 fx-btn bg-white text-brand-800">{{ __('messages.start_shopping') }}<i class="ph-bold ph-arrow-right"></i></a>
             </div>

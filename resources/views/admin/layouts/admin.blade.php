@@ -263,7 +263,7 @@
         .dark { --btn-primary-bg: #e2e8f0; --btn-primary-text: #0f172a; --btn-primary-hover: #ffffff; }
         @endif
     </style>
-    <link rel="stylesheet" href="{{ asset('assets/shared/fx-select.css') }}?v=2.2.0">
+    <link rel="stylesheet" href="{{ asset('assets/shared/fx-select.css') }}?v=3.1.0">
     <link rel="stylesheet" href="{{ asset('assets/admin/admin.css') }}?v=2.1.0">
     @stack('styles')
 </head>
@@ -1043,7 +1043,7 @@
             },
         };
     </script>
-    <script src="{{ asset('assets/shared/fx-select.js') }}?v=2.2.0"></script>
+    <script src="{{ asset('assets/shared/fx-select.js') }}?v=3.0.0"></script>
     <script src="{{ asset('assets/admin/admin.js') }}?v=2.1.0"></script>
     <script>
         // ==================== LIVE CUSTOMIZER CONTROLLER ====================
