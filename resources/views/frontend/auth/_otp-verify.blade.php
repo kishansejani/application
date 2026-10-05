@@ -115,13 +115,16 @@
         <p class="fx-otp-sub mt-1.5 text-[13.5px] text-slate-500 dark:text-slate-400">
             {{ __('auth_ui.code_sent_to', ['length' => $length]) }}
             <span class="inline-flex items-center gap-1.5 flex-wrap justify-center">
-                <strong class="font-bold text-slate-800 dark:text-slate-100 {{ $channel === 'email' ? 'break-all' : 'font-mono tracking-wide' }}">{{ $target }}</strong>
-                <a href="{{ $changeUrl }}" class="inline-flex items-center gap-1 text-[12px] font-bold text-brand-700 dark:text-brand-400 hover:underline"><i class="ph-bold ph-pencil-simple"></i>{{ $changeLabel }}</a>
+                <strong class="font-extrabold text-slate-800 dark:text-slate-100 {{ $channel === 'email' ? 'break-all' : 'font-mono tracking-wide' }}">{{ $target }}</strong>
+                <a href="{{ $changeUrl }}" class="inline-flex items-center gap-1 text-[12px] font-extrabold text-emerald-600 dark:text-emerald-400 hover:underline hover:text-emerald-700 dark:hover:text-emerald-300 ml-1">
+                    <i class="ph-bold ph-pencil-simple"></i>{{ $changeLabel }}
+                </a>
             </span>
         </p>
         @if(!empty($demoCode))
-            <button type="button" data-otp-fill="{{ $demoCode }}" class="fx-otp-demo mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 text-[12px] font-semibold text-amber-800 dark:text-amber-200 hover:bg-amber-100 dark:hover:bg-amber-500/20">
-                <i class="ph-fill ph-info"></i><span>{!! str_replace('__CODE__', '<strong class="font-mono tracking-widest">' . e($demoCode) . '</strong>', e(__('auth_ui.demo_hint', ['code' => '__CODE__']))) !!}</span>
+            <button type="button" data-otp-fill="{{ $demoCode }}" class="fx-otp-demo mt-3 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 text-[12px] font-bold text-amber-800 dark:text-amber-200 hover:bg-amber-100 dark:hover:bg-amber-500/20 shadow-sm transition-all transform active:scale-95">
+                <i class="ph-fill ph-lightning text-amber-500 text-sm"></i>
+                <span>{!! str_replace('__CODE__', '<strong class="font-mono tracking-widest text-amber-900 dark:text-amber-100">' . e($demoCode) . '</strong>', e(__('auth_ui.demo_hint', ['code' => '__CODE__']))) !!}</span>
             </button>
         @endif
     </div>
@@ -132,7 +135,7 @@
         <input type="hidden" name="otp" value="" data-otp-value>
         <noscript>
             <style>.fx-otp-boxes{display:none!important}</style>
-            <input type="text" name="otp" inputmode="numeric" maxlength="{{ $length }}" required class="fx-input !h-14 text-center !text-2xl font-mono tracking-[.5em]" aria-label="{{ __('auth_ui.otp_label') }}">
+            <input type="text" name="otp" inputmode="numeric" maxlength="{{ $length }}" required class="w-full h-14 text-center text-2xl font-mono tracking-[.5em] rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white" aria-label="{{ __('auth_ui.otp_label') }}">
         </noscript>
 
         <div class="fx-otp-boxes" role="group" aria-label="{{ __('auth_ui.otp_label') }}" style="--n: {{ $length }}">
@@ -144,15 +147,19 @@
             @endfor
         </div>
 
-        <p class="fx-otp-msg" data-otp-msg role="alert" aria-live="assertive">{{ $error ?? '' }}</p>
+        <p class="fx-otp-msg font-semibold text-xs" data-otp-msg role="alert" aria-live="assertive">{{ $error ?? '' }}</p>
         @if(!empty($notice) && empty($error))
             <p class="fx-otp-notice" data-otp-notice role="status"><i class="ph-fill ph-paper-plane-tilt"></i><span>{{ $notice }}</span></p>
         @else
             <p class="fx-otp-notice hidden" data-otp-notice role="status"><i class="ph-fill ph-paper-plane-tilt"></i><span></span></p>
         @endif
 
-        <button type="submit" class="fx-btn fx-btn-primary fx-btn-lg w-full !h-12 mt-4 relative fx-otp-submit" data-otp-submit>
-            <span class="fx-otp-submit-label inline-flex items-center gap-2"><i class="ph-bold ph-shield-check"></i><span data-otp-submit-text>{{ __('auth_ui.verify_btn') }}</span></span>
+        <button type="submit" class="w-full h-12 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:from-emerald-700 active:to-teal-700 text-white font-extrabold text-[14.5px] shadow-lg shadow-emerald-600/25 hover:shadow-emerald-600/35 transition-all duration-200 flex items-center justify-center gap-2 relative overflow-hidden group/btn mt-4 fx-otp-submit" data-otp-submit>
+            <span class="absolute inset-0 w-1/2 h-full bg-white/20 skew-x-12 -translate-x-full group-hover/btn:translate-x-[300%] transition-transform duration-700 pointer-events-none"></span>
+            <span class="fx-otp-submit-label inline-flex items-center gap-2">
+                <i class="ph-bold ph-shield-check text-lg"></i>
+                <span data-otp-submit-text>{{ __('auth_ui.verify_btn') }}</span>
+            </span>
         </button>
     </form>
 
@@ -178,8 +185,8 @@
     </div>
 
     <div class="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800 flex flex-col items-center gap-1.5 text-[12px] text-slate-400 text-center">
-        <span class="inline-flex items-center gap-1.5"><i class="ph-bold ph-timer"></i>{{ __('auth_ui.code_expires', ['minutes' => $expiryMinutes ?? 5]) }}</span>
-        <span class="inline-flex items-center gap-1.5"><i class="ph-fill ph-lock-key"></i>{{ __('auth_ui.secure_note') }}</span>
+        <span class="inline-flex items-center gap-1.5"><i class="ph-bold ph-timer text-emerald-500"></i>{{ __('auth_ui.code_expires', ['minutes' => $expiryMinutes ?? 5]) }}</span>
+        <span class="inline-flex items-center gap-1.5"><i class="ph-fill ph-lock-key text-emerald-500"></i>{{ __('auth_ui.secure_note') }}</span>
     </div>
 </div>
 

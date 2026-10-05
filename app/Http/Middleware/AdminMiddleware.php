@@ -22,7 +22,7 @@ class AdminMiddleware
         $user = Auth::user();
 
         if (!$user->isAdmin()) {
-            abort(403, 'Access denied. Administrator privileges required.');
+            return redirect()->route('admin.login')->with('error', 'Access denied. You do not have administrator permissions.');
         }
 
         if ($user->is_active === false) {

@@ -122,6 +122,13 @@ Route::get('/page/{slug}', [PageViewController::class, 'show'])->name('pages.sho
 |--------------------------------------------------------------------------
 */
 Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', function () {
+        if (\Illuminate\Support\Facades\Auth::check() && \Illuminate\Support\Facades\Auth::user()->isAdmin()) {
+            return redirect()->route('admin.dashboard');
+        }
+        return redirect()->route('admin.login');
+    })->name('index');
+
     Route::get('/login', [AdminAuth::class, 'showLoginForm'])->name('login');
     Route::post('/login', [AdminAuth::class, 'login'])->name('login.post');
     Route::post('/logout', [AdminAuth::class, 'logout'])->name('logout');
