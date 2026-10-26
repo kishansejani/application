@@ -77,7 +77,7 @@ class SubCategoryController extends Controller
             'is_active' => $request->boolean('is_active', true),
         ]);
 
-        return redirect()->route('admin.subcategories.index')->with('success', 'Subcategory created successfully!');
+        return redirect()->route('admin.subcategories.index')->with('success', __('Subcategory created successfully!'));
     }
 
     public function edit(SubCategory $subcategory)
@@ -122,7 +122,7 @@ class SubCategoryController extends Controller
             'is_active' => $request->boolean('is_active'),
         ]);
 
-        return redirect()->route('admin.subcategories.index')->with('success', 'Subcategory updated successfully!');
+        return redirect()->route('admin.subcategories.index')->with('success', __('Subcategory updated successfully!'));
     }
 
     public function destroy(SubCategory $subcategory)
@@ -131,7 +131,7 @@ class SubCategoryController extends Controller
             Storage::disk('public')->delete($subcategory->image);
         }
         $subcategory->delete();
-        return redirect()->route('admin.subcategories.index')->with('success', 'Subcategory deleted successfully.');
+        return redirect()->route('admin.subcategories.index')->with('success', __('Subcategory deleted successfully.'));
     }
 
     public function getByCategory(Category $category)

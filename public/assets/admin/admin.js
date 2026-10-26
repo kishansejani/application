@@ -8,7 +8,49 @@
 
     var cfg = window.AdminConfig || {};
     var I18N = cfg.i18n || {};
-    var t = function (str) { return (I18N && I18N[str]) || str; };
+    /* Dynamic strings (numbers / names inside a sentence). {0},{1} = captured parts, translated if known. */
+    var PATTERNS = [
+        ['{0} in stock · {1}', '{0} સ્ટોકમાં · {1}'], ['{0} in stock', '{0} સ્ટોકમાં'],
+        ['Low ({0})', 'ઓછો ({0})'], ['Low · {0}', 'ઓછો · {0}'], ['Out ({0})', 'સ્ટોક પૂરો ({0})'],
+        ['+{0} more', '+{0} વધુ'], ['Content ({0})', 'કન્ટેન્ટ ({0})'], ['ETA {0}', 'અંદાજિત સમય {0}'],
+        ['ID {0} · You', 'ID {0} · તમે'], ['Max ₹{0}', 'મહત્તમ ₹{0}'], ['Reason: {0}', 'કારણ: {0}'],
+        ['{0} (English)', '{0} (અંગ્રેજી)'], ['{0}% off', '{0}% છૂટ'], ['−₹{0} coupon', '−₹{0} કૂપન'], ['≤ {0} units', '≤ {0} યુનિટ'],
+        ['Please fix the following {0}:', 'કૃપા કરીને નીચેની {0} સુધારો:'],
+        ['Used {0} {1} so far.', 'અત્યાર સુધી {0} {1} વપરાયું.'],
+        ['{0} {1} currently assigned to this role.', 'આ રોલ પર હાલમાં {0} {1} સોંપાયેલ છે.'],
+        ['{0} · {1} Admin', '{0} · {1} એડમિન'], ['{0} ({1}) — inactive', '{0} ({1}) — નિષ્ક્રિય'],
+        ['{0} here, or', '{0} અહીં, અથવા'], ['{0}, or', '{0}, અથવા'],
+        ['Add at least {0} frames to activate the 360° view.', '360° વ્યૂ ચાલુ કરવા ઓછામાં ઓછી {0} ફ્રેમ ઉમેરો.'],
+        ['Replace the existing {0} frames with these', 'હાલની {0} ફ્રેમ આના વડે બદલો'],
+        ['PNG, JPG, WEBP or GIF · up to 4 MB{0}', 'PNG, JPG, WEBP અથવા GIF · મહત્તમ 4 MB{0}'],
+        [') – frames are arranged by file name. Minimum {0}, maximum {1}, up to 5 MB each.', ') – ફ્રેમ ફાઇલ નામ પ્રમાણે ગોઠવાય છે. ઓછામાં ઓછી {0}, વધુમાં વધુ {1}, દરેક 5 MB સુધી.'],
+        ['Edit offer {0}', 'ઓફર સંપાદિત કરો {0}'], ['Edit role: {0}', 'રોલ સંપાદિત કરો: {0}'], ['Edit user: {0}', 'યુઝર સંપાદિત કરો: {0}'], ['Edit {0}', 'સંપાદિત કરો: {0}'],
+        ['Invoice {0}', 'ઇન્વોઇસ {0}'], ['Order {0}', 'ઓર્ડર {0}'], ['Order #{0}', 'ઓર્ડર #{0}'],
+        ['Welcome back, {0}!', 'ફરી સ્વાગત છે, {0}!'],
+        ['Order #{0} status updated to {1}', 'ઓર્ડર #{0} ની સ્થિતિ બદલાઈને {1} થઈ'],
+        ['Stock updated successfully for {0}', '{0} માટે સ્ટોક સફળતાપૂર્વક અપડેટ થયો'],
+        ["Page '{0}' updated successfully!", "પેજ '{0}' સફળતાપૂર્વક અપડેટ થયું!"],
+        ['User account has been {0} successfully.', 'યુઝર એકાઉન્ટ સફળતાપૂર્વક {0} થયું.'],
+        ['{0} items', '{0} વસ્તુઓ'], ['{0} item', '{0} વસ્તુ'], ['{0} orders', '{0} ઓર્ડર'], ['{0} order', '{0} ઓર્ડર'],
+        ['{0} products', '{0} પ્રોડક્ટ્સ'], ['{0} product', '{0} પ્રોડક્ટ'], ['{0} users', '{0} યુઝર્સ'], ['{0} units', '{0} યુનિટ'],
+        ['{0} days ago', '{0} દિવસ પહેલાં'], ['{0} hours ago', '{0} કલાક પહેલાં'], ['{0} min ago', '{0} મિનિટ પહેલાં'], ['{0} mins ago', '{0} મિનિટ પહેલાં'], ['Just now', 'હમણાં જ']
+    ].map(function (p) {
+        var parts = p[0].split(/\{\d\}/), esc = function (x) { return x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); };
+        return { re: new RegExp('^' + parts.map(esc).join('(.+?)') + '$'), to: p[1], w: p[0].replace(/\{\d\}/g, '').length };
+    }).sort(function (a, b) { return b.w - a.w; });
+    var plain = function (str) { return (I18N && I18N[str]) || ''; };
+    var t = function (str) {
+        if (!I18N || typeof str !== 'string') return str;
+        if (I18N[str]) return I18N[str];
+        var key = str.replace(/\s+/g, ' ').trim();
+        if (!key) return str;
+        if (I18N[key]) return I18N[key];
+        for (var i = 0; i < PATTERNS.length; i++) {
+            var m = PATTERNS[i].re.exec(key);
+            if (m) return PATTERNS[i].to.replace(/\{(\d)\}/g, function (_, n) { var g = m[+n + 1]; return g === undefined ? '' : (plain(g) || plain(g.toLowerCase()) || g); });
+        }
+        return str;
+    };
     window.__ = t;
     var html = document.documentElement;
     var store = {
@@ -28,6 +70,7 @@
         icons: { success: 'ph-check-circle', error: 'ph-x-circle', warning: 'ph-warning', info: 'ph-info' },
         show: function (type, message, title, timeout) {
             if (!message) return;
+            message = t(String(message)); if (title) title = t(String(title));
             type = this.icons[type] ? type : 'info';
             timeout = timeout || (type === 'error' ? 6000 : 4000);
             var stack = document.getElementById('toastStack');
@@ -67,6 +110,13 @@
     if (window.Swal) {
         var baseSwal = window.Swal;
         window.Swal = baseSwal.mixin({ reverseButtons: true });
+        var swalFire = window.Swal.fire.bind(window.Swal);
+        window.Swal.fire = function (o) {
+            if (o && typeof o === 'object') {
+                ['title', 'text', 'confirmButtonText', 'cancelButtonText', 'denyButtonText'].forEach(function (k) { if (typeof o[k] === 'string') o[k] = t(o[k]); });
+            }
+            return swalFire.apply(null, arguments);
+        };
     }
 
     /* ------------------------------------------------------------------ Theme */
@@ -303,8 +353,8 @@
         skip: { SCRIPT: 1, STYLE: 1, TEXTAREA: 1, CODE: 1, PRE: 1, OPTION: 0 },
         translateText: function (node) {
             var raw = node.nodeValue, key = raw.replace(/\s+/g, ' ').trim();
-            if (!key || key.length > 120) return;
-            var tr = I18N[key] || I18N[key.replace(/&/g, '&amp;')];
+            if (!key || key.length > 300) return;
+            var tr = I18N[key] || I18N[key.replace(/&/g, '&amp;')] || t(key);
             if (tr && tr !== key) node.nodeValue = raw.replace(raw.trim(), tr);
         },
         run: function (root) {
@@ -318,10 +368,10 @@
             });
             var nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
             nodes.forEach(I18nDom.translateText);
-            (root.querySelectorAll ? root.querySelectorAll('[placeholder],[title],[aria-label],[data-confirm-title]') : []).forEach(function (el) {
+            (root.querySelectorAll ? root.querySelectorAll('[placeholder],[title],[aria-label],[data-confirm-title],[data-confirm],[data-confirm-text],[data-confirm-button]') : []).forEach(function (el) {
                 if (el.closest('[data-no-i18n]')) return;
-                ['placeholder', 'title', 'aria-label', 'data-confirm-title'].forEach(function (a) {
-                    var v = el.getAttribute(a); if (v && I18N[v.trim()]) el.setAttribute(a, I18N[v.trim()]);
+                ['placeholder', 'title', 'aria-label', 'data-confirm-title', 'data-confirm', 'data-confirm-text', 'data-confirm-button'].forEach(function (a) {
+                    var v = el.getAttribute(a); if (!v) return; var tv = t(v.trim()); if (tv && tv !== v.trim()) { el.setAttribute(a, tv); if (a.indexOf('data-confirm') === 0 && window.jQuery) window.jQuery(el).removeData(a.slice(5)); }
                 });
             });
         }

@@ -131,23 +131,7 @@ class MainNavigationScreenState extends State<MainNavigationScreen> {
     } else {
       scaffold = Scaffold(
         body: body,
-        bottomNavigationBar: DecoratedBox(
-          decoration: BoxDecoration(
-            border: Border(top: BorderSide(color: context.colors.outlineVariant.fade(0.5))),
-          ),
-          child: NavigationBar(
-            selectedIndex: _currentIndex,
-            onDestinationSelected: switchTab,
-            destinations: [
-              for (var i = 0; i < items.length; i++)
-                NavigationDestination(
-                  icon: _icon(items[i].icon, i, cartCount),
-                  selectedIcon: _icon(items[i].selectedIcon, i, cartCount),
-                  label: items[i].label,
-                ),
-            ],
-          ),
-        ),
+        bottomNavigationBar: _buildBottomBar(context, items, cartCount),
       );
     }
 
@@ -158,6 +142,51 @@ class MainNavigationScreenState extends State<MainNavigationScreen> {
         if (!didPop) setState(() => _currentIndex = 0);
       },
       child: scaffold,
+    );
+  }
+
+  Widget _buildBottomBar(BuildContext context, List<_NavItem> items, int cartCount) {
+    final d = context.design;
+    final scheme = context.colors;
+    final bar = NavigationBar(
+      selectedIndex: _currentIndex,
+      onDestinationSelected: switchTab,
+      backgroundColor: d.floatTabbar ? Colors.transparent : null,
+      destinations: [
+        for (var i = 0; i < items.length; i++)
+          NavigationDestination(
+            icon: _icon(items[i].icon, i, cartCount),
+            selectedIcon: _icon(items[i].selectedIcon, i, cartCount),
+            label: items[i].label,
+          ),
+      ],
+    );
+    if (!d.floatTabbar) {
+      return DecoratedBox(
+        decoration: BoxDecoration(
+          border: Border(top: BorderSide(color: scheme.outlineVariant.fade(0.5))),
+        ),
+        child: bar,
+      );
+    }
+    // Floating pill bar (Admin → Design & Experience → "Floating tab bar").
+    return Container(
+      color: context.theme.scaffoldBackgroundColor,
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.xs, AppSpacing.md, AppSpacing.sm),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: scheme.surface,
+              borderRadius: BorderRadius.circular(d.r(26)),
+              border: Border.all(color: d.isBold ? scheme.onSurface : scheme.outlineVariant.fade(0.7), width: d.isBold ? 1.6 : 1),
+              boxShadow: [BoxShadow(color: Colors.black.fade(context.isDark ? 0.4 : 0.12), blurRadius: 24, offset: const Offset(0, 10))],
+            ),
+            child: ClipRRect(borderRadius: BorderRadius.circular(d.r(26)), child: bar),
+          ),
+        ),
+      ),
     );
   }
 }

@@ -34,19 +34,19 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             if (!Auth::user()->isAdmin()) {
                 Auth::logout();
-                return back()->withInput()->with('error', 'Access denied. You do not have administrator permissions.');
+                return back()->withInput()->with('error', __('Access denied. You do not have administrator permissions.'));
             }
 
             if (Auth::user()->is_active === false) {
                 Auth::logout();
-                return back()->withInput()->with('error', 'Your account has been deactivated. Please contact the super administrator.');
+                return back()->withInput()->with('error', __('Your account has been deactivated. Please contact the super administrator.'));
             }
 
             $request->session()->regenerate();
             return redirect()->intended(route('admin.dashboard'))->with('success', 'Welcome back, ' . Auth::user()->name . '!');
         }
 
-        return back()->withInput()->with('error', 'Invalid login credentials. Please check and try again.');
+        return back()->withInput()->with('error', __('Invalid login credentials. Please check and try again.'));
     }
 
     public function logout(Request $request)
@@ -55,6 +55,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('admin.login')->with('success', 'Logged out successfully.');
+        return redirect()->route('admin.login')->with('success', __('Logged out successfully.'));
     }
 }

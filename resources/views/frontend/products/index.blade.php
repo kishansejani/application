@@ -24,7 +24,7 @@
     </nav>
     <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-5">
         <div>
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+            <h1 class="mk-page-title">
                 @if(request('q'))
                     {{ $gu ? 'શોધ પરિણામ' : 'Results for' }} “{{ request('q') }}”
                 @elseif($activeCat)
@@ -82,7 +82,7 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 xl:gap-8 items-start">
         <!-- Sidebar (desktop) -->
-        <aside class="hidden lg:block fx-card p-5 sticky top-36">
+        <aside class="hidden lg:block mk-side sticky top-36">
             <h4 class="font-extrabold text-slate-900 dark:text-white text-sm flex items-center gap-2 mb-5">
                 <i class="ph ph-funnel text-brand-600"></i>{{ __('messages.filter_by') }}
             </h4>
@@ -91,7 +91,7 @@
 
         <!-- Grid -->
         <div class="lg:col-span-3 space-y-8">
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-5">
+            <div class="mk-grid mk-grid-3">
                 @forelse($products as $product)
                     @include('frontend.partials.product-card', ['product' => $product])
                 @empty

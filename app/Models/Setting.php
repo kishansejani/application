@@ -34,6 +34,97 @@ class Setting extends Model
         );
     }
 
+    /** Choice lists for the select-type design settings (also used for validation). */
+    public const DESIGN_CHOICES = [
+        'ui_style'  => ['aurora', 'soft', 'glass', 'bold', 'minimal'],
+        'ui_radius' => ['sharp', 'soft', 'round', 'pill'],
+        'ui_font'   => ['jakarta', 'poppins', 'outfit', 'manrope', 'sora'],
+    ];
+
+    /** On/off design settings stored as '1' / '0'. */
+    public const DESIGN_TOGGLES = [
+        'fx_aurora', 'fx_reveal', 'fx_tilt', 'fx_glow', 'fx_marquee', 'fx_glass_header', 'fx_float_tabbar', 'fx_progress',
+        'fx_scene3d', 'fx_product3d',
+        'spin_autoplay', 'spin_wheel', 'spin_hint', 'spin_hover_scrub',
+    ];
+
+    /** Numeric (1-10) design settings. */
+    public const DESIGN_SCALES = ['spin_speed', 'spin_sensitivity'];
+
+    /** Defaults for the "Design & Experience" settings (website + mobile app). */
+    public static function designDefaults(): array
+    {
+        return [
+            'ui_style' => 'aurora',
+            'ui_radius' => 'round',
+            'ui_font' => 'jakarta',
+
+            'fx_aurora' => '1',
+            'fx_reveal' => '1',
+            'fx_tilt' => '1',
+            'fx_glow' => '1',
+            'fx_marquee' => '1',
+            'fx_glass_header' => '1',
+            'fx_float_tabbar' => '1',
+            'fx_progress' => '1',
+            'fx_scene3d' => '0',
+            'fx_product3d' => '0',
+
+            'spin_autoplay' => '1',
+            'spin_speed' => '5',
+            'spin_sensitivity' => '5',
+            'spin_wheel' => '1',
+            'spin_hint' => '1',
+            'spin_hover_scrub' => '1',
+        ];
+    }
+
+    /** Settings the mobile app needs (palette + design). Light and dark are both returned. */
+    public static function appTheme(): array
+    {
+        $s = self::getAllSettings();
+        $pick = fn (array $map) => collect($map)->map(fn ($key) => $s[$key] ?? null)->all();
+
+        return [
+            'light' => $pick([
+                'primary' => 'front_brand_primary', 'primary_hover' => 'front_brand_hover', 'primary_soft' => 'front_brand_light',
+                'accent' => 'front_accent_color', 'button_bg' => 'front_btn_primary_bg', 'button_text' => 'front_btn_primary_text',
+                'background' => 'front_body_bg', 'surface' => 'front_card_bg', 'border' => 'front_card_border',
+                'header' => 'front_header_bg', 'text' => 'front_text_primary', 'text_muted' => 'front_text_muted',
+                'input_bg' => 'front_input_bg', 'input_border' => 'front_input_border',
+            ]),
+            'dark' => $pick([
+                'primary' => 'front_dark_brand_primary', 'primary_hover' => 'front_dark_brand_hover', 'primary_soft' => 'front_dark_brand_light',
+                'accent' => 'front_dark_accent_color', 'button_bg' => 'front_dark_btn_primary_bg', 'button_text' => 'front_dark_btn_primary_text',
+                'background' => 'front_dark_body_bg', 'surface' => 'front_dark_card_bg', 'border' => 'front_dark_card_border',
+                'header' => 'front_dark_header_bg', 'text' => 'front_dark_text_primary', 'text_muted' => 'front_dark_text_muted',
+                'input_bg' => 'front_dark_input_bg', 'input_border' => 'front_dark_input_border',
+            ]),
+            'design' => [
+                'style' => $s['ui_style'],
+                'radius' => $s['ui_radius'],
+                'font' => $s['ui_font'],
+                'effects' => [
+                    'aurora' => $s['fx_aurora'] === '1', 'reveal' => $s['fx_reveal'] === '1',
+                    'tilt' => $s['fx_tilt'] === '1', 'glow' => $s['fx_glow'] === '1',
+                    'glass_header' => $s['fx_glass_header'] === '1', 'float_tabbar' => $s['fx_float_tabbar'] === '1',
+                ],
+                'spin' => [
+                    'autoplay' => $s['spin_autoplay'] === '1',
+                    'speed' => (int) $s['spin_speed'],
+                    'sensitivity' => (int) $s['spin_sensitivity'],
+                    'hint' => $s['spin_hint'] === '1',
+                ],
+            ],
+            'store_name' => $s['store_name'],
+            'theme_mode' => $s['theme_mode'],
+            'version' => md5(json_encode(array_intersect_key($s, array_flip(array_merge(
+                ['front_brand_primary', 'front_dark_brand_primary', 'front_body_bg', 'front_dark_body_bg'],
+                array_keys(self::designDefaults())
+            ))))),
+        ];
+    }
+
     public static function getAllSettings(): array
     {
         $defaults = [
@@ -102,6 +193,6 @@ class Setting extends Model
         ];
 
         $settings = self::all()->pluck('value', 'key')->toArray();
-        return array_merge($defaults, $settings);
+        return array_merge($defaults, self::designDefaults(), $settings);
     }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../constants/app_colors.dart';
+import '../models/remote_theme.dart';
 
 /// Corner radius tokens.
 class AppRadius {
@@ -42,50 +43,111 @@ extension AppThemeContext on BuildContext {
   bool get isDark => Theme.of(this).brightness == Brightness.dark;
 }
 
+/// Admin-managed design language, available via `context.design`.
+class AppDesign extends ThemeExtension<AppDesign> {
+  final String style; // aurora | soft | glass | bold | minimal
+  final double radiusFactor;
+  final bool aurora, glassHeader, floatTabbar;
+  final bool spinAutoplay, spinHint;
+  final int spinSpeed, spinSensitivity;
+
+  const AppDesign({
+    this.style = 'aurora',
+    this.radiusFactor = 1,
+    this.aurora = true,
+    this.glassHeader = true,
+    this.floatTabbar = true,
+    this.spinAutoplay = true,
+    this.spinHint = true,
+    this.spinSpeed = 50,
+    this.spinSensitivity = 50,
+  });
+
+  double r(double base) => base * radiusFactor;
+  double get card => r(AppRadius.lg);
+  double get button => r(AppRadius.md);
+  bool get isGlass => style == 'glass';
+  bool get isBold => style == 'bold';
+  bool get isMinimal => style == 'minimal';
+  bool get isSoft => style == 'soft';
+
+  @override
+  AppDesign copyWith() => this;
+
+  @override
+  AppDesign lerp(ThemeExtension<AppDesign>? other, double t) => this;
+}
+
+extension AppDesignContext on BuildContext {
+  AppDesign get design => Theme.of(this).extension<AppDesign>() ?? const AppDesign();
+}
+
 class AppTheme {
   AppTheme._();
 
-  static ThemeData? _lightCache;
-  static ThemeData? _darkCache;
+  static final Map<String, ThemeData> _cache = {};
 
-  static ThemeData light() => _lightCache ??= _build(Brightness.light);
-  static ThemeData dark() => _darkCache ??= _build(Brightness.dark);
+  static ThemeData light([RemoteTheme? t]) => _get(t ?? RemoteTheme.defaults, Brightness.light);
+  static ThemeData dark([RemoteTheme? t]) => _get(t ?? RemoteTheme.defaults, Brightness.dark);
 
-  static ThemeData _build(Brightness brightness) {
-    final isDark = brightness == Brightness.dark;
+  static ThemeData _get(RemoteTheme t, Brightness b) =>
+      _cache['${t.version}|${t.style}|${t.radius}|${t.font}|${b.name}'] ??= _build(t, b);
 
-    var scheme = ColorScheme.fromSeed(seedColor: AppColors.seed, brightness: brightness);
-    if (isDark) {
-      scheme = scheme.copyWith(
-        surface: AppColors.surfaceDark,
-        tertiary: AppColors.accent,
-      );
-    } else {
-      scheme = scheme.copyWith(
-        primary: AppColors.primary,
-        onPrimary: Colors.white,
-        surface: Colors.white,
-        tertiary: AppColors.accent,
-      );
+  static TextTheme _fontTheme(String font, TextTheme base) {
+    switch (font) {
+      case 'poppins':
+        return GoogleFonts.poppinsTextTheme(base);
+      case 'outfit':
+        return GoogleFonts.outfitTextTheme(base);
+      case 'manrope':
+        return GoogleFonts.manropeTextTheme(base);
+      case 'sora':
+        return GoogleFonts.soraTextTheme(base);
+      default:
+        return GoogleFonts.plusJakartaSansTextTheme(base);
     }
+  }
 
-    final scaffoldBg = isDark ? AppColors.backgroundDark : AppColors.background;
+  static ThemeData _build(RemoteTheme t, Brightness brightness) {
+    final isDark = brightness == Brightness.dark;
+    final pal = isDark ? t.dark : t.light;
+    final f = t.radiusFactor;
+    double rr(double v) => v * f;
+
+    var scheme = ColorScheme.fromSeed(seedColor: pal.primary, brightness: brightness);
+    scheme = scheme.copyWith(
+      primary: pal.buttonBg,
+      onPrimary: pal.buttonText,
+      primaryContainer: pal.primarySoft,
+      onPrimaryContainer: isDark ? pal.primary : pal.primaryHover,
+      surface: pal.surface,
+      onSurface: pal.text,
+      onSurfaceVariant: pal.textMuted,
+      outline: pal.inputBorder,
+      outlineVariant: pal.border,
+      tertiary: pal.accent,
+      surfaceContainerHigh: isDark ? pal.inputBg : null,
+    );
+
+    final accentInk = isDark ? pal.primary : pal.primaryHover;
+    final scaffoldBg = pal.background;
     final baseText = ThemeData(brightness: brightness, useMaterial3: true).textTheme;
-    final textTheme = GoogleFonts.plusJakartaSansTextTheme(baseText).apply(
-      bodyColor: scheme.onSurface,
-      displayColor: scheme.onSurface,
+    final textTheme = _fontTheme(t.font, baseText).apply(
+      bodyColor: pal.text,
+      displayColor: pal.text,
     );
 
+    final isBold = t.style == 'bold';
     final inputBorder = OutlineInputBorder(
-      borderRadius: BorderRadius.circular(AppRadius.sm),
-      borderSide: BorderSide(color: scheme.outlineVariant),
+      borderRadius: BorderRadius.circular(rr(AppRadius.sm)),
+      borderSide: BorderSide(color: pal.inputBorder, width: isBold ? 1.4 : 1),
     );
 
-    final buttonShape = RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md));
+    final buttonShape = RoundedRectangleBorder(borderRadius: BorderRadius.circular(rr(AppRadius.md)));
 
     // Icons: neutral at rest, brand colour while pressed / hovered / focused.
     final iconRest = scheme.onSurfaceVariant;
-    final iconActive = isDark ? scheme.primary : AppColors.primary;
+    final iconActive = accentInk;
     Color? iconForeground(Set<WidgetState> states) {
       if (states.contains(WidgetState.disabled)) return null;
       if (states.contains(WidgetState.pressed) ||
@@ -93,7 +155,7 @@ class AppTheme {
           states.contains(WidgetState.focused)) {
         return iconActive;
       }
-      return null; // fall back to the per-variant default / AppBar colour
+      return null;
     }
 
     Color? iconOverlay(Set<WidgetState> states) {
@@ -103,10 +165,9 @@ class AppTheme {
       return null;
     }
 
-    // Menus (PopupMenuButton, DropdownButton, DropdownMenu, MenuAnchor).
-    final menuColor = isDark ? scheme.surfaceContainerHigh : Colors.white;
+    final menuColor = isDark ? pal.inputBg : pal.surface;
     final menuShape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(AppRadius.md),
+      borderRadius: BorderRadius.circular(rr(AppRadius.md)),
       side: BorderSide(color: scheme.outlineVariant.fade(0.6)),
     );
     final menuStyle = MenuStyle(
@@ -119,10 +180,23 @@ class AppTheme {
     );
     final buttonText = textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700, fontSize: 15);
 
+    final design = AppDesign(
+      style: t.style,
+      radiusFactor: f,
+      aurora: t.aurora,
+      glassHeader: t.glassHeader,
+      floatTabbar: t.floatTabbar,
+      spinAutoplay: t.spinAutoplay,
+      spinHint: t.spinHint,
+      spinSpeed: t.spinSpeed,
+      spinSensitivity: t.spinSensitivity,
+    );
+
     return ThemeData(
       useMaterial3: true,
       brightness: brightness,
       colorScheme: scheme,
+      extensions: [design],
       scaffoldBackgroundColor: scaffoldBg,
       canvasColor: scaffoldBg,
       cardColor: scheme.surface,
@@ -137,7 +211,7 @@ class AppTheme {
         elevation: 0,
         scrolledUnderElevation: 0.6,
         centerTitle: false,
-        backgroundColor: scaffoldBg,
+        backgroundColor: t.glassHeader ? scaffoldBg.fade(0.92) : pal.header,
         surfaceTintColor: Colors.transparent,
         foregroundColor: scheme.onSurface,
         iconTheme: IconThemeData(color: scheme.onSurface),
@@ -174,14 +248,14 @@ class AppTheme {
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(rr(AppRadius.sm))),
           textStyle: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700),
         ),
       ),
       iconButtonTheme: IconButtonThemeData(
         style: ButtonStyle(
           shape: WidgetStatePropertyAll(
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(rr(AppRadius.sm))),
           ),
           foregroundColor: WidgetStateProperty.resolveWith(iconForeground),
           overlayColor: WidgetStateProperty.resolveWith(iconOverlay),
@@ -206,7 +280,7 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: isDark ? scheme.surfaceContainerHigh : Colors.white,
+        fillColor: pal.inputBg,
         contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.lg),
         border: inputBorder,
         enabledBorder: inputBorder,
@@ -245,7 +319,7 @@ class AppTheme {
         unselectedLabelTextStyle: textTheme.labelMedium?.copyWith(color: scheme.onSurfaceVariant),
       ),
       chipTheme: ChipThemeData(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(rr(AppRadius.sm))),
         side: BorderSide(color: scheme.outlineVariant),
         backgroundColor: scheme.surface,
         selectedColor: scheme.primaryContainer,
@@ -259,23 +333,23 @@ class AppTheme {
         surfaceTintColor: Colors.transparent,
         showDragHandle: true,
         clipBehavior: Clip.antiAlias,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(rr(AppRadius.xl))),
         ),
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
         elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(rr(AppRadius.sm))),
         backgroundColor: isDark ? scheme.surfaceContainerHighest : const Color(0xFF1E293B),
         contentTextStyle: textTheme.bodyMedium?.copyWith(
           color: isDark ? scheme.onSurface : Colors.white,
           fontWeight: FontWeight.w600,
         ),
-        actionTextColor: isDark ? scheme.primary : AppColors.primaryOnDark,
+        actionTextColor: isDark ? scheme.tertiary : AppColors.primaryOnDark,
       ),
       listTileTheme: ListTileThemeData(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(rr(AppRadius.sm))),
         iconColor: iconRest,
         selectedColor: iconActive,
         selectedTileColor: scheme.primaryContainer.fade(0.35),
@@ -292,7 +366,7 @@ class AppTheme {
         elevation: 2,
         backgroundColor: scheme.primary,
         foregroundColor: scheme.onPrimary,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(rr(AppRadius.md))),
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(color: scheme.primary),
       switchTheme: SwitchThemeData(
@@ -304,7 +378,7 @@ class AppTheme {
       segmentedButtonTheme: SegmentedButtonThemeData(
         style: ButtonStyle(
           shape: WidgetStatePropertyAll(
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(rr(AppRadius.sm))),
           ),
           textStyle: WidgetStatePropertyAll(textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700)),
         ),

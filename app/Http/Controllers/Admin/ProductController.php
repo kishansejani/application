@@ -65,6 +65,8 @@ class ProductController extends Controller
             'thumbnail_file' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
             'thumbnail_url' => 'nullable|url',
             'gallery_files.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'spin_files' => 'nullable|array|max:' . ProductImage::MAX_SPIN_FRAMES,
+            'spin_files.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
 
         $thumbnailPath = null;
@@ -109,14 +111,16 @@ class ProductController extends Controller
             }
         }
 
-        return redirect()->route('admin.products.index')->with('success', 'Product created successfully!');
+        $this->saveSpinFrames($request, $product);
+
+        return redirect()->route('admin.products.index')->with('success', __('Product created successfully!'));
     }
 
     public function edit(Product $product)
     {
         $categories = Category::with('subCategories')->where('is_active', true)->orderBy('name_en')->get();
         $subCategories = SubCategory::where('category_id', $product->category_id)->where('is_active', true)->get();
-        $product->load('images');
+        $product->load(['images', 'spinFrames']);
         return view('admin.products.edit', compact('product', 'categories', 'subCategories'));
     }
 
@@ -135,6 +139,8 @@ class ProductController extends Controller
             'thumbnail_file' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
             'thumbnail_url' => 'nullable|url',
             'gallery_files.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'spin_files' => 'nullable|array|max:' . ProductImage::MAX_SPIN_FRAMES,
+            'spin_files.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
 
         $thumbnailPath = $product->thumbnail;
@@ -180,7 +186,9 @@ class ProductController extends Controller
             }
         }
 
-        return redirect()->route('admin.products.index')->with('success', 'Product updated successfully!');
+        $this->saveSpinFrames($request, $product);
+
+        return redirect()->route('admin.products.index')->with('success', __('Product updated successfully!'));
     }
 
     public function destroy(Product $product)
@@ -188,13 +196,13 @@ class ProductController extends Controller
         if ($product->thumbnail && !filter_var($product->thumbnail, FILTER_VALIDATE_URL) && Storage::disk('public')->exists($product->thumbnail)) {
             Storage::disk('public')->delete($product->thumbnail);
         }
-        foreach ($product->images as $img) {
+        foreach ($product->allImages as $img) {
             if (!filter_var($img->image_path, FILTER_VALIDATE_URL) && Storage::disk('public')->exists($img->image_path)) {
                 Storage::disk('public')->delete($img->image_path);
             }
         }
         $product->delete();
-        return redirect()->route('admin.products.index')->with('success', 'Product deleted successfully.');
+        return redirect()->route('admin.products.index')->with('success', __('Product deleted successfully.'));
     }
 
     public function deleteImage(ProductImage $image)
@@ -203,6 +211,58 @@ class ProductController extends Controller
             Storage::disk('public')->delete($image->image_path);
         }
         $image->delete();
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Stores the 360° turntable frames. Files are ordered by their original file
+     * name (natural order: 1.jpg, 2.jpg … 10.jpg), so name them in rotation order.
+     * Ticking "replace" removes the previous frames first.
+     */
+    private function saveSpinFrames(Request $request, Product $product): void
+    {
+        if (!ProductImage::supportsTypes()) {
+            return;
+        }
+
+        $files = $request->file('spin_files');
+        if (empty($files)) {
+            return;
+        }
+
+        if ($request->boolean('spin_replace')) {
+            $this->deleteSpinFrames($product);
+        }
+
+        usort($files, fn ($a, $b) => strnatcasecmp($a->getClientOriginalName(), $b->getClientOriginalName()));
+
+        $sort = (int) ($product->spinFrames()->reorder()->max('sort_order') ?? 0);
+        $room = ProductImage::MAX_SPIN_FRAMES - $product->spinFrames()->reorder()->count();
+
+        foreach (array_slice($files, 0, max(0, $room)) as $file) {
+            ProductImage::create([
+                'product_id' => $product->id,
+                'image_path' => $file->store('products/360/' . $product->id, 'public'),
+                'sort_order' => ++$sort,
+                'type' => ProductImage::TYPE_SPIN,
+            ]);
+        }
+    }
+
+    private function deleteSpinFrames(Product $product): void
+    {
+        foreach ($product->spinFrames()->get() as $frame) {
+            if (!filter_var($frame->image_path, FILTER_VALIDATE_URL) && Storage::disk('public')->exists($frame->image_path)) {
+                Storage::disk('public')->delete($frame->image_path);
+            }
+            $frame->delete();
+        }
+    }
+
+    /** Remove every 360° frame of a product (ajax from the product form). */
+    public function clearSpin(Product $product)
+    {
+        $this->deleteSpinFrames($product);
         return response()->json(['success' => true]);
     }
 

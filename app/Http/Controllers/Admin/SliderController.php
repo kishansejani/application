@@ -55,7 +55,7 @@ class SliderController extends Controller
         } elseif ($request->filled('image_url')) {
             $imagePath = $request->input('image_url');
         } else {
-            return back()->withInput()->with('error', 'Please upload a slider banner image or provide an image URL.');
+            return back()->withInput()->with('error', __('Please upload a slider banner image or provide an image URL.'));
         }
 
         Slider::create([
@@ -73,7 +73,7 @@ class SliderController extends Controller
             'is_active' => $request->boolean('is_active', true),
         ]);
 
-        return redirect()->route('admin.sliders.index')->with('success', 'Slider banner created successfully!');
+        return redirect()->route('admin.sliders.index')->with('success', __('Slider banner created successfully!'));
     }
 
     public function edit(Slider $slider)
@@ -119,7 +119,7 @@ class SliderController extends Controller
             'is_active' => $request->boolean('is_active'),
         ]);
 
-        return redirect()->route('admin.sliders.index')->with('success', 'Slider updated successfully!');
+        return redirect()->route('admin.sliders.index')->with('success', __('Slider updated successfully!'));
     }
 
     public function destroy(Slider $slider)
@@ -128,7 +128,7 @@ class SliderController extends Controller
             Storage::disk('public')->delete($slider->image);
         }
         $slider->delete();
-        return redirect()->route('admin.sliders.index')->with('success', 'Slider banner deleted successfully.');
+        return redirect()->route('admin.sliders.index')->with('success', __('Slider banner deleted successfully.'));
     }
 
     public function toggleStatus(Slider $slider)

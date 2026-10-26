@@ -90,3 +90,45 @@ MAIL_FROM_ADDRESS=you@gmail.com
 MAIL_FROM_NAME="Fresh Express"
 ```
 then `php artisan config:clear && php artisan mail:test you@gmail.com`.
+
+
+---
+## v3 – "Aurora" redesign + 360° product view + theme from admin
+
+### Run these once
+```
+php artisan migrate            # adds product_images.type (gallery | spin)
+php artisan config:clear && php artisan view:clear
+php artisan storage:link       # if not done already
+cd flutter_app && flutter pub get && flutter analyze && flutter run
+```
+
+### What's new
+* **360° product view** – Admin → Products → Edit → *360° view*: upload 6–72 frames (natural filename order, drag to preview). Storefront product page gets a 360° / Photos switch, home gets a *Spin & explore* rail, cards get a 360° badge. Flutter app has the same viewer (drag + inertia, slider, auto-rotate, fullscreen).
+  Test frames: `demo_360_frames/01.jpg … 36.jpg`.
+* **Admin → Settings → Design & Experience** (super admin): style (aurora/soft/glass/bold/minimal), corner radius, font, effect toggles (aurora background, reveal, 3D tilt, cursor glow, marquee, glass header, floating tab bar, progress bar), 360° behaviour (autoplay, speed, sensitivity, hint, wheel, hover-scrub). Colours come from the existing Frontend colour tabs.
+* **Flutter follows the admin theme** via `GET /api/theme` (cached offline, refreshed on start and pull-to-refresh): colours light/dark, style, radius, font, floating nav bar.
+
+
+---
+## v4 – Three.js 3D redesign
+* **3D hero** on the home page (floating apples, oranges, lemon, tomato, carrot, leaves – react to mouse, scroll, touch/tilt; click a fruit to spin it). Colours follow the brand colour from admin.
+* **Auto 3D product view** – every product photo becomes a lit, rotatable 3D object (background auto-removed, shape "inflated"), no extra photos needed. Product page tabs: `3D | 360° | Photos`.
+  Best with a product on a plain / white background or a transparent PNG. Photos without a plain background become a rounded 3D tile.
+* Admin → Settings → Design & Experience: new toggles **3D hero scene** and **Auto 3D product view**.
+* Three.js is self-hosted in `public/assets/vendor/three/` (no CDN needed). Scripts: `public/assets/front/scene3d.js`, `scene3d.css`.
+* After copying: `php artisan view:clear` and hard-refresh the browser (Ctrl+F5). Settings keys are created automatically (defaults ON).
+
+---
+## v5 – "Fresh Market" home (no 3D, no photo slider)
+* Home hero is now a photo-free bento (brand gradient, deal tile, aisle chips). The old image slider section was removed from the home page (Admin → Sliders still exists for the app).
+* New colourful category tiles, numbered section headings, framed product cards (used on every product list) and a dark "Today's deals" band. Colours follow the admin brand colour.
+* 3D hero / auto 3D product tab are OFF by default (Settings → Design & Experience → experimental). 360° photo viewer stays available per product.
+* Files: `public/assets/front/market.css`, `resources/views/frontend/home.blade.php`, `resources/views/frontend/partials/product-card.blade.php`.
+* Run `php artisan view:clear` and hard refresh (Ctrl+F5).
+
+## v6 – fixes
+- Home: old hero (image slider + 4-card trust strip) restored; rest of "Fresh Market" kept.
+- `market.css` now loaded globally from `layouts/app.blade.php` → All Products / category / search / wishlist cards and filters are styled. Listing grid uses `.mk-grid-3`, sidebar `.mk-side`.
+- Admin Gujarati: +165 keys in `lang/gu.json`; `admin.js` now translates dynamic sentences (PATTERNS), toasts, SweetAlert dialogs, `data-confirm*` attributes; controller flash messages wrapped in `__()`; new `lang/gu/validation.php`.
+- After deploy: `php artisan view:clear` and hard refresh (Ctrl+F5).

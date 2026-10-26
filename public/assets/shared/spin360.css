@@ -1,0 +1,107 @@
+/* Spin360 – 360° product viewer. Uses the storefront CSS variables when present. */
+.spin360 {
+    --s360-accent: var(--fx-brand-primary, #059669);
+    --s360-glass: color-mix(in srgb, var(--fx-card-bg, #ffffff) 78%, transparent);
+    --s360-ink: var(--fx-text-primary, #0f172a);
+    position: relative; width: 100%; height: 100%; min-height: 220px;
+    overflow: hidden; user-select: none; -webkit-user-select: none;
+    touch-action: pan-y; cursor: grab; outline: none;
+    background:
+        radial-gradient(60% 55% at 50% 58%, color-mix(in srgb, var(--s360-accent) 14%, transparent), transparent 70%),
+        var(--fx-card-bg, #f8fafc);
+    -webkit-tap-highlight-color: transparent;
+}
+.spin360.is-dragging { cursor: grabbing; }
+.spin360.is-zoomed { cursor: move; }
+.spin360:focus-visible { box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--s360-accent) 60%, transparent); }
+.spin360.is-hover { cursor: ew-resize; touch-action: auto; }
+
+.spin360-stage { position: absolute; inset: 0; }
+.spin360-canvas { width: 100%; height: 100%; display: block; }
+
+/* floor shadow under the product */
+.spin360::after {
+    content: ''; position: absolute; left: 22%; right: 22%; bottom: 13%; height: 7%;
+    background: radial-gradient(ellipse at center, rgba(15, 23, 42, .22), transparent 70%);
+    filter: blur(6px); pointer-events: none; z-index: 0;
+}
+.spin360-stage { z-index: 1; }
+
+/* 360° badge */
+.spin360-badge {
+    position: absolute; top: .75rem; left: .75rem; z-index: 4; display: inline-flex; align-items: center; gap: .35rem;
+    padding: .3rem .6rem .3rem .45rem; border-radius: 999px; font-size: .72rem; letter-spacing: .02em;
+    color: #fff; background: linear-gradient(135deg, var(--s360-accent), color-mix(in srgb, var(--s360-accent) 55%, #7c3aed));
+    box-shadow: 0 8px 18px -8px color-mix(in srgb, var(--s360-accent) 70%, transparent); pointer-events: none;
+}
+.spin360-badge svg { width: 16px; height: 16px; animation: s360-spin 6s linear infinite; }
+.spin360.is-hover .spin360-badge { top: .5rem; left: .5rem; padding: .22rem .5rem .22rem .38rem; font-size: .65rem; }
+.spin360.is-hover .spin360-badge svg { width: 13px; height: 13px; }
+@keyframes s360-spin { to { transform: rotate(360deg); } }
+
+/* loader ring */
+.spin360-loader { position: absolute; inset: auto 0 .9rem 0; margin: auto; width: 56px; height: 56px; z-index: 5; display: grid; place-items: center; pointer-events: none; }
+.spin360-loader[hidden] { display: none; }
+.spin360-loader svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+.spin360-loader circle { fill: none; stroke-width: 3; }
+.spin360-loader .trk { stroke: color-mix(in srgb, var(--s360-ink) 12%, transparent); }
+.spin360-loader .bar { stroke: var(--s360-accent); stroke-linecap: round; stroke-dasharray: 119.4; stroke-dashoffset: 119.4; transition: stroke-dashoffset .2s; }
+.spin360-loader .pct { font-size: .68rem; font-weight: 800; color: var(--s360-ink); }
+.spin360-loader { top: auto; bottom: 4.6rem; }
+
+/* hint */
+.spin360-hint {
+    position: absolute; left: 50%; top: 1rem; transform: translateX(-50%); z-index: 4; display: inline-flex; align-items: center; gap: .55rem;
+    padding: .4rem .8rem; border-radius: 999px; font-size: .72rem; font-weight: 700; color: var(--s360-ink);
+    background: var(--s360-glass); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border: 1px solid color-mix(in srgb, var(--s360-ink) 10%, transparent); pointer-events: none; white-space: nowrap;
+    transition: opacity .4s, transform .4s; animation: s360-hint-in .6s .3s both;
+}
+.spin360-hint.gone { opacity: 0; transform: translate(-50%, -8px); }
+.spin360-hint .arrows { display: inline-flex; gap: 2px; }
+.spin360-hint .arrows i { width: 6px; height: 6px; border-top: 2px solid var(--s360-accent); border-right: 2px solid var(--s360-accent); transform: rotate(45deg); opacity: .25; animation: s360-arrow 1.2s infinite; }
+.spin360-hint .arrows i:nth-child(2) { animation-delay: .15s; }
+.spin360-hint .arrows i:nth-child(3) { animation-delay: .3s; }
+@keyframes s360-arrow { 0%, 100% { opacity: .2; } 50% { opacity: 1; } }
+@keyframes s360-hint-in { from { opacity: 0; transform: translate(-50%, 8px); } }
+
+/* toolbar */
+.spin360-ui {
+    position: absolute; left: .75rem; right: .75rem; bottom: .75rem; z-index: 6; display: flex; align-items: center; gap: .4rem;
+    padding: .35rem; border-radius: 1.1rem; background: var(--s360-glass);
+    backdrop-filter: blur(14px) saturate(160%); -webkit-backdrop-filter: blur(14px) saturate(160%);
+    border: 1px solid color-mix(in srgb, var(--s360-ink) 9%, transparent);
+    box-shadow: 0 14px 30px -16px rgba(15, 23, 42, .45); cursor: default;
+}
+.spin360-ui button {
+    width: 2.25rem; height: 2.25rem; flex: none; display: grid; place-items: center; border-radius: .8rem; border: 0; cursor: pointer;
+    color: var(--s360-ink); background: transparent; transition: background-color .15s, color .15s, transform .15s;
+}
+.spin360-ui button:hover { background: color-mix(in srgb, var(--s360-accent) 14%, transparent); color: var(--s360-accent); }
+.spin360-ui button:active { transform: scale(.92); }
+.spin360-ui button.on { background: var(--s360-accent); color: #fff; }
+
+.spin360-range { flex: 1; min-width: 0; height: 1.5rem; -webkit-appearance: none; appearance: none; background: transparent; cursor: pointer; }
+.spin360-range::-webkit-slider-runnable-track { height: 6px; border-radius: 99px; background: color-mix(in srgb, var(--s360-ink) 14%, transparent); }
+.spin360-range::-moz-range-track { height: 6px; border-radius: 99px; background: color-mix(in srgb, var(--s360-ink) 14%, transparent); }
+.spin360-range::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; margin-top: -6px; border-radius: 50%; background: var(--s360-accent); border: 3px solid #fff; box-shadow: 0 2px 8px rgba(15, 23, 42, .35); }
+.spin360-range::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--s360-accent); border: 3px solid #fff; box-shadow: 0 2px 8px rgba(15, 23, 42, .35); }
+
+/* wheel-armed ring */
+.spin360.is-active:not(.is-hover)::before {
+    content: ''; position: absolute; inset: 0; z-index: 3; pointer-events: none; border-radius: inherit;
+    box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--s360-accent) 45%, transparent);
+}
+
+/* full screen */
+.spin360.is-fs, .spin360.is-fake-fs { background: var(--fx-body-bg, #fff); }
+.spin360.is-fake-fs { position: fixed; inset: 0; z-index: 9999; width: 100vw; height: 100dvh; border-radius: 0 !important; }
+.spin360.is-fs .spin360-ui { max-width: 640px; margin: 0 auto; bottom: 1.25rem; }
+
+@media (max-width: 480px) {
+    .spin360-hint { font-size: .68rem; padding: .35rem .65rem; }
+    .spin360-ui { left: .5rem; right: .5rem; bottom: .5rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .spin360-badge svg, .spin360-hint .arrows i { animation: none; }
+}

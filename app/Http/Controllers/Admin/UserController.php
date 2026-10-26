@@ -70,7 +70,7 @@ class UserController extends Controller
             'is_active' => $request->has('is_active'),
         ]);
 
-        return redirect()->route('admin.users.index')->with('success', 'User account created successfully!');
+        return redirect()->route('admin.users.index')->with('success', __('User account created successfully!'));
     }
 
     public function edit(User $user)
@@ -107,13 +107,13 @@ class UserController extends Controller
 
         $user->update($data);
 
-        return redirect()->route('admin.users.index')->with('success', 'User account updated successfully!');
+        return redirect()->route('admin.users.index')->with('success', __('User account updated successfully!'));
     }
 
     public function toggleStatus(User $user)
     {
         if ($user->id === auth()->id()) {
-            return back()->with('error', 'You cannot deactivate your own account!');
+            return back()->with('error', __('You cannot deactivate your own account!'));
         }
 
         $user->update(['is_active' => !$user->is_active]);
@@ -125,10 +125,10 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         if ($user->id === auth()->id()) {
-            return back()->with('error', 'You cannot delete your own account!');
+            return back()->with('error', __('You cannot delete your own account!'));
         }
 
         $user->delete();
-        return redirect()->route('admin.users.index')->with('success', 'User account deleted successfully!');
+        return redirect()->route('admin.users.index')->with('success', __('User account deleted successfully!'));
     }
 }

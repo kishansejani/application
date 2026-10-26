@@ -348,4 +348,12 @@ const Map<String, String> guTranslations = {
   'lang_en': 'English',
   'lang_gu': 'ગુજરાતી',
   'select_option': 'પસંદ કરો',
+  'spin_view_360': '360° વ્યૂ',
+  'spin_view_photos': 'ફોટા',
+  'spin_drag_hint': 'ફેરવવા માટે ખેંચો',
+  'spin_play': 'ઓટો-રોટેટ',
+  'spin_pause': 'થોભાવો',
+  'spin_fullscreen': 'ફુલ સ્ક્રીન',
+  'spin_title': 'ફેરવો અને જુઓ',
+  'spin_subtitle': 'પ્રોડક્ટને 360°માં ફેરવીને જુઓ',
 };

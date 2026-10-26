@@ -29,6 +29,10 @@ class Product {
   final SubCategory? subCategory;
   final List<Product> relatedProducts;
 
+  /// 360° view frames (ordered). Empty when the product has no spin.
+  final List<String> spinFrames;
+  final bool has360Flag;
+
   Product({
     required this.id,
     this.categoryId = 0,
@@ -52,7 +56,11 @@ class Product {
     this.category,
     this.subCategory,
     this.relatedProducts = const [],
+    this.spinFrames = const [],
+    this.has360Flag = false,
   });
+
+  bool get has360 => has360Flag || spinFrames.length >= 2;
 
   int get discountPercentage {
     final mrp = strikePrice;
@@ -121,6 +129,12 @@ class Product {
       }
     }
 
+    final spin = <String>[];
+    for (final f in asList(json['spin_frames'])) {
+      final u = f is Map ? asStringOrNull(f['url'] ?? f['image_url']) : asStringOrNull(f);
+      if (u != null) spin.add(u);
+    }
+
     final stock = asInt(json['stock_quantity'] ?? json['stock'] ?? json['max_stock']);
     final inStock = json.containsKey('is_in_stock') ? asBool(json['is_in_stock']) : stock > 0;
 
@@ -150,6 +164,8 @@ class Product {
       category: category,
       subCategory: subCategory,
       relatedProducts: mapList(json['related_products'], (e) => Product.fromJson(e)),
+      spinFrames: spin,
+      has360Flag: asBool(json['has_360']) || asInt(json['spin_frames_count']) >= 2,
     );
   }
 }

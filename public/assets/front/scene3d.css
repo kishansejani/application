@@ -1,0 +1,71 @@
+/* Scene3D – hero stage + product 3D viewer chrome */
+.hero3d {
+    --h3-brand: var(--fx-brand-primary, #059669);
+    --h3-ink: #031a12;
+    position: relative; isolation: isolate; overflow: hidden; border-radius: 2rem; color: #fff;
+    min-height: clamp(520px, 78vh, 700px);
+    background:
+        radial-gradient(60% 70% at 78% 40%, color-mix(in srgb, var(--h3-brand) 55%, transparent), transparent 70%),
+        radial-gradient(40% 50% at 10% 0%, color-mix(in srgb, var(--fx-accent, #f59e0b) 28%, transparent), transparent 70%),
+        linear-gradient(155deg, color-mix(in srgb, var(--h3-brand) 22%, var(--h3-ink)), var(--h3-ink) 70%);
+    box-shadow: 0 40px 80px -40px color-mix(in srgb, var(--h3-brand) 70%, #000), inset 0 1px 0 rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.08);
+}
+/* perspective grid floor */
+.hero3d::before {
+    content: ''; position: absolute; left: -20%; right: -20%; bottom: -35%; height: 75%; z-index: -1;
+    background-image:
+        linear-gradient(color-mix(in srgb, var(--h3-brand) 55%, transparent) 1px, transparent 1px),
+        linear-gradient(90deg, color-mix(in srgb, var(--h3-brand) 55%, transparent) 1px, transparent 1px);
+    background-size: 56px 56px; transform: perspective(520px) rotateX(64deg); transform-origin: 50% 0;
+    mask-image: linear-gradient(to bottom, #000 0%, transparent 85%); -webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 85%);
+    opacity: .35; animation: h3-grid 6s linear infinite;
+}
+@keyframes h3-grid { to { background-position: 0 56px, 56px 0; } }
+.hero3d::after { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(120% 90% at 50% 120%, rgba(0,0,0,.5), transparent 60%); }
+
+.hero3d-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
+.hero3d-copy { position: relative; z-index: 2; max-width: 38rem; padding: clamp(1.5rem, 5vw, 4rem); pointer-events: none; }
+.hero3d-copy a, .hero3d-copy button { pointer-events: auto; }
+.hero3d-eyebrow { display: inline-flex; align-items: center; gap: .5rem; padding: .4rem .85rem; border-radius: 999px; font-size: .75rem; font-weight: 800; letter-spacing: .04em;
+    background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.hero3d-eyebrow i { color: #fbbf24; }
+.hero3d h1 { font-size: clamp(2.4rem, 6.2vw, 4.6rem); line-height: 1.02; font-weight: 800; letter-spacing: -.035em; margin: 1.1rem 0 1rem; }
+.hero3d h1 em { font-style: normal; background: linear-gradient(100deg, #fff 0%, color-mix(in srgb, var(--h3-brand) 40%, #bbf7d0) 45%, #fde68a 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero3d p.lead { font-size: clamp(.95rem, 1.7vw, 1.15rem); line-height: 1.6; color: rgba(255,255,255,.8); max-width: 30rem; }
+.hero3d-cta { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.6rem; }
+.hero3d-btn { display: inline-flex; align-items: center; gap: .55rem; padding: .95rem 1.5rem; border-radius: 1.1rem; font-weight: 800; font-size: .95rem; transition: transform .2s, box-shadow .2s, background-color .2s; }
+.hero3d-btn.primary { background: linear-gradient(135deg, var(--h3-brand), color-mix(in srgb, var(--h3-brand) 55%, #34d399)); color: #fff; box-shadow: 0 18px 36px -14px color-mix(in srgb, var(--h3-brand) 90%, #000), inset 0 1px 0 rgba(255,255,255,.35); }
+.hero3d-btn.ghost { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.25); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: #fff; }
+.hero3d-btn:hover { transform: translateY(-3px); }
+.hero3d-stats { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 2rem; }
+.hero3d-stat { padding: .6rem .9rem; border-radius: 1rem; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.hero3d-stat b { display: block; font-size: 1.15rem; font-weight: 800; }
+.hero3d-stat span { font-size: .7rem; color: rgba(255,255,255,.7); font-weight: 600; }
+.hero3d-tip { position: absolute; z-index: 2; right: 1.25rem; bottom: 1.1rem; display: none; align-items: center; gap: .45rem; font-size: .72rem; font-weight: 700; color: rgba(255,255,255,.75); padding: .4rem .8rem; border-radius: 999px; background: rgba(0,0,0,.25); border: 1px solid rgba(255,255,255,.12); pointer-events: none; }
+.hero3d.is-3d-ready .hero3d-tip { display: inline-flex; }
+/* CSS fallback orbs (before WebGL is ready / when it is unavailable) */
+.hero3d-orbs { position: absolute; inset: 0; z-index: 0; pointer-events: none; transition: opacity .8s; }
+.hero3d.is-3d-ready .hero3d-orbs { opacity: 0; }
+.hero3d-orbs i { position: absolute; border-radius: 50%; filter: blur(.5px); animation: h3-float 7s ease-in-out infinite;
+    background: radial-gradient(circle at 30% 28%, rgba(255,255,255,.85), var(--c) 38%, color-mix(in srgb, var(--c) 40%, #000) 100%); box-shadow: 0 30px 50px -20px rgba(0,0,0,.6); }
+.hero3d-orbs i:nth-child(1) { --c: #ef4444; width: 150px; height: 150px; right: 22%; top: 24%; }
+.hero3d-orbs i:nth-child(2) { --c: #f59e0b; width: 96px; height: 96px; right: 8%; top: 12%; animation-delay: -2s; }
+.hero3d-orbs i:nth-child(3) { --c: #22c55e; width: 80px; height: 80px; right: 12%; bottom: 18%; animation-delay: -4s; }
+.hero3d-orbs i:nth-child(4) { --c: #eab308; width: 70px; height: 70px; right: 40%; bottom: 14%; animation-delay: -1s; }
+@keyframes h3-float { 50% { transform: translateY(-18px) rotate(6deg); } }
+@media (max-width: 1024px) { .hero3d-orbs i { opacity: .55; } .hero3d { min-height: 640px; } .hero3d-copy { margin-top: 13rem; } .hero3d-canvas { } }
+@media (max-width: 640px) { .hero3d { border-radius: 1.5rem; } .hero3d-copy { margin-top: 12.5rem; padding-top: 1rem; } .hero3d-tip { display: none !important; } .hero3d-stat b { font-size: 1rem; } }
+
+/* Product 3D viewer */
+.prod3d-canvas { outline: none; }
+.prod3d-badge { position: absolute; top: .75rem; left: .75rem; z-index: 4; padding: .3rem .65rem; border-radius: 999px; font-size: .72rem; font-weight: 800; letter-spacing: .04em; color: #fff; pointer-events: none;
+    background: linear-gradient(135deg, var(--fx-brand-primary, #059669), color-mix(in srgb, var(--fx-brand-primary, #059669) 55%, #7c3aed)); box-shadow: 0 8px 18px -8px color-mix(in srgb, var(--fx-brand-primary, #059669) 70%, transparent); }
+.prod3d-hint { position: absolute; left: 50%; bottom: 1rem; transform: translateX(-50%); z-index: 4; display: inline-flex; align-items: center; gap: .55rem; padding: .45rem .9rem; border-radius: 999px; font-size: .74rem; font-weight: 700; white-space: nowrap; pointer-events: none;
+    color: var(--fx-text-primary, #0f172a); background: color-mix(in srgb, var(--fx-card-bg, #fff) 80%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid color-mix(in srgb, var(--fx-text-primary, #0f172a) 10%, transparent); transition: opacity .4s, transform .4s; }
+.prod3d-hint.gone { opacity: 0; transform: translate(-50%, 8px); }
+.prod3d-hint .arrows { display: inline-flex; gap: 2px; }
+.prod3d-hint .arrows i { width: 6px; height: 6px; border-top: 2px solid var(--fx-brand-primary, #059669); border-right: 2px solid var(--fx-brand-primary, #059669); transform: rotate(45deg); opacity: .3; animation: p3-arrow 1.2s infinite; }
+.prod3d-hint .arrows i:nth-child(2) { animation-delay: .15s; } .prod3d-hint .arrows i:nth-child(3) { animation-delay: .3s; }
+@keyframes p3-arrow { 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .hero3d::before, .hero3d-orbs i { animation: none; } }

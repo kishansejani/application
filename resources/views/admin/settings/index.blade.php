@@ -134,6 +134,40 @@
     ];
 
     $mode = old('theme_mode', $settings['theme_mode'] ?? 'system');
+
+    $designStyles = [
+        'aurora'  => ['Aurora',  'Glow, gradients & soft depth'],
+        'soft'    => ['Soft',    'Airy, borderless, big shadows'],
+        'glass'   => ['Glass',   'Frosted translucent panels'],
+        'bold'    => ['Bold',    'Thick outlines, hard shadows'],
+        'minimal' => ['Minimal', 'Flat, clean and quiet'],
+    ];
+    $designRadius = ['sharp' => 'Sharp', 'soft' => 'Soft', 'round' => 'Rounded', 'pill' => 'Pill'];
+    $designFonts = [
+        'jakarta' => ['Plus Jakarta Sans', "'Plus Jakarta Sans'"],
+        'poppins' => ['Poppins', "'Poppins'"],
+        'outfit'  => ['Outfit', "'Outfit'"],
+        'manrope' => ['Manrope', "'Manrope'"],
+        'sora'    => ['Sora', "'Sora'"],
+    ];
+    $fxToggles = [
+        ['fx_scene3d',       'ph-cube-focus',   'Experimental: 3D scene', 'Loads Three.js. (Not used by the current home design – off by default.)'],
+        ['fx_product3d',     'ph-cube',         'Auto 3D product view',   'Every product photo becomes a rotatable 3D object on the product page – no extra photos needed.'],
+        ['fx_aurora',        'ph-sun-horizon',  'Aurora background',      'Slowly drifting colour glow behind every page, built from your brand colour.'],
+        ['fx_reveal',        'ph-sparkle',      'Scroll reveal',          'Sections and product cards fade and rise into view as you scroll.'],
+        ['fx_tilt',          'ph-cube',         '3D card tilt',           'Product cards tilt towards the mouse with a soft glare (desktop only).'],
+        ['fx_glow',          'ph-flashlight',   'Cursor spotlight',       'A soft light follows the cursor across cards (desktop only).'],
+        ['fx_marquee',       'ph-arrows-left-right', 'Trust marquee',     'Scrolling strip of delivery / quality promises under the home hero.'],
+        ['fx_glass_header',  'ph-app-window',   'Glass header',           'Frosted, translucent sticky header that blurs the page behind it.'],
+        ['fx_float_tabbar',  'ph-device-mobile','Floating mobile tab bar','Rounded floating bottom navigation on phones.'],
+        ['fx_progress',      'ph-line-segment', 'Scroll progress bar',    'Thin gradient bar at the top showing how far down the page you are.'],
+    ];
+    $spinToggles = [
+        ['spin_autoplay',     'Auto-rotate',            'Product turns slowly until the visitor touches it.'],
+        ['spin_wheel',        'Scroll wheel rotation',  'Click the product, then scroll to rotate it (page scroll is never hijacked until clicked).'],
+        ['spin_hint',         'Show "drag to rotate" hint', 'Small animated hint on first view.'],
+        ['spin_hover_scrub',  'Hover to rotate on cards', 'Home "Spin & explore" cards rotate as the mouse moves across them.'],
+    ];
 @endphp
 
     <x-admin.page-header title="Settings & Color Management" subtitle="Centralized color system, branding and appearance controls across the entire system." icon="gear-six">
@@ -161,6 +195,11 @@
                 <i class="ph-duotone ph-moon-stars text-lg"></i>
                 <span>Dark Mode Colors</span>
                 <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-indigo-100 text-indigo-800 dark:bg-indigo-500/20 dark:text-indigo-300">Dark Theme</span>
+            </button>
+            <button type="button" class="tab-btn flex items-center gap-2 px-4 py-3 font-bold text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white -mb-px transition" data-tab-target="tabDesign">
+                <i class="ph-duotone ph-magic-wand text-lg"></i>
+                <span>Design &amp; Experience</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-fuchsia-100 text-fuchsia-800 dark:bg-fuchsia-500/20 dark:text-fuchsia-300">New</span>
             </button>
         @endif
     </div>
@@ -554,12 +593,236 @@
                 </div>
             </div>
         </div>
+
+        {{-- ============================== TAB 4: DESIGN & EXPERIENCE ============================== --}}
+        <div id="tabDesign" class="tab-pane hidden space-y-6">
+            <input type="hidden" name="design_form" value="1">
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-5 items-start">
+                <div class="xl:col-span-2 space-y-5 min-w-0">
+
+                    {{-- Style --}}
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h3 class="card-title"><i class="ph-duotone ph-paint-brush-broad"></i> Design style</h3>
+                                <p class="card-subtitle">The overall look of the website and mobile app. Works with every colour palette, in light and dark mode.</p>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                                @foreach($designStyles as $key => [$label, $desc])
+                                    <label class="dx-tile cursor-pointer">
+                                        <input type="radio" name="ui_style" value="{{ $key }}" class="sr-only peer" data-dx="style" {{ $s('ui_style', 'aurora') === $key ? 'checked' : '' }}>
+                                        <span class="dx-tile-body peer-checked:dx-on">
+                                            <span class="dx-mini dx-mini-{{ $key }}"><i></i><b></b><em></em></span>
+                                            <span class="block font-extrabold text-[13px] text-slate-900 dark:text-white mt-2">{{ $label }}</span>
+                                            <span class="block text-[11px] text-slate-500 dark:text-slate-400 leading-snug">{{ $desc }}</span>
+                                        </span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Shape + font --}}
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h3 class="card-title"><i class="ph-duotone ph-shapes"></i> Shape &amp; typography</h3>
+                                <p class="card-subtitle">Corner roundness and the font used across the storefront (Gujarati text always uses Hind Vadodara).</p>
+                            </div>
+                        </div>
+                        <div class="card-body space-y-5">
+                            <div>
+                                <p class="form-label">Corner radius</p>
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                    @foreach($designRadius as $key => $label)
+                                        <label class="dx-tile cursor-pointer">
+                                            <input type="radio" name="ui_radius" value="{{ $key }}" class="sr-only peer" data-dx="radius" {{ $s('ui_radius', 'round') === $key ? 'checked' : '' }}>
+                                            <span class="dx-tile-body peer-checked:dx-on flex items-center gap-3">
+                                                <span class="dx-corner dx-corner-{{ $key }}"></span>
+                                                <span class="font-extrabold text-[13px] text-slate-900 dark:text-white">{{ $label }}</span>
+                                            </span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
+                            <div>
+                                <p class="form-label">Font</p>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                    @foreach($designFonts as $key => [$label, $css])
+                                        <label class="dx-tile cursor-pointer">
+                                            <input type="radio" name="ui_font" value="{{ $key }}" class="sr-only peer" data-dx="font" {{ $s('ui_font', 'jakarta') === $key ? 'checked' : '' }}>
+                                            <span class="dx-tile-body peer-checked:dx-on">
+                                                <span class="block text-xl font-extrabold text-slate-900 dark:text-white" style="font-family: {{ $css }}, sans-serif">Fresh Express</span>
+                                                <span class="block text-[11px] text-slate-500 dark:text-slate-400 mt-0.5" style="font-family: {{ $css }}, sans-serif">{{ $label }} · Aa Bb 123 ₹</span>
+                                            </span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Effects --}}
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h3 class="card-title"><i class="ph-duotone ph-sparkle"></i> Motion &amp; effects</h3>
+                                <p class="card-subtitle">Switch each effect on or off. Visitors who prefer reduced motion never see animations.</p>
+                            </div>
+                        </div>
+                        <div class="card-body grid grid-cols-1 md:grid-cols-2 gap-3">
+                            @foreach($fxToggles as [$key, $icon, $label, $desc])
+                                <label class="dx-switch-row">
+                                    <span class="dx-ico"><i class="ph-duotone {{ $icon }}"></i></span>
+                                    <span class="min-w-0 flex-1">
+                                        <span class="block font-bold text-[13px] text-slate-900 dark:text-white">{{ $label }}</span>
+                                        <span class="block text-[11.5px] text-slate-500 dark:text-slate-400 leading-snug">{{ $desc }}</span>
+                                    </span>
+                                    <input type="checkbox" name="{{ $key }}" value="1" class="dx-switch" data-dx-fx="{{ $key }}" {{ $s($key, '1') === '1' ? 'checked' : '' }}>
+                                </label>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    {{-- 360 --}}
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h3 class="card-title"><i class="ph-duotone ph-arrows-clockwise"></i> 360° product viewer</h3>
+                                <p class="card-subtitle">How customers interact with products that have a 360° view (upload frames in Products → Edit → 360° view).</p>
+                            </div>
+                        </div>
+                        <div class="card-body space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                @foreach($spinToggles as [$key, $label, $desc])
+                                    <label class="dx-switch-row">
+                                        <span class="min-w-0 flex-1">
+                                            <span class="block font-bold text-[13px] text-slate-900 dark:text-white">{{ $label }}</span>
+                                            <span class="block text-[11.5px] text-slate-500 dark:text-slate-400 leading-snug">{{ $desc }}</span>
+                                        </span>
+                                        <input type="checkbox" name="{{ $key }}" value="1" class="dx-switch" {{ $s($key, '1') === '1' ? 'checked' : '' }}>
+                                    </label>
+                                @endforeach
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div>
+                                    <label for="spin_speed" class="form-label flex justify-between"><span>Auto-rotate speed</span><b id="spinSpeedOut" class="text-slate-900 dark:text-white">{{ $s('spin_speed', '5') }}</b></label>
+                                    <input type="range" id="spin_speed" name="spin_speed" min="1" max="10" step="1" value="{{ $s('spin_speed', '5') }}" class="w-full" oninput="document.getElementById('spinSpeedOut').textContent = this.value">
+                                    <p class="form-hint">1 = slow (25 s per turn) · 10 = fast (2.5 s per turn)</p>
+                                </div>
+                                <div>
+                                    <label for="spin_sensitivity" class="form-label flex justify-between"><span>Drag sensitivity</span><b id="spinSensOut" class="text-slate-900 dark:text-white">{{ $s('spin_sensitivity', '5') }}</b></label>
+                                    <input type="range" id="spin_sensitivity" name="spin_sensitivity" min="1" max="10" step="1" value="{{ $s('spin_sensitivity', '5') }}" class="w-full" oninput="document.getElementById('spinSensOut').textContent = this.value">
+                                    <p class="form-hint">How far the product turns when the visitor drags across it.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Right: live preview --}}
+                <div class="space-y-5 xl:sticky xl:top-24">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="ph-duotone ph-eye"></i> Live preview</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="dxPreview" class="dx-pv" data-style="{{ $s('ui_style', 'aurora') }}" data-radius="{{ $s('ui_radius', 'round') }}">
+                                <div class="dx-pv-head"><span class="dx-pv-logo"><i class="ph-fill ph-basket"></i></span><b>{{ $s('store_name', 'Fresh Express') }}</b><span class="dx-pv-search"></span></div>
+                                <div class="dx-pv-hero"><b>Fresh groceries<br>in 2 hours</b><span class="dx-pv-btn">Shop now</span></div>
+                                <div class="dx-pv-cards">
+                                    <div class="dx-pv-card"><span class="dx-pv-img"></span><i></i><u></u><span class="dx-pv-btn sm">Add</span></div>
+                                    <div class="dx-pv-card"><span class="dx-pv-img"><em>360°</em></span><i></i><u></u><span class="dx-pv-btn sm">Add</span></div>
+                                </div>
+                            </div>
+                            <p class="text-[11.5px] text-slate-500 dark:text-slate-400 mt-3">Colours come from the Frontend / Dark colour tabs. Save to apply to the website <b>and</b> the mobile app.</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body flex gap-3">
+                            <span class="stat-icon tone-violet !w-11 !h-11 text-xl shrink-0"><i class="ph-duotone ph-device-mobile"></i></span>
+                            <div class="text-[12.5px] text-slate-600 dark:text-slate-300 leading-relaxed">
+                                <p class="font-extrabold text-slate-900 dark:text-white">Mobile app follows automatically</p>
+                                The Flutter app reads these colours, style, corner radius and 360° options from <span class="font-mono text-[11px]">/api/theme</span> every time it opens – no new app release needed.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body flex gap-2.5">
+                            <a href="{{ route('admin.settings.reset', ['scope' => 'design']) }}" class="btn btn-outline flex-1 justify-center" data-confirm="Style, shape, font, effects and 360° options return to the defaults." data-confirm-button="Reset" data-confirm-danger><i class="ph ph-arrow-counter-clockwise"></i> Reset</a>
+                            <button type="submit" class="btn btn-primary flex-1 justify-center"><i class="ph ph-floppy-disk"></i> Save Design</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         @endif
     </form>
 @endsection
 
 @push('styles')
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&family=Outfit:wght@700;800&family=Manrope:wght@700;800&family=Sora:wght@700;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
 <style>
+    /* ---- Design & Experience tab ---- */
+    .dx-tile-body { display: block; padding: .85rem; border-radius: 1rem; border: 2px solid #e2e8f0; background: #fff; transition: border-color .15s, box-shadow .15s, transform .15s; height: 100%; }
+    .dark .dx-tile-body { border-color: #334155; background: #0f172a; }
+    .dx-tile:hover .dx-tile-body { transform: translateY(-2px); border-color: #cbd5e1; }
+    .peer:checked + .dx-tile-body { border-color: var(--theme-primary, #059669); box-shadow: 0 0 0 4px color-mix(in srgb, var(--theme-primary, #059669) 16%, transparent); }
+    .peer:focus-visible + .dx-tile-body { outline: 2px solid var(--theme-primary, #059669); outline-offset: 2px; }
+    .dx-mini { position: relative; display: block; height: 62px; border-radius: .7rem; overflow: hidden; background: #f1f5f9; }
+    .dark .dx-mini { background: #1e293b; }
+    .dx-mini i { position: absolute; left: 8px; top: 8px; width: 55%; height: 8px; border-radius: 4px; background: #cbd5e1; }
+    .dx-mini b { position: absolute; left: 8px; bottom: 8px; width: 42%; height: 20px; border-radius: 7px; background: var(--theme-primary, #059669); }
+    .dx-mini em { position: absolute; right: 8px; bottom: 8px; width: 34%; height: 34px; border-radius: 9px; background: #fff; border: 1px solid #e2e8f0; }
+    .dx-mini-aurora { background: radial-gradient(70% 90% at 10% 0%, color-mix(in srgb, var(--theme-primary, #059669) 30%, transparent), transparent), radial-gradient(60% 80% at 100% 100%, #c4b5fd88, transparent), #f8fafc; }
+    .dx-mini-aurora b { background-image: linear-gradient(135deg, var(--theme-primary, #059669), #7c3aed); }
+    .dx-mini-soft em { border: 0; box-shadow: 0 8px 14px -6px rgba(15,23,42,.3); }
+    .dx-mini-glass { background: linear-gradient(135deg, color-mix(in srgb, var(--theme-primary, #059669) 45%, #fff), #c7d2fe); }
+    .dx-mini-glass em { background: rgba(255,255,255,.45); border-color: rgba(255,255,255,.7); backdrop-filter: blur(4px); }
+    .dx-mini-bold { background: #fef9c3; }
+    .dx-mini-bold em, .dx-mini-bold b { border: 2px solid #0f172a; box-shadow: 2px 2px 0 #0f172a; border-radius: 4px; }
+    .dx-mini-minimal em { border-radius: 4px; box-shadow: none; }
+    .dx-mini-minimal b { border-radius: 4px; }
+    .dx-corner { width: 34px; height: 34px; border: 3px solid var(--theme-primary, #059669); border-right-color: transparent; border-bottom-color: transparent; flex: none; }
+    .dx-corner-sharp { border-top-left-radius: 2px; } .dx-corner-soft { border-top-left-radius: 9px; } .dx-corner-round { border-top-left-radius: 16px; } .dx-corner-pill { border-top-left-radius: 34px; }
+    .dx-switch-row { display: flex; align-items: center; gap: .75rem; padding: .75rem .85rem; border-radius: .9rem; border: 1px solid #e2e8f0; cursor: pointer; transition: background-color .15s, border-color .15s; }
+    .dark .dx-switch-row { border-color: #334155; }
+    .dx-switch-row:hover { background: #f8fafc; } .dark .dx-switch-row:hover { background: #111c31; }
+    .dx-ico { width: 2.2rem; height: 2.2rem; flex: none; display: grid; place-items: center; border-radius: .7rem; font-size: 1.15rem; color: var(--theme-primary, #059669); background: color-mix(in srgb, var(--theme-primary, #059669) 12%, transparent); }
+    .dx-switch { appearance: none; -webkit-appearance: none; flex: none; position: relative; width: 2.6rem; height: 1.5rem; border-radius: 999px; background: #cbd5e1; cursor: pointer; transition: background-color .2s; }
+    .dx-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 4px rgba(15,23,42,.35); transition: transform .2s; }
+    .dx-switch:checked { background: var(--theme-primary, #059669); }
+    .dx-switch:checked::after { transform: translateX(1.1rem); }
+    .dx-switch:focus-visible { outline: 2px solid var(--theme-primary, #059669); outline-offset: 2px; }
+
+    /* live preview */
+    .dx-pv { --r: 16px; --rb: 11px; padding: 12px; border-radius: 18px; background: #f6f8f7; border: 1px solid #e2e8f0; font-size: 11px; display: grid; gap: 10px; }
+    .dark .dx-pv { background: #0b1220; border-color: #334155; }
+    .dx-pv[data-radius="sharp"] { --r: 5px; --rb: 3px; } .dx-pv[data-radius="soft"] { --r: 10px; --rb: 7px; } .dx-pv[data-radius="pill"] { --r: 26px; --rb: 99px; }
+    .dx-pv-head { display: flex; align-items: center; gap: 7px; padding: 8px 10px; border-radius: var(--r); background: #fff; border: 1px solid #e2e8f0; color: #0f172a; }
+    .dark .dx-pv-head, .dark .dx-pv-card { background: #0f172a; border-color: #1e293b; color: #f1f5f9; }
+    .dx-pv-logo { width: 22px; height: 22px; border-radius: calc(var(--rb) - 2px); display: grid; place-items: center; color: #fff; background: var(--theme-primary, #059669); }
+    .dx-pv-search { flex: 1; height: 16px; border-radius: 99px; background: #e2e8f0; margin-left: 4px; } .dark .dx-pv-search { background: #1e293b; }
+    .dx-pv-hero { display: flex; flex-direction: column; gap: 8px; padding: 16px 14px; border-radius: var(--r); color: #fff; font-size: 14px; line-height: 1.2; background: linear-gradient(135deg, var(--theme-primary, #059669), color-mix(in srgb, var(--theme-primary, #059669) 55%, #0f172a)); }
+    .dx-pv-btn { align-self: flex-start; padding: 6px 12px; border-radius: var(--rb); font-weight: 800; font-size: 11px; color: #fff; background: var(--theme-primary, #059669); }
+    .dx-pv-hero .dx-pv-btn { background: #fff; color: #0f172a; }
+    .dx-pv-btn.sm { align-self: stretch; text-align: center; padding: 5px; }
+    .dx-pv-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .dx-pv-card { display: grid; gap: 6px; padding: 8px; border-radius: var(--r); background: #fff; border: 1px solid #e2e8f0; }
+    .dx-pv-card i { height: 7px; width: 70%; border-radius: 4px; background: #cbd5e1; } .dx-pv-card u { height: 7px; width: 40%; border-radius: 4px; background: #e2e8f0; text-decoration: none; }
+    .dx-pv-img { position: relative; display: block; aspect-ratio: 1.25; border-radius: calc(var(--r) - 4px); background: linear-gradient(135deg, #d1fae5, #a7f3d0); }
+    .dx-pv-img em { position: absolute; right: 5px; bottom: 5px; padding: 1px 6px; border-radius: 99px; font-style: normal; font-size: 9px; font-weight: 800; color: #fff; background: linear-gradient(135deg, var(--theme-primary, #059669), #7c3aed); }
+    .dx-pv[data-style="aurora"] { background: radial-gradient(60% 50% at 0% 0%, color-mix(in srgb, var(--theme-primary, #059669) 22%, transparent), transparent), radial-gradient(50% 50% at 100% 100%, #c4b5fd66, transparent), #f6f8f7; }
+    .dx-pv[data-style="aurora"] .dx-pv-btn { background-image: linear-gradient(135deg, var(--theme-primary, #059669), #7c3aed); }
+    .dx-pv[data-style="soft"] .dx-pv-card, .dx-pv[data-style="soft"] .dx-pv-head { border-color: transparent; box-shadow: 0 10px 18px -10px rgba(15,23,42,.3); }
+    .dx-pv[data-style="glass"] { background: linear-gradient(135deg, color-mix(in srgb, var(--theme-primary, #059669) 35%, #fff), #c7d2fe); }
+    .dx-pv[data-style="glass"] .dx-pv-card, .dx-pv[data-style="glass"] .dx-pv-head { background: rgba(255,255,255,.5); border-color: rgba(255,255,255,.75); backdrop-filter: blur(6px); }
+    .dx-pv[data-style="bold"] .dx-pv-card, .dx-pv[data-style="bold"] .dx-pv-head { border: 2px solid #0f172a; box-shadow: 3px 3px 0 #0f172a; }
+    .dx-pv[data-style="bold"] .dx-pv-btn { border: 2px solid #0f172a; box-shadow: 2px 2px 0 #0f172a; }
+    .dx-pv[data-style="minimal"] .dx-pv-card, .dx-pv[data-style="minimal"] .dx-pv-head { box-shadow: none; }
+    .dx-pv[data-style="minimal"] .dx-pv-hero { background: var(--theme-primary, #059669); }
     .tab-btn.is-active {
         border-color: var(--theme-primary, #059669) !important;
         color: var(--theme-primary, #059669) !important;
@@ -778,6 +1041,21 @@
                 document.querySelectorAll('.sb-brand-name').forEach(el => { el.textContent = v; });
             });
         }
+    });
+})();
+</script>
+
+<script>
+(function () {
+    // Design tab: live preview follows the selected style / radius
+    var pv = document.getElementById('dxPreview');
+    if (!pv) return;
+    document.querySelectorAll('input[data-dx]').forEach(function (r) {
+        r.addEventListener('change', function () {
+            if (!r.checked) return;
+            if (r.dataset.dx === 'style') pv.dataset.style = r.value;
+            if (r.dataset.dx === 'radius') pv.dataset.radius = r.value;
+        });
     });
 })();
 </script>

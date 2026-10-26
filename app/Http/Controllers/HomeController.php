@@ -29,6 +29,16 @@ class HomeController extends Controller
             ->take(8)
             ->get();
 
+        // "Spin & explore" rail: products that have a 360° view
+        $spinProducts = Product::with(['category', 'spinFrames'])
+            ->where('is_active', true)
+            ->whereHas('spinFrames')
+            ->latest()
+            ->take(8)
+            ->get()
+            ->filter(fn ($p) => $p->has_360)
+            ->values();
+
         $activeOffers = Offer::where('is_active', true)->take(3)->get();
         
         // Calculate current delivery timing slot
@@ -39,6 +49,7 @@ class HomeController extends Controller
             'categories',
             'featuredProducts',
             'discountedProducts',
+            'spinProducts',
             'activeOffers',
             'deliverySlotInfo'
         ));

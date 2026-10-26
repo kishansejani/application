@@ -42,7 +42,11 @@ class ProductController extends Controller
 
         return response()->json([
             'status' => true,
-            'data' => $products->items(),
+            'data' => collect($products->items())->map(function ($p) {
+                $row = $p->toArray();
+                $row['has_360'] = $p->has_360;
+                return $row;
+            })->values(),
             'current_page' => $products->currentPage(),
             'last_page' => $products->lastPage(),
             'total' => $products->total(),
@@ -51,7 +55,7 @@ class ProductController extends Controller
 
     public function show($id)
     {
-        $product = Product::with(['category', 'subCategory', 'images'])->where('is_active', true)->findOrFail($id);
+        $product = Product::with(['category', 'subCategory', 'images', 'spinFrames'])->where('is_active', true)->findOrFail($id);
 
         $related = Product::where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
@@ -66,6 +70,7 @@ class ProductController extends Controller
                 'effective_price' => (float) $p->effective_price,
                 'thumbnail_url' => $p->thumbnail_url,
                 'is_in_stock' => $p->is_in_stock,
+                'has_360' => $p->has_360,
             ]);
 
         return response()->json([
@@ -84,6 +89,8 @@ class ProductController extends Controller
                 'is_in_stock' => $product->is_in_stock,
                 'thumbnail_url' => $product->thumbnail_url,
                 'gallery' => $product->images->map(fn($img) => $img->image_url),
+                'has_360' => $product->has_360,
+                'spin_frames' => $product->has_360 ? $product->spin_frame_urls : [],
                 'short_description' => $product->localized_short_description,
                 'description' => $product->localized_description,
                 'related_products' => $related,

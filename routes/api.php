@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\CheckoutController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PageController;
 use App\Http\Controllers\Api\OfferController;
+use App\Http\Controllers\Api\ThemeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +34,7 @@ Route::middleware('throttle:40,1,api-otp-verify')->group(function () {
 });
 
 Route::get('/home', [HomeController::class, 'index']);
+Route::get('/theme', [ThemeController::class, 'show']);
 Route::get('/settings', function() {
     return response()->json([
         'success' => true,

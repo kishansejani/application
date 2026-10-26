@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class SettingController extends Controller
 {
@@ -62,6 +63,14 @@ class SettingController extends Controller
 
             foreach ($frontFields as $ff) {
                 $rules[$ff] = 'nullable|string|max:30';
+            }
+
+            // Design & Experience tab
+            foreach (Setting::DESIGN_CHOICES as $key => $choices) {
+                $rules[$key] = ['nullable', Rule::in($choices)];
+            }
+            foreach (Setting::DESIGN_SCALES as $key) {
+                $rules[$key] = 'nullable|integer|min:1|max:10';
             }
         }
 
@@ -123,7 +132,21 @@ class SettingController extends Controller
             }
         }
 
-        return redirect()->route('admin.settings.index')->with('success', 'Centralized color and theme settings saved successfully!');
+        // Design & Experience (style, radius, font, effects, 360° viewer)
+        if ($isSuperAdmin && $request->boolean('design_form')) {
+            $defaults = Setting::designDefaults();
+            foreach (array_keys(Setting::DESIGN_CHOICES) as $key) {
+                Setting::set($key, $request->input($key, $defaults[$key]), 'design');
+            }
+            foreach (Setting::DESIGN_SCALES as $key) {
+                Setting::set($key, (string) $request->integer($key, (int) $defaults[$key]), 'design');
+            }
+            foreach (Setting::DESIGN_TOGGLES as $key) {
+                Setting::set($key, $request->boolean($key) ? '1' : '0', 'design');
+            }
+        }
+
+        return redirect()->route('admin.settings.index')->with('success', __('Centralized color and theme settings saved successfully!'));
     }
 
     public function reset(Request $request)
@@ -198,6 +221,13 @@ class SettingController extends Controller
             Setting::set('front_dark_dropdown_bg', '#0f172a', 'front_dark_theme');
         }
 
-        return redirect()->route('admin.settings.index')->with('success', 'Colors and theme settings have been reset to default values!');
+        // Design & Experience defaults
+        if (in_array($scope, ['all', 'frontend', 'design']) && Auth::user() && Auth::user()->isSuperAdmin()) {
+            foreach (Setting::designDefaults() as $key => $value) {
+                Setting::set($key, $value, 'design');
+            }
+        }
+
+        return redirect()->route('admin.settings.index')->with('success', __('Colors and theme settings have been reset to default values!'));
     }
 }

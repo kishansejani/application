@@ -8,6 +8,7 @@ import '../../models/slider_item.dart';
 import '../../providers/address_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/product_provider.dart';
+import '../../providers/theme_provider.dart';
 import '../../providers/wishlist_provider.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/responsive.dart';
@@ -20,6 +21,7 @@ import '../../widgets/offer_card.dart';
 import '../../widgets/product_card.dart';
 import '../../widgets/section_header.dart';
 import '../../widgets/shimmer_box.dart';
+import '../../widgets/spin_rail.dart';
 import '../catalog/product_detail_screen.dart';
 import '../catalog/product_list_screen.dart';
 import '../catalog/subcategories_screen.dart';
@@ -45,7 +47,10 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  Future<void> _refresh() => context.read<ProductProvider>().fetchHomeData();
+  Future<void> _refresh() {
+    context.read<ThemeProvider>().refreshRemote(); // pick up admin design changes
+    return context.read<ProductProvider>().fetchHomeData();
+  }
 
   void _openCategory(Category category) {
     final Widget screen = category.subCategories.isEmpty
@@ -184,6 +189,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   ],
+                  // 360° rail
+                  SliverToBoxAdapter(
+                    child: SpinRail(products: provider.spinProducts, horizontalPadding: hPad),
+                  ),
                   // Featured rail
                   SliverPadding(
                     padding: EdgeInsets.symmetric(horizontal: hPad),

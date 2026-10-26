@@ -9,6 +9,7 @@ import '../theme/app_theme.dart';
 import '../utils/app_actions.dart';
 import 'app_network_image.dart';
 import 'price_text.dart';
+import 'spin_viewer.dart';
 import 'qty_stepper.dart';
 
 /// Grid / rail product card. Give it a bounded height
@@ -30,12 +31,21 @@ class ProductCard extends StatelessWidget {
     final scheme = context.colors;
     final name = product.nameFor(context.langCode);
 
-    final card = Material(
-      color: scheme.surface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppRadius.md),
-        side: BorderSide(color: scheme.outlineVariant.fade(context.isDark ? 0.5 : 0.7)),
-      ),
+    final d = context.design;
+    final radius = BorderRadius.circular(d.r(AppRadius.md + (d.isSoft || d.isGlass ? 4 : 0)));
+    final borderSide = d.isMinimal
+        ? BorderSide.none
+        : BorderSide(
+            color: d.isBold ? scheme.onSurface : scheme.outlineVariant.fade(context.isDark ? 0.5 : 0.7),
+            width: d.isBold ? 1.6 : 1,
+          );
+    final cardColor = d.isGlass ? scheme.surface.fade(context.isDark ? 0.7 : 0.82) : scheme.surface;
+
+    Widget card = Material(
+      color: cardColor,
+      elevation: d.isSoft ? 3 : 0,
+      shadowColor: Colors.black.fade(0.12),
+      shape: RoundedRectangleBorder(borderRadius: radius, side: borderSide),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () => _open(context),
@@ -55,6 +65,12 @@ class ProductCard extends StatelessWidget {
                       ),
                     ),
                   ),
+                  if (product.has360)
+                    const Positioned(
+                      bottom: AppSpacing.md,
+                      right: AppSpacing.md,
+                      child: Spin360Badge(),
+                    ),
                   if (product.hasDiscount)
                     Positioned(
                       top: AppSpacing.md,
@@ -140,6 +156,15 @@ class ProductCard extends StatelessWidget {
       ),
     );
 
+    if (d.isBold) {
+      card = DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: radius,
+          boxShadow: [BoxShadow(color: scheme.onSurface, offset: const Offset(3, 3))],
+        ),
+        child: card,
+      );
+    }
     return width != null ? SizedBox(width: width, child: card) : card;
   }
 }

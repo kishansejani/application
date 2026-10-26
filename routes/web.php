@@ -157,6 +157,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::middleware('permission:manage_products')->group(function () {
             Route::resource('products', AdminProduct::class);
             Route::delete('products/images/{image}', [AdminProduct::class, 'deleteImage'])->name('products.images.delete');
+            Route::delete('products/{product}/spin', [AdminProduct::class, 'clearSpin'])->name('products.spin.clear');
             Route::patch('products/{product}/toggle-featured', [AdminProduct::class, 'toggleFeatured'])->name('products.toggle_featured');
             Route::patch('products/{product}/toggle-status', [AdminProduct::class, 'toggleStatus'])->name('products.toggle_status');
         });

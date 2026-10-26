@@ -58,8 +58,37 @@ class HomeController extends Controller
                 'thumbnail_url' => $p->thumbnail_url,
                 'is_in_stock' => $p->is_in_stock,
                 'stock_quantity' => $p->stock_quantity,
+                'has_360' => $p->has_360,
             ];
         });
+
+        // Products with a 360° view (shown in the app's "Spin & explore" rail)
+        $spinProducts = Product::with(['category', 'spinFrames'])
+            ->where('is_active', true)
+            ->whereHas('spinFrames')
+            ->latest()
+            ->take(8)
+            ->get()
+            ->filter(fn ($p) => $p->has_360)
+            ->values()
+            ->map(function ($p) {
+                return [
+                    'id' => $p->id,
+                    'name' => $p->localized_name,
+                    'slug' => $p->slug,
+                    'category_name' => $p->category ? $p->category->localized_name : '',
+                    'unit' => $p->unit,
+                    'price' => (float) $p->price,
+                    'discount_price' => $p->discount_price ? (float) $p->discount_price : null,
+                    'effective_price' => (float) $p->effective_price,
+                    'discount_percent' => $p->discount_percent,
+                    'thumbnail_url' => $p->thumbnail_url,
+                    'is_in_stock' => $p->is_in_stock,
+                    'stock_quantity' => $p->stock_quantity,
+                    'has_360' => true,
+                    'spin_frames' => $p->spin_frame_urls,
+                ];
+            });
 
         $offers = Offer::where('is_active', true)->get()->map(function ($o) {
             return [
@@ -89,6 +118,7 @@ class HomeController extends Controller
                 'sliders' => $sliders,
                 'categories' => $categories,
                 'featured_products' => $featuredProducts,
+                'spin_products' => $spinProducts,
                 'offers' => $offers,
             ],
         ]);

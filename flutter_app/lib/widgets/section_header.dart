@@ -29,10 +29,27 @@ class SectionHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: context.textStyles.titleLarge?.copyWith(fontWeight: FontWeight.w800, fontSize: 19),
-                ),
+                Row(children: [
+                  Container(
+                    width: 4,
+                    height: 18,
+                    margin: const EdgeInsets.only(right: 8),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(4),
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [context.colors.primary, context.colors.tertiary],
+                      ),
+                    ),
+                  ),
+                  Flexible(
+                    child: Text(
+                      title,
+                      style: context.textStyles.titleLarge?.copyWith(fontWeight: FontWeight.w800, fontSize: 19),
+                    ),
+                  ),
+                ]),
                 if (subtitle != null)
                   Padding(
                     padding: const EdgeInsets.only(top: 2),

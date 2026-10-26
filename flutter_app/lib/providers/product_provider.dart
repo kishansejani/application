@@ -14,6 +14,7 @@ class ProductProvider extends ChangeNotifier {
   List<SliderItem> _sliders = [];
   List<Category> _categories = [];
   List<Product> _featuredProducts = [];
+  List<Product> _spinProducts = [];
   List<Product> _newProducts = [];
   List<Offer> _offers = [];
   Map<String, dynamic>? _deliverySlotInfo;
@@ -31,6 +32,9 @@ class ProductProvider extends ChangeNotifier {
   List<SliderItem> get sliders => _sliders;
   List<Category> get categories => _categories;
   List<Product> get featuredProducts => _featuredProducts;
+
+  /// Products that have a 360° view (home "Spin & explore" rail).
+  List<Product> get spinProducts => _spinProducts;
   List<Product> get newProducts => _newProducts;
   List<Offer> get offers => _offers;
 
@@ -64,6 +68,7 @@ class ProductProvider extends ChangeNotifier {
       _sliders = mapList(data['sliders'], (e) => SliderItem.fromJson(e));
       _categories = mapList(data['categories'], (e) => Category.fromJson(e));
       _featuredProducts = mapList(data['featured_products'], (e) => Product.fromJson(e));
+      _spinProducts = mapList(data['spin_products'], (e) => Product.fromJson(e));
       _offers = mapList(data['offers'], (e) => Offer.fromJson(e));
       final banner = data['delivery_banner'] ?? data['delivery_slot'];
       if (banner is Map) _deliverySlotInfo = asMap(banner);

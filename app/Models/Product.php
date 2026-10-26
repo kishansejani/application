@@ -31,6 +31,12 @@ class Product extends Model
         'sku',
     ];
 
+    /**
+     * Always load the number of 360° frames so cards / lists can show the
+     * "360°" badge without an extra query per product.
+     */
+    protected $withCount = ['spinFrames'];
+
     protected $casts = [
         'price' => 'decimal:2',
         'discount_price' => 'decimal:2',
@@ -63,9 +69,45 @@ class Product extends Model
         return $this->belongsTo(SubCategory::class);
     }
 
+    /** Normal gallery photos (everything that is not a 360° frame). */
     public function images()
     {
-        return $this->hasMany(ProductImage::class)->orderBy('sort_order');
+        $rel = $this->hasMany(ProductImage::class)->orderBy('sort_order')->orderBy('id');
+        if (ProductImage::supportsTypes()) {
+            $rel->where('product_images.type', ProductImage::TYPE_GALLERY);
+        }
+        return $rel;
+    }
+
+    /** Ordered frames of the 360° turntable view. */
+    public function spinFrames()
+    {
+        $rel = $this->hasMany(ProductImage::class)->orderBy('sort_order')->orderBy('id');
+        if (ProductImage::supportsTypes()) {
+            $rel->where('product_images.type', ProductImage::TYPE_SPIN);
+        } else {
+            $rel->whereRaw('1 = 0'); // migration not run yet -> no 360° frames
+        }
+        return $rel;
+    }
+
+    /** Gallery photos + 360° frames (used when deleting a product). */
+    public function allImages()
+    {
+        return $this->hasMany(ProductImage::class);
+    }
+
+    /** A 360° view needs at least 6 frames to feel smooth. */
+    public function getHas360Attribute(): bool
+    {
+        $count = $this->spin_frames_count ?? $this->spinFrames()->reorder()->count();
+        return $count >= ProductImage::MIN_SPIN_FRAMES;
+    }
+
+    /** @return array<int,string> */
+    public function getSpinFrameUrlsAttribute(): array
+    {
+        return $this->spinFrames->map(fn ($f) => $f->image_url)->values()->all();
     }
 
     public function getLocalizedNameAttribute(): string

@@ -74,7 +74,7 @@ class CategoryController extends Controller
             'is_active' => $request->boolean('is_active', true),
         ]);
 
-        return redirect()->route('admin.categories.index')->with('success', 'Category created successfully!');
+        return redirect()->route('admin.categories.index')->with('success', __('Category created successfully!'));
     }
 
     public function edit(Category $category)
@@ -119,7 +119,7 @@ class CategoryController extends Controller
             'is_active' => $request->boolean('is_active'),
         ]);
 
-        return redirect()->route('admin.categories.index')->with('success', 'Category updated successfully!');
+        return redirect()->route('admin.categories.index')->with('success', __('Category updated successfully!'));
     }
 
     public function destroy(Category $category)
@@ -128,7 +128,7 @@ class CategoryController extends Controller
             Storage::disk('public')->delete($category->image);
         }
         $category->delete();
-        return redirect()->route('admin.categories.index')->with('success', 'Category deleted successfully.');
+        return redirect()->route('admin.categories.index')->with('success', __('Category deleted successfully.'));
     }
 
     public function toggleStatus(Category $category)

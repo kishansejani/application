@@ -47,7 +47,7 @@ class RoleController extends Controller
             $role->permissions()->sync($request->permissions);
         }
 
-        return redirect()->route('admin.roles.index')->with('success', 'Role created successfully!');
+        return redirect()->route('admin.roles.index')->with('success', __('Role created successfully!'));
     }
 
     public function edit(Role $role)
@@ -77,22 +77,22 @@ class RoleController extends Controller
             $role->permissions()->detach();
         }
 
-        return redirect()->route('admin.roles.index')->with('success', 'Role permissions updated successfully!');
+        return redirect()->route('admin.roles.index')->with('success', __('Role permissions updated successfully!'));
     }
 
     public function destroy(Role $role)
     {
         if (in_array($role->name, ['super_admin', 'admin', 'user'])) {
-            return back()->with('error', 'Default system roles cannot be deleted!');
+            return back()->with('error', __('Default system roles cannot be deleted!'));
         }
 
         if ($role->users()->count() > 0) {
-            return back()->with('error', 'Cannot delete role with assigned users. Reassign users first.');
+            return back()->with('error', __('Cannot delete role with assigned users. Reassign users first.'));
         }
 
         $role->permissions()->detach();
         $role->delete();
 
-        return redirect()->route('admin.roles.index')->with('success', 'Role deleted successfully!');
+        return redirect()->route('admin.roles.index')->with('success', __('Role deleted successfully!'));
     }
 }

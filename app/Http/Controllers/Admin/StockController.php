@@ -90,6 +90,6 @@ class StockController extends Controller
             }
         });
 
-        return back()->with('success', 'Bulk inventory updated successfully!');
+        return back()->with('success', __('Bulk inventory updated successfully!'));
     }
 }

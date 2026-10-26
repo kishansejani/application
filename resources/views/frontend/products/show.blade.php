@@ -27,8 +27,67 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12 -mt-6 sm:-mt-8">
         <!-- Gallery -->
-        <div class="space-y-3 lg:sticky lg:top-36 self-start">
-            <div class="relative aspect-square rounded-3xl overflow-hidden fx-card !rounded-3xl bg-slate-50 dark:bg-slate-800/60">
+        @php
+            $has360 = $product->has_360;
+            $ss = $sysSettings ?? \App\Models\Setting::getAllSettings();
+        @endphp
+        <div class="space-y-3 lg:sticky lg:top-36 self-start" data-product-media>
+            @php
+                $pd3   = ($ss['fx_product3d'] ?? '1') === '1' && !empty($product->thumbnail_url);
+                $modes = array_values(array_filter([$pd3 ? '3d' : null, $has360 ? 'spin' : null, 'photos']));
+                $first = $has360 ? 'spin' : ($pd3 ? '3d' : 'photos');
+                $modeMeta = [
+                    '3d'     => ['ph-cube', '3D'],
+                    'spin'   => ['ph-arrows-clockwise', '360°'],
+                    'photos' => ['ph-images', $gu ? 'ફોટા' : 'Photos'],
+                ];
+            @endphp
+            @if(count($modes) > 1)
+                <div class="media-tabs" style="grid-template-columns: repeat({{ count($modes) }}, 1fr); --n: {{ count($modes) }}" role="tablist" aria-label="{{ $gu ? 'મીડિયા પ્રકાર' : 'Media type' }}">
+                    @foreach($modes as $m)
+                        <button type="button" role="tab" class="media-tab {{ $m === $first ? 'is-active' : '' }}" data-media-tab="{{ $m }}" aria-selected="{{ $m === $first ? 'true' : 'false' }}">
+                            <i class="ph-bold {{ $modeMeta[$m][0] }}"></i>{{ $modeMeta[$m][1] }}
+                        </button>
+                    @endforeach
+                    <span class="media-tab-pill" aria-hidden="true"></span>
+                </div>
+            @endif
+
+            @if($pd3)
+                <div id="media3d" class="relative aspect-square rounded-3xl overflow-hidden fx-card !rounded-3xl prod3d-stage {{ $first !== '3d' ? 'hidden' : '' }}">
+                    <div data-product3d data-src="{{ $product->thumbnail_url }}" class="absolute inset-0"
+                         data-autoplay="{{ $ss['spin_autoplay'] }}" data-speed="{{ $ss['spin_speed'] }}" data-sensitivity="{{ $ss['spin_sensitivity'] }}"
+                         data-hint="{{ $ss['spin_hint'] }}" data-hint-text="{{ $gu ? 'ફેરવવા ખેંચો' : 'Drag to rotate in 3D' }}"
+                         aria-label="{{ $product->localized_name }} – 3D"></div>
+                    <img src="{{ $product->thumbnail_url }}" alt="{{ $product->localized_name }}" class="prod3d-fallback absolute inset-0 w-full h-full object-contain p-6" loading="eager">
+                    @if($product->has_discount)
+                        <span class="absolute bottom-3 left-3 z-10 inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-600 text-white font-extrabold text-xs shadow">
+                            <i class="ph-fill ph-seal-percent"></i>{{ $product->discount_percent }}% {{ __('messages.off') }}
+                        </span>
+                    @endif
+                </div>
+            @endif
+
+            @if($has360)
+                <div id="mediaSpin" class="relative aspect-square rounded-3xl overflow-hidden fx-card !rounded-3xl {{ $first !== 'spin' ? 'hidden' : '' }}">
+                    <div data-spin360
+                         data-frames='@json($product->spin_frame_urls)'
+                         data-eager="1"
+                         data-autoplay="{{ $ss['spin_autoplay'] }}"
+                         data-speed="{{ $ss['spin_speed'] }}"
+                         data-sensitivity="{{ $ss['spin_sensitivity'] }}"
+                         data-wheel="{{ $ss['spin_wheel'] }}"
+                         data-hint="{{ $ss['spin_hint'] }}"
+                         aria-label="{{ $product->localized_name }} – 360°"></div>
+                    @if($product->has_discount)
+                        <span class="absolute top-3 right-3 z-10 inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-600 text-white font-extrabold text-xs shadow">
+                            <i class="ph-fill ph-seal-percent"></i>{{ $product->discount_percent }}% {{ __('messages.off') }}
+                        </span>
+                    @endif
+                </div>
+            @endif
+
+            <div id="mediaPhotos" class="relative aspect-square rounded-3xl overflow-hidden fx-card !rounded-3xl bg-slate-50 dark:bg-slate-800/60 {{ $first !== 'photos' ? 'hidden' : '' }}">
                 <img id="mainProductImage" src="{{ $product->thumbnail_url }}" alt="{{ $product->localized_name }}" class="w-full h-full object-cover transition-opacity duration-200">
                 @if($product->has_discount)
                     <span class="absolute top-4 left-4 inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-600 text-white font-extrabold text-xs shadow">
@@ -37,7 +96,7 @@
                 @endif
             </div>
             @if($gallery->count() > 1)
-                <div class="flex items-center gap-2.5 overflow-x-auto no-scrollbar pb-1" role="list">
+                <div id="mediaThumbs" class="flex items-center gap-2.5 overflow-x-auto no-scrollbar pb-1 {{ $first !== 'photos' ? 'hidden' : '' }}" role="list">
                     @foreach($gallery as $img)
                         <button type="button" onclick="swapMainImage(@js($img), this)" role="listitem"
                                 class="fx-thumb w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden shrink-0 border-2 {{ $loop->first ? 'border-brand-600' : 'border-transparent opacity-70 hover:opacity-100' }} bg-slate-100 dark:bg-slate-800 transition">
@@ -179,10 +238,22 @@
 @endif
 @endsection
 
+@push('styles')
+<style>
+    .media-tabs { position: relative; display: inline-grid; padding: .25rem; border-radius: 1rem; background: var(--fx-card-bg); border: 1px solid var(--fx-card-border); }
+    .media-tab { position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center; gap: .4rem; padding: .5rem 1.1rem; font-size: .8rem; font-weight: 800; color: var(--fx-text-muted); border-radius: .75rem; transition: color .25s; }
+    .media-tab.is-active { color: #fff; }
+    .media-tab-pill { position: absolute; z-index: 0; top: .25rem; bottom: .25rem; left: .25rem; width: calc(50% - .25rem); border-radius: .75rem; /* width set by JS for 2 or 3 tabs */ background: linear-gradient(135deg, var(--fx-brand-primary), color-mix(in srgb, var(--fx-brand-primary) 60%, #7c3aed)); box-shadow: 0 8px 18px -8px color-mix(in srgb, var(--fx-brand-primary) 70%, transparent); transition: transform .35s cubic-bezier(.2,.8,.2,1); }
+    .prod3d-stage { background: radial-gradient(65% 55% at 50% 55%, color-mix(in srgb, var(--fx-brand-primary) 16%, transparent), transparent 72%), var(--fx-card-bg); }
+    .prod3d-stage.is-3d-ready .prod3d-fallback, .prod3d-stage:has(.is-3d-ready) .prod3d-fallback { opacity: 0; pointer-events: none; transition: opacity .5s; }
+</style>
+@endpush
+
 @push('scripts')
 <script>
     function swapMainImage(url, btn) {
         const img = document.getElementById('mainProductImage');
+        if (window.__showPhotos && document.getElementById('mediaPhotos').classList.contains('hidden')) window.__showPhotos();
         img.style.opacity = .3;
         setTimeout(() => { img.src = url; img.style.opacity = 1; }, 120);
         if (btn) {
@@ -190,6 +261,33 @@
             btn.classList.add('border-brand-600'); btn.classList.remove('border-transparent', 'opacity-70');
         }
     }
+
+    // 3D / 360° / Photos tabs
+    (function () {
+        const root = document.querySelector('[data-product-media]');
+        if (!root) return;
+        const tabs = root.querySelectorAll('[data-media-tab]');
+        if (!tabs.length) return;
+        const panes = { '3d': document.getElementById('media3d'), spin: document.getElementById('mediaSpin'), photos: document.getElementById('mediaPhotos') };
+        const thumbs = document.getElementById('mediaThumbs');
+        const pill = root.querySelector('.media-tab-pill');
+        const n = tabs.length;
+        if (pill) pill.style.width = 'calc(' + (100 / n) + '% - .25rem)';
+        function show(which) {
+            Object.keys(panes).forEach(function (k) { if (panes[k]) panes[k].classList.toggle('hidden', k !== which); });
+            if (thumbs) thumbs.classList.toggle('hidden', which !== 'photos');
+            tabs.forEach(function (t, i) {
+                const on = t.dataset.mediaTab === which;
+                t.classList.toggle('is-active', on); t.setAttribute('aria-selected', on ? 'true' : 'false');
+                if (on && pill) pill.style.transform = 'translateX(' + (i * 100) + '%)';
+            });
+            if (which === 'spin' && window.Spin360) Spin360.refresh(panes.spin);
+            if (which === '3d') { if (window.Scene3D) Scene3D.mountAll(panes['3d']); else window.addEventListener('scene3d:ready', function () { Scene3D.mountAll(panes['3d']); }, { once: true }); }
+        }
+        tabs.forEach(function (t) { t.addEventListener('click', function () { show(t.dataset.mediaTab); }); });
+        window.__showPhotos = function () { show('photos'); };
+        show(root.querySelector('.media-tab.is-active').dataset.mediaTab);
+    })();
 
     function adjustQty(delta) {
         const input = document.getElementById('detailQtyInput');

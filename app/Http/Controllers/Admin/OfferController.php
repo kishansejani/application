@@ -75,7 +75,7 @@ class OfferController extends Controller
             'is_active' => $request->boolean('is_active', true),
         ]);
 
-        return redirect()->route('admin.offers.index')->with('success', 'Offer coupon created successfully!');
+        return redirect()->route('admin.offers.index')->with('success', __('Offer coupon created successfully!'));
     }
 
     public function edit(Offer $offer)
@@ -127,7 +127,7 @@ class OfferController extends Controller
             'is_active' => $request->boolean('is_active'),
         ]);
 
-        return redirect()->route('admin.offers.index')->with('success', 'Offer updated successfully!');
+        return redirect()->route('admin.offers.index')->with('success', __('Offer updated successfully!'));
     }
 
     public function destroy(Offer $offer)
@@ -136,7 +136,7 @@ class OfferController extends Controller
             Storage::disk('public')->delete($offer->banner_image);
         }
         $offer->delete();
-        return redirect()->route('admin.offers.index')->with('success', 'Offer deleted successfully.');
+        return redirect()->route('admin.offers.index')->with('success', __('Offer deleted successfully.'));
     }
 
     public function toggleStatus(Offer $offer)

@@ -196,6 +196,84 @@
                 @error('gallery_files.*')<p class="{{ $err }}">{{ $message }}</p>@enderror
             </div>
         </div>
+
+        {{-- ============ 360° view ============ --}}
+        @php $spinFrames = $isEdit ? $product->spinFrames : collect(); $spinOk = \App\Models\ProductImage::supportsTypes(); @endphp
+        <div class="card" id="spinCard" style="--fx-brand-primary: var(--theme-primary, #059669); --fx-card-bg: #f8fafc; --fx-text-primary: #0f172a;">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title"><i class="ph-duotone ph-arrows-clockwise"></i> 360° view</h3>
+                    <p class="card-subtitle">Turntable photos – customers rotate the product by dragging or scrolling, on the website and in the app.</p>
+                </div>
+                <span class="badge {{ $spinFrames->count() >= \App\Models\ProductImage::MIN_SPIN_FRAMES ? 'badge-success' : 'badge-neutral' }}" id="spinCount">{{ $spinFrames->count() }} {{ \Illuminate\Support\Str::plural('frame', $spinFrames->count()) }}</span>
+            </div>
+            <div class="card-body space-y-4">
+                @unless($spinOk)
+                    <div class="rounded-xl border border-amber-300 bg-amber-50 dark:bg-amber-500/10 dark:border-amber-500/30 p-3 text-xs font-semibold text-amber-800 dark:text-amber-300">
+                        Run <code class="font-mono">php artisan migrate</code> once to enable the 360° view feature.
+                    </div>
+                @endunless
+
+                @if($spinFrames->count())
+                    <div class="grid grid-cols-1 md:grid-cols-[minmax(0,250px)_minmax(0,1fr)] gap-4 items-start" id="spinCurrent">
+                        <div class="aspect-square rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700">
+                            @if($spinFrames->count() >= \App\Models\ProductImage::MIN_SPIN_FRAMES)
+                                <div data-spin360 data-eager="1" data-hint="0" data-autoplay="1" data-speed="4" data-frames='@json($product->spin_frame_urls)'></div>
+                            @else
+                                <div class="w-full h-full grid place-items-center text-xs text-slate-400 p-4 text-center">Add at least {{ \App\Models\ProductImage::MIN_SPIN_FRAMES }} frames to activate the 360° view.</div>
+                            @endif
+                        </div>
+                        <div class="min-w-0">
+                            <div class="flex items-center justify-between gap-2 mb-2">
+                                <p class="form-label !mb-0">Current frames (in rotation order)</p>
+                                <button type="button" onclick="clearSpinFrames()" class="text-xs font-bold text-rose-600 hover:underline inline-flex items-center gap-1"><i class="ph ph-trash"></i> Remove all</button>
+                            </div>
+                            <div class="grid grid-cols-6 sm:grid-cols-8 gap-1.5 max-h-44 overflow-y-auto pr-1" id="spinFrameGrid">
+                                @foreach($spinFrames as $f)
+                                    <div class="spin-frame relative group aspect-square rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-900">
+                                        <img src="{{ $f->image_url }}" alt="" class="w-full h-full object-cover" loading="lazy">
+                                        <span class="absolute left-0.5 bottom-0.5 px-1 rounded bg-black/60 text-white text-[9px] font-bold leading-4">{{ $loop->iteration }}</span>
+                                        <button type="button" onclick="deleteSpinFrame({{ $f->id }}, this)" title="Delete frame" aria-label="Delete frame"
+                                                class="absolute top-0.5 right-0.5 w-5 h-5 rounded bg-white/90 text-rose-600 text-[11px] flex items-center justify-center opacity-0 group-hover:opacity-100 focus:opacity-100 transition"><i class="ph-bold ph-x"></i></button>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                <div class="rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-700 p-3 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    <p class="font-bold text-slate-800 dark:text-slate-100 mb-1"><i class="ph-duotone ph-camera"></i> How to shoot</p>
+                    Put the product on a turntable (or walk around it) and take <b>24 or 36</b> photos, rotating a little each time. Same distance, same light, plain background.
+                    Name the files in order (<span class="font-mono">01.jpg, 02.jpg …</span>) – frames are arranged by file name. Minimum {{ \App\Models\ProductImage::MIN_SPIN_FRAMES }}, maximum {{ \App\Models\ProductImage::MAX_SPIN_FRAMES }}, up to 5 MB each.
+                </div>
+
+                <div id="spinDropzone" class="dropzone-container p-6 rounded-2xl text-center bg-slate-50 dark:bg-slate-900/40 cursor-pointer hover:bg-slate-100/80 dark:hover:bg-slate-900/70" role="button" tabindex="0">
+                    <input type="file" id="spinFileInput" name="spin_files[]" accept="image/*" multiple class="hidden" @disabled(!$spinOk)>
+                    <div class="flex flex-col items-center justify-center gap-2">
+                        <span class="stat-icon tone-violet !w-11 !h-11 text-xl"><i class="ph-duotone ph-arrows-clockwise"></i></span>
+                        <p class="text-sm font-bold text-slate-700 dark:text-slate-200">{{ $spinFrames->count() ? 'Add / replace 360° frames' : 'Drop the 360° photos' }} here, or <span class="text-emerald-600 dark:text-emerald-400 underline">browse</span></p>
+                        <p class="text-xs text-slate-400">Select all frames at once · JPG, PNG or WEBP</p>
+                    </div>
+                </div>
+
+                <div id="spinPreviewWrap" class="hidden grid grid-cols-1 md:grid-cols-[minmax(0,250px)_minmax(0,1fr)] gap-4 items-center">
+                    <div class="aspect-square rounded-2xl overflow-hidden border border-emerald-300 dark:border-emerald-500/40" id="spinPreview"></div>
+                    <div class="text-sm space-y-1.5">
+                        <p class="font-extrabold text-slate-900 dark:text-white"><span id="spinPreviewCount">0</span> new frames selected</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400" id="spinPreviewNote">Preview – drag the picture to check the rotation before saving.</p>
+                        @if($spinFrames->count())
+                            <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-200 cursor-pointer">
+                                <input type="checkbox" name="spin_replace" value="1" checked class="rounded border-slate-300"> Replace the existing {{ $spinFrames->count() }} frames with these
+                            </label>
+                        @endif
+                        <button type="button" onclick="resetSpinSelection()" class="block text-xs font-bold text-slate-500 hover:text-rose-600">Clear selection</button>
+                    </div>
+                </div>
+                @error('spin_files')<p class="{{ $err }}">{{ $message }}</p>@enderror
+                @error('spin_files.*')<p class="{{ $err }}">{{ $message }}</p>@enderror
+            </div>
+        </div>
     </div>
 
     {{-- ================= Sidebar ================= --}}
@@ -293,9 +371,15 @@
     </div>
 </form>
 
+@push('styles')
+<link rel="stylesheet" href="{{ asset('assets/shared/spin360.css') }}?v=1.0.0">
+@endpush
+
 @push('scripts')
+<script src="{{ asset('assets/shared/spin360.js') }}?v=1.0.0"></script>
 <script>
     $(function () {
+        initSpinUploader();
         // Uploaders (thumbnail + gallery)
         [['thumbDropzone', 'thumbFileInput', 'thumbPreview'], ['galleryDropzone', 'galleryFileInput', 'galleryPreview']].forEach(function (ids) {
             const drop = document.getElementById(ids[0]), file = document.getElementById(ids[1]);
@@ -372,6 +456,84 @@
             loadSubs(@json((string) $selectedCat), @json((string) $selectedSub));
         @endif
     });
+
+    // ---------------------------------------------------------- 360° frames
+    var __spinDt = null;
+    function initSpinUploader() {
+        const drop = document.getElementById('spinDropzone'), input = document.getElementById('spinFileInput');
+        if (!drop || !input) return;
+        drop.addEventListener('click', function (e) { if (e.target !== input) input.click(); });
+        drop.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.click(); } });
+        ['dragenter', 'dragover'].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add('dragover'); }); });
+        ['dragleave', 'drop'].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove('dragover'); }); });
+        drop.addEventListener('drop', function (e) { if (e.dataTransfer.files.length) handleSpinFiles(e.dataTransfer.files); });
+        input.addEventListener('change', function () { if (input.files.length) handleSpinFiles(input.files); });
+    }
+
+    function handleSpinFiles(fileList) {
+        const input = document.getElementById('spinFileInput');
+        const max = {{ \App\Models\ProductImage::MAX_SPIN_FRAMES }}, min = {{ \App\Models\ProductImage::MIN_SPIN_FRAMES }};
+        const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
+        let files = Array.prototype.filter.call(fileList, f => f.type && f.type.indexOf('image/') === 0)
+            .sort((a, b) => collator.compare(a.name, b.name));
+        if (files.length > max) { toastr.warning('Only the first ' + max + ' frames are used.'); files = files.slice(0, max); }
+        if (!files.length) return;
+
+        // keep the <input> in sorted order so the server receives them in rotation order
+        try { const dt = new DataTransfer(); files.forEach(f => dt.items.add(f)); input.files = dt.files; } catch (e) { /* older browsers: server sorts by name */ }
+
+        if (__spinDt) __spinDt.forEach(u => URL.revokeObjectURL(u));
+        __spinDt = files.map(f => URL.createObjectURL(f));
+
+        const wrap = document.getElementById('spinPreviewWrap'), host = document.getElementById('spinPreview');
+        host.innerHTML = '';
+        const el = document.createElement('div');
+        el.setAttribute('data-spin360', ''); el.setAttribute('data-eager', '1'); el.setAttribute('data-hint', '0');
+        el.setAttribute('data-autoplay', '1'); el.setAttribute('data-speed', '4');
+        el.setAttribute('data-frames', JSON.stringify(__spinDt));
+        host.appendChild(el);
+        wrap.classList.remove('hidden');
+        if (files.length >= min) { new Spin360(el); }
+        else { host.innerHTML = '<div class="w-full h-full grid place-items-center text-xs text-amber-600 p-4 text-center font-semibold">Select at least ' + min + ' frames for a smooth 360° view.</div>'; }
+        document.getElementById('spinPreviewCount').textContent = files.length;
+    }
+
+    function resetSpinSelection() {
+        const input = document.getElementById('spinFileInput');
+        input.value = '';
+        if (__spinDt) { __spinDt.forEach(u => URL.revokeObjectURL(u)); __spinDt = null; }
+        document.getElementById('spinPreviewWrap').classList.add('hidden');
+        document.getElementById('spinPreview').innerHTML = '';
+    }
+
+    function deleteSpinFrame(id, btn) {
+        Swal.fire({ title: 'Delete this frame?', text: 'The 360° view will use the remaining frames.', icon: 'warning', showCancelButton: true,
+            confirmButtonText: 'Yes, delete', customClass: { confirmButton: 'is-danger' }, focusCancel: true }).then(function (r) {
+            if (!r.isConfirmed) return;
+            $.ajax({ url: `/admin/products/images/${id}`, type: 'DELETE' }).done(function () {
+                $(btn).closest('.spin-frame').fadeOut(120, function () {
+                    $(this).remove();
+                    const n = $('#spinFrameGrid .spin-frame').length;
+                    $('#spinCount').text(n + (n === 1 ? ' frame' : ' frames'));
+                    toastr.success('Frame removed – reload to refresh the preview.');
+                });
+            }).fail(function () { toastr.error('Could not delete the frame.'); });
+        });
+    }
+
+    @if($isEdit)
+    function clearSpinFrames() {
+        Swal.fire({ title: 'Remove the whole 360° view?', text: 'All frames of this product are deleted.', icon: 'warning', showCancelButton: true,
+            confirmButtonText: 'Yes, remove all', customClass: { confirmButton: 'is-danger' }, focusCancel: true }).then(function (r) {
+            if (!r.isConfirmed) return;
+            $.ajax({ url: @json(route('admin.products.spin.clear', $product)), type: 'DELETE' })
+                .done(function () { toastr.success('360° view removed.'); $('#spinCurrent').fadeOut(150, function () { $(this).remove(); $('#spinCount').text('0 frames'); }); })
+                .fail(function () { toastr.error('Could not remove the frames.'); });
+        });
+    }
+    @else
+    function clearSpinFrames() {}
+    @endif
 
     function deleteProductImage(imageId, btn) {
         Swal.fire({

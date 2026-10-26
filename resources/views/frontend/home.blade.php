@@ -3,8 +3,12 @@
 @section('title', __('messages.store_name') . ' - ' . __('messages.tagline'))
 
 @section('content')
-@php $gu = app()->getLocale() === 'gu'; @endphp
-<div class="space-y-10 sm:space-y-14 pb-6">
+@php
+    $gu = app()->getLocale() === 'gu';
+    $maxOff = (int) ($discountedProducts->max('discount_percent') ?: 0);
+    $maxOff = $maxOff > 0 ? $maxOff : 20;
+@endphp
+<div class="space-y-12 sm:space-y-16 pb-8">
 
     <!-- Hero slider -->
     <section class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-3 sm:pt-6">
@@ -155,56 +159,50 @@
         </div>
     </section>
 
-    <!-- Categories Section (Ultra-Premium Card Showcase) -->
-    <section class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8" aria-labelledby="homeCats">
-        <div class="flex items-end justify-between gap-4 mb-4 sm:mb-6">
-            <div>
-                <div class="flex items-center gap-2 mb-1">
-                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span class="text-[11px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">{{ $gu ? 'શ્રેણીઓ' : 'Categories' }}</span>
-                </div>
-                <h2 id="homeCats" class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">{{ $gu ? 'કેટેગરી પ્રમાણે ખરીદી કરો' : 'Shop by Category' }}</h2>
-                <p class="text-[13px] text-slate-500 dark:text-slate-400 mt-0.5">{{ $gu ? 'તાજી ખેત પેદાશો, ડેરી અને ઘરની રોજિંદી જરૂરિયાતો' : 'Farm-fresh produce, dairy and household essentials' }}</p>
+    @if(\App\Models\Setting::get('fx_marquee', '1') === '1')
+    <!-- Trust marquee -->
+    <section class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 -mt-4" aria-hidden="true" data-no-reveal>
+        @php
+            $marq = $gu
+                ? [['ph-lightning','૨ કલાકમાં ડિલિવરી'],['ph-plant','૧૦૦% ખેતરથી તાજું'],['ph-truck','₹૧૯૯ ઉપર મફત ડિલિવરી'],['ph-shield-check','ગુણવત્તા ગેરંટી'],['ph-money','કેશ ઓન ડિલિવરી'],['ph-seal-percent','દરરોજ નવી ઓફર્સ']]
+                : [['ph-lightning','2-hour express delivery'],['ph-plant','100% farm fresh'],['ph-truck','Free delivery above ₹199'],['ph-shield-check','Quality guaranteed'],['ph-money','Cash on delivery'],['ph-seal-percent','Fresh offers every day']];
+        @endphp
+        <div class="fx-marquee">
+            <div class="fx-marquee-track">
+                @for($i = 0; $i < 2; $i++)
+                    @foreach($marq as [$mi, $mt])
+                        <span class="fx-marquee-item"><i class="ph-duotone {{ $mi }}"></i>{{ $mt }}</span>
+                    @endforeach
+                @endfor
             </div>
-            <a href="{{ route('categories.index') }}" class="group text-[13px] font-bold text-emerald-700 dark:text-emerald-400 hover:text-emerald-600 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-800/40 hover:shadow-sm transition-all shrink-0">
-                <span>{{ $gu ? 'બધી કેટેગરીઝ' : 'View All' }}</span>
-                <i class="ph-bold ph-arrow-right group-hover:translate-x-1 transition-transform"></i>
-            </a>
         </div>
+    </section>
+    @endif
 
-        <div class="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-3 md:grid-cols-6 gap-3 sm:gap-4">
-            @php
-                $catThemes = [
-                    ['bg' => 'from-emerald-50/90 to-teal-50/30 dark:from-emerald-950/30 dark:to-slate-900', 'border' => 'border-emerald-200/70 dark:border-emerald-800/40 hover:border-emerald-500 hover:shadow-emerald-500/15', 'accent' => 'text-emerald-600 dark:text-emerald-400'],
-                    ['bg' => 'from-amber-50/90 to-orange-50/30 dark:from-amber-950/30 dark:to-slate-900', 'border' => 'border-amber-200/70 dark:border-amber-800/40 hover:border-amber-500 hover:shadow-amber-500/15', 'accent' => 'text-amber-600 dark:text-amber-400'],
-                    ['bg' => 'from-orange-50/90 to-yellow-50/30 dark:from-orange-950/30 dark:to-slate-900', 'border' => 'border-orange-200/70 dark:border-orange-800/40 hover:border-orange-500 hover:shadow-orange-500/15', 'accent' => 'text-orange-600 dark:text-orange-400'],
-                    ['bg' => 'from-rose-50/90 to-red-50/30 dark:from-rose-950/30 dark:to-slate-900', 'border' => 'border-rose-200/70 dark:border-rose-800/40 hover:border-rose-500 hover:shadow-rose-500/15', 'accent' => 'text-rose-600 dark:text-rose-400'],
-                    ['bg' => 'from-yellow-50/90 to-amber-50/30 dark:from-yellow-950/30 dark:to-slate-900', 'border' => 'border-yellow-200/70 dark:border-yellow-800/40 hover:border-yellow-500 hover:shadow-yellow-500/15', 'accent' => 'text-yellow-600 dark:text-yellow-400'],
-                    ['bg' => 'from-sky-50/90 to-blue-50/30 dark:from-sky-950/30 dark:to-slate-900', 'border' => 'border-sky-200/70 dark:border-sky-800/40 hover:border-sky-500 hover:shadow-sky-500/15', 'accent' => 'text-sky-600 dark:text-sky-400'],
-                ];
-            @endphp
+    <!-- ============ 01 Categories ============ -->
+    <section class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8" aria-labelledby="homeCats">
+        <div class="mk-head">
+            <div class="tt">
+                <span class="no" aria-hidden="true">01</span>
+                <div><h2 id="homeCats">{{ $gu ? 'કેટેગરી પ્રમાણે ખરીદી' : 'Shop by category' }}</h2>
+                    <p>{{ $gu ? 'તાજી ખેત પેદાશો, ડેરી અને ઘરની જરૂરિયાતો' : 'Farm produce, dairy and household essentials' }}</p></div>
+            </div>
+            <a href="{{ route('categories.index') }}" class="mk-more"><span>{{ $gu ? 'બધી' : 'All' }}</span><i class="ph-bold ph-arrow-right"></i></a>
+        </div>
+        <div class="mk-cats">
             @foreach($categories as $category)
-                @php $th = $catThemes[$loop->index % count($catThemes)]; @endphp
-                <a href="{{ route('categories.show', $category->slug) }}" class="group relative flex flex-col items-center justify-between text-center p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl border bg-gradient-to-b {{ $th['bg'] }} {{ $th['border'] }} shadow-xs hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 min-h-[195px] sm:min-h-[220px]">
-                    <!-- Circular Image Showcase with Luxury Ring -->
-                    <div class="w-20 h-20 sm:w-24 sm:h-24 md:w-26 md:h-26 rounded-2xl sm:rounded-3xl overflow-hidden shadow-md ring-4 ring-white/95 dark:ring-slate-800/90 bg-white dark:bg-slate-800 flex items-center justify-center shrink-0 mb-2.5 group-hover:scale-105 group-hover:rotate-1 transition-all duration-300">
+                <a href="{{ route('categories.show', $category->slug) }}" class="mk-cat">
+                    <div>
+                        <h3>{{ $category->localized_name }}</h3>
+                        <span class="n">{{ $category->sub_categories_count ?? $category->subCategories->count() }} {{ $gu ? 'પેટા શ્રેણી' : 'types' }}</span>
+                    </div>
+                    <span class="go"><i class="ph-bold ph-arrow-up-right"></i></span>
+                    <span class="pic">
                         @if($category->image)
-                            <img src="{{ $category->image_url }}" alt="{{ $category->localized_name }}" class="w-full h-full object-cover object-center" loading="lazy">
+                            <img src="{{ $category->image_url }}" alt="" loading="lazy">
                         @else
-                            <i class="{{ $category->icon ?: 'fa-solid fa-layer-group' }} text-3xl text-emerald-600 dark:text-emerald-400"></i>
+                            <i class="ph-duotone ph-basket"></i>
                         @endif
-                    </div>
-
-                    <!-- Category Name -->
-                    <div class="flex-1 flex items-center justify-center px-1">
-                        <h3 class="text-[13px] sm:text-[14px] font-extrabold text-slate-800 dark:text-slate-100 group-hover:{{ $th['accent'] }} leading-tight line-clamp-2 transition-colors">
-                            {{ $category->localized_name }}
-                        </h3>
-                    </div>
-
-                    <!-- Subcategory Count Pill -->
-                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 mt-1.5 rounded-full text-[10.5px] font-bold text-slate-500 dark:text-slate-400 bg-white/90 dark:bg-slate-800/90 border border-slate-200/60 dark:border-slate-700/60 shadow-xs">
-                        {{ $category->sub_categories_count ?? $category->subCategories->count() }} {{ $gu ? 'પેટા શ્રેણી' : 'items' }}
                     </span>
                 </a>
             @endforeach
@@ -271,34 +269,38 @@
         </section>
     @endif
 
-    <!-- Featured products -->
+    <!-- ============ 02 Featured ============ -->
     <section class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8" aria-labelledby="homeFeatured">
-        <div class="flex items-end justify-between gap-4 mb-4 sm:mb-5">
-            <div>
-                <h2 id="homeFeatured" class="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">{{ $gu ? 'ખેતરથી તાજું — ખાસ પસંદગી' : 'Farm-fresh featured picks' }}</h2>
-                <p class="text-[13px] text-slate-500 dark:text-slate-400 mt-0.5">{{ $gu ? 'રોજ પસંદ કરેલા ફળો, શાકભાજી અને ડેરી' : 'Hand-picked daily fruits, veggies and dairy' }}</p>
+        <div class="mk-head">
+            <div class="tt">
+                <span class="no" aria-hidden="true">02</span>
+                <div><h2 id="homeFeatured">{{ $gu ? 'ખાસ પસંદગી' : 'Fresh picks' }}</h2>
+                    <p>{{ $gu ? 'રોજ પસંદ કરેલા ફળો, શાકભાજી અને ડેરી' : 'Hand-picked fruits, veggies and dairy, every day' }}</p></div>
             </div>
-            <a href="{{ route('products.index') }}" class="text-[13px] font-bold text-brand-700 dark:text-brand-400 hover:underline inline-flex items-center gap-1 shrink-0">{{ $gu ? 'બધું જુઓ' : 'View all' }}<i class="ph-bold ph-arrow-right"></i></a>
+            <a href="{{ route('products.index') }}" class="mk-more"><span>{{ $gu ? 'બધું જુઓ' : 'View all' }}</span><i class="ph-bold ph-arrow-right"></i></a>
         </div>
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
+        <div class="mk-grid">
             @foreach($featuredProducts as $product)
                 @include('frontend.partials.product-card', ['product' => $product])
             @endforeach
         </div>
     </section>
 
-    <!-- Deals -->
+    <!-- ============ 03 Deals ============ -->
     @if($discountedProducts->count() > 0)
         <section class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8" aria-labelledby="homeDeals">
-            <div class="rounded-3xl bg-gradient-to-br from-brand-50 to-teal-50 dark:from-brand-500/10 dark:to-teal-500/5 border border-brand-100 dark:border-brand-500/20 p-4 sm:p-6">
-                <div class="flex items-end justify-between gap-4 mb-4">
-                    <div>
-                        <span class="inline-flex items-center gap-1 text-[11px] font-extrabold uppercase tracking-wider text-rose-600 dark:text-rose-400"><i class="ph-fill ph-fire"></i>{{ $gu ? 'આજના ડીલ' : "Today's deals" }}</span>
-                        <h2 id="homeDeals" class="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">{{ $gu ? 'ખાસ ડિસ્કાઉન્ટ અને ઑફર' : 'Special discounts on daily staples' }}</h2>
+            <div class="mk-band">
+                <div class="mk-head">
+                    <div class="tt">
+                        <span class="no" aria-hidden="true">03</span>
+                        <div>
+                            <span class="mk-fire"><i class="ph-fill ph-fire"></i>{{ $gu ? 'આજના ડીલ' : "Today's deals" }}</span>
+                            <h2 id="homeDeals">{{ $gu ? 'ખાસ ડિસ્કાઉન્ટ' : 'Big savings, daily staples' }}</h2>
+                        </div>
                     </div>
-                    <a href="{{ route('products.index', ['sort' => 'price_asc']) }}" class="hidden sm:inline-flex text-[13px] font-bold text-brand-700 dark:text-brand-400 hover:underline items-center gap-1 shrink-0">{{ $gu ? 'બધું જુઓ' : 'View all' }}<i class="ph-bold ph-arrow-right"></i></a>
+                    <a href="{{ route('products.index', ['sort' => 'price_asc']) }}" class="mk-more"><span>{{ $gu ? 'બધું જુઓ' : 'View all' }}</span><i class="ph-bold ph-arrow-right"></i></a>
                 </div>
-                <div class="fx-rail">
+                <div class="mk-rail">
                     @foreach($discountedProducts as $product)
                         @include('frontend.partials.product-card', ['product' => $product])
                     @endforeach
@@ -315,5 +317,6 @@
         </div>
         <div class="fx-rail" data-rv-rail></div>
     </section>
+</div>
 </div>
 @endsection

@@ -21,6 +21,9 @@ class ApiConstants {
 
   static final String imageBaseUrl = '$webBaseUrl/storage';
 
+  // Theme (managed from Admin → Settings → Design & Experience)
+  static const String theme = '$baseUrl/theme';
+
   // Auth endpoints
   static const String sendOtp = '$baseUrl/auth/otp/send';
   static const String verifyOtp = '$baseUrl/auth/otp/verify';

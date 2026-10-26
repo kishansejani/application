@@ -38,14 +38,16 @@ class FreshGroceryApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final locale = context.watch<LocaleProvider>().locale;
-    final themeMode = context.watch<ThemeProvider>().themeMode;
+    final themeProvider = context.watch<ThemeProvider>();
+    final themeMode = themeProvider.themeMode;
+    final remote = themeProvider.remote;
 
     return MaterialApp(
       // Localised app title (task switcher / web tab) - follows the selected language.
       onGenerateTitle: (context) => context.tr('app_name'),
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.light(),
-      darkTheme: AppTheme.dark(),
+      theme: AppTheme.light(remote),
+      darkTheme: AppTheme.dark(remote),
       themeMode: themeMode,
       locale: locale,
       supportedLocales: LocaleProvider.supported,

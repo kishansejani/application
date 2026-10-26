@@ -95,7 +95,7 @@ class ProductCatalogController extends Controller
     {
         abort_if(!$product->is_active, 404);
 
-        $product->load(['category', 'subCategory', 'images']);
+        $product->load(['category', 'subCategory', 'images', 'spinFrames']);
         $relatedProducts = Product::where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
             ->where('is_active', true)
@@ -121,6 +121,7 @@ class ProductCatalogController extends Controller
             'unit' => $product->unit,
             'thumbnail' => $product->thumbnail_url,
             'images' => $product->images->map(fn($img) => $img->image_url),
+            'has_360' => $product->has_360,
             'short_desc' => $product->localized_short_description,
             'in_stock' => $product->is_in_stock,
             'stock_quantity' => $product->stock_quantity,

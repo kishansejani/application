@@ -348,4 +348,12 @@ const Map<String, String> enTranslations = {
   'lang_en': 'English',
   'lang_gu': 'ગુજરાતી',
   'select_option': 'Select',
+  'spin_view_360': '360° view',
+  'spin_view_photos': 'Photos',
+  'spin_drag_hint': 'Drag to rotate',
+  'spin_play': 'Auto-rotate',
+  'spin_pause': 'Pause',
+  'spin_fullscreen': 'Full screen',
+  'spin_title': 'Spin & explore',
+  'spin_subtitle': 'Turn products around in 360°',
 };

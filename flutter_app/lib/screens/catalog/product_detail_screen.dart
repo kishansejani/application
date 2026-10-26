@@ -18,6 +18,7 @@ import '../../widgets/price_text.dart';
 import '../../widgets/product_card.dart';
 import '../../widgets/section_header.dart';
 import '../../widgets/shimmer_box.dart';
+import '../../widgets/spin_viewer.dart';
 import '../cart/cart_screen.dart';
 
 /// Product page. Pass a [product] (instant render, then enriched from the API)
@@ -335,6 +336,7 @@ class _Gallery extends StatefulWidget {
 class _GalleryState extends State<_Gallery> {
   final _controller = PageController();
   int _index = 0;
+  bool _spin = true; // show the 360° view first when the product has one
 
   @override
   void dispose() {
@@ -352,12 +354,23 @@ class _GalleryState extends State<_Gallery> {
   Widget build(BuildContext context) {
     final images = widget.product.allImages;
     final scheme = context.colors;
+    final frames = widget.product.spinFrames;
+    final showSpin = frames.length >= 2 && _spin;
     return Container(
       height: widget.height,
       color: context.isDark ? scheme.surfaceContainerLow : Colors.white,
       child: Stack(
         children: [
-          if (images.isEmpty)
+          if (showSpin)
+            Positioned.fill(
+              child: Product360Viewer(
+                key: ValueKey('spin-${frames.length}'),
+                frames: frames,
+                borderRadius: BorderRadius.zero,
+                backgroundColor: Colors.transparent,
+              ),
+            )
+          else if (images.isEmpty)
             const Positioned.fill(child: AppNetworkImage(url: null, placeholderIcon: Icons.image_outlined))
           else
             PageView.builder(
@@ -369,13 +382,19 @@ class _GalleryState extends State<_Gallery> {
                 child: AppNetworkImage(url: images[i], fit: BoxFit.cover),
               ),
             ),
-          if (widget.product.hasDiscount)
+          if (frames.length >= 2)
+            Positioned(
+              right: AppSpacing.md,
+              top: widget.height * 0.38,
+              child: _MediaSwitch(spin: _spin, onChanged: (v) => setState(() => _spin = v)),
+            ),
+          if (widget.product.hasDiscount && !showSpin)
             Positioned(
               left: AppSpacing.lg,
               bottom: AppSpacing.lg,
               child: DiscountBadge(percent: widget.product.discountPercentage, large: true),
             ),
-          if (images.length > 1)
+          if (images.length > 1 && !showSpin)
             Positioned(
               bottom: AppSpacing.lg,
               left: 0,
@@ -400,6 +419,53 @@ class _GalleryState extends State<_Gallery> {
             ),
         ],
       ),
+    );
+  }
+}
+
+/// Vertical 360° / Photos switch shown on the gallery when a product has a spin.
+class _MediaSwitch extends StatelessWidget {
+  final bool spin;
+  final ValueChanged<bool> onChanged;
+  const _MediaSwitch({required this.spin, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = context.colors;
+    Widget item(bool value, IconData icon, String tip) {
+      final active = spin == value;
+      return Tooltip(
+        message: tip,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(context.design.r(14)),
+          onTap: () => onChanged(value),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: active ? scheme.primary : Colors.transparent,
+              borderRadius: BorderRadius.circular(context.design.r(14)),
+            ),
+            child: Icon(icon, size: 22, color: active ? scheme.onPrimary : scheme.onSurfaceVariant),
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: scheme.surface.fade(0.9),
+        borderRadius: BorderRadius.circular(context.design.r(18)),
+        border: Border.all(color: scheme.outlineVariant),
+        boxShadow: [BoxShadow(color: Colors.black.fade(0.12), blurRadius: 14, offset: const Offset(0, 6))],
+      ),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        item(true, Icons.threesixty_rounded, context.tr('spin_view_360')),
+        const SizedBox(height: 2),
+        item(false, Icons.photo_library_outlined, context.tr('spin_view_photos')),
+      ]),
     );
   }
 }

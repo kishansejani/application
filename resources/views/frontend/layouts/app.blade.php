@@ -1,5 +1,21 @@
 @php
     $gu = app()->getLocale() === 'gu';
+    // Design & Experience (Admin -> Settings): style, radius, font and effects
+    $sysSettings = \App\Models\Setting::getAllSettings();
+    $uiStyle  = $sysSettings['ui_style'] ?? 'aurora';
+    $uiRadius = $sysSettings['ui_radius'] ?? 'round';
+    $uiFont   = $sysSettings['ui_font'] ?? 'jakarta';
+    $fxFlags  = collect([
+        'fx_aurora' => 'aurora', 'fx_reveal' => 'reveal', 'fx_tilt' => 'tilt', 'fx_glow' => 'glow', 'fx_marquee' => 'marquee',
+        'fx_glass_header' => 'glass-header', 'fx_float_tabbar' => 'float-tabbar', 'fx_progress' => 'progress',
+        'fx_scene3d' => 'scene3d', 'fx_product3d' => 'product3d',
+    ])->filter(fn ($name, $key) => ($sysSettings[$key] ?? '1') === '1')->values()->implode(' ');
+    $fontLinks = [
+        'poppins' => 'Poppins:wght@400;500;600;700;800',
+        'outfit'  => 'Outfit:wght@400;500;600;700;800',
+        'manrope' => 'Manrope:wght@400;500;600;700;800',
+        'sora'    => 'Sora:wght@400;500;600;700;800',
+    ];
     // Rendered inside the Flutter app's WebView: hide the site chrome (header, footer, tab bar)
     $inApp = str_contains((string) request()->userAgent(), 'FreshExpressApp') || request()->boolean('in_app');
     $navCategories = \App\Models\Category::with('subCategories')->where('is_active', true)->orderBy('sort_order')->get();
@@ -43,7 +59,7 @@
             ];
 @endphp
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full" data-ui-style="{{ $uiStyle }}" data-ui-radius="{{ $uiRadius }}" data-ui-font="{{ $uiFont }}" data-fx="{{ $fxFlags }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -58,6 +74,7 @@
             try { m = localStorage.getItem('theme') || 'system'; } catch (e) {}
             var dark = m === 'dark' || (m === 'system' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
             if (dark) document.documentElement.classList.add('dark');
+            document.documentElement.classList.add('fx-js');
         })();
     </script>
 
@@ -65,6 +82,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Hind+Vadodara:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    @if(isset($fontLinks[$uiFont]))
+        <link href="https://fonts.googleapis.com/css2?family={{ $fontLinks[$uiFont] }}&display=swap" rel="stylesheet">
+    @endif
 
     <!-- Icons: Phosphor (UI) + Font Awesome (category icons stored in the DB) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
@@ -77,8 +98,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 
     @php
-        $sysSettings = \App\Models\Setting::getAllSettings();
-        
+        $sysSettings = $sysSettings ?? \App\Models\Setting::getAllSettings();
+
         // Light mode colors
         $fBrandPri   = $sysSettings['front_brand_primary'] ?? '#059669';
         $fBrandHov   = $sysSettings['front_brand_hover'] ?? '#047857';
@@ -129,6 +150,18 @@
     <!-- Storefront components (loaded before inline style overrides and Tailwind) -->
     <link rel="stylesheet" href="{{ asset('assets/shared/fx-select.css') }}?v=4.0.0">
     <link rel="stylesheet" href="{{ asset('assets/front/store.css') }}?v=5.0.0">
+    <link rel="stylesheet" href="{{ asset('assets/shared/spin360.css') }}?v=1.0.0">
+    <link rel="stylesheet" href="{{ asset('assets/front/aurora.css') }}?v={{ @filemtime(public_path('assets/front/aurora.css')) ?: 1 }}">
+    <link rel="stylesheet" href="{{ asset('assets/front/market.css') }}?v={{ @filemtime(public_path('assets/front/market.css')) ?: 1 }}">
+    <link rel="stylesheet" href="{{ asset('assets/front/scene3d.css') }}?v={{ @filemtime(public_path('assets/front/scene3d.css')) ?: 1 }}">
+    @if(str_contains($fxFlags, 'scene3d') || str_contains($fxFlags, 'product3d'))
+        {{-- Three.js (self-hosted) – resolved by the browser import map --}}
+        <script type="importmap">{"imports":{"three":"{{ asset('assets/vendor/three/three.module.min.js') }}"}}</script>
+        <link rel="modulepreload" href="{{ asset('assets/vendor/three/three.module.min.js') }}">
+    @endif
+    @if(str_contains($fxFlags, 'reveal'))
+        <style>@view-transition { navigation: auto; } ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .22s; }</style>
+    @endif
 
     <style>
         :root {
@@ -1338,6 +1371,11 @@
     </script>
     <script src="{{ asset('assets/shared/fx-select.js') }}?v=3.0.0"></script>
     <script src="{{ asset('assets/front/store.js') }}?v=4"></script>
+    <script src="{{ asset('assets/shared/spin360.js') }}?v=1.0.0"></script>
+    <script src="{{ asset('assets/front/aurora.js') }}?v={{ @filemtime(public_path('assets/front/aurora.js')) ?: 1 }}"></script>
+    @if(str_contains($fxFlags, 'scene3d') || str_contains($fxFlags, 'product3d'))
+        <script type="module" src="{{ asset('assets/front/scene3d.js') }}?v={{ @filemtime(public_path('assets/front/scene3d.js')) ?: 1 }}"></script>
+    @endif
     <script>
         // ==================== STORE LIVE CUSTOMIZER CONTROLLER ====================
         (function() {
