@@ -193,12 +193,21 @@
                     <h3 class="card-title"><i class="ph-duotone ph-receipt"></i> Recent orders</h3>
                     <p class="card-subtitle">{{ __('The latest :count orders placed', ['count' => $recentOrders->count()]) }}</p>
                 </div>
-                @if($u->hasPermission('manage_orders'))
-                    <a href="{{ route('admin.orders.index') }}" class="btn btn-outline btn-sm">View all <i class="ph ph-arrow-right"></i></a>
-                @endif
+                <div class="flex items-center gap-2">
+                    @if($u->hasPermission('manage_orders'))
+                        <a href="{{ route('admin.orders.index') }}" class="btn btn-outline btn-sm">View all <i class="ph ph-arrow-right"></i></a>
+                    @endif
+                    <button type="button" class="btn-col-modal !w-8 !h-8 !rounded-lg" data-target-table="#dashboardOrdersTable" title="Customize columns" aria-label="Customize columns">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="9" y1="3" x2="9" y2="21"></line>
+                            <line x1="15" y1="3" x2="15" y2="21"></line>
+                        </svg>
+                    </button>
+                </div>
             </div>
             <div class="overflow-x-auto">
-                <table class="table-modern">
+                <table id="dashboardOrdersTable" data-export-title="Recent orders" class="table-modern">
                     <thead>
                         <tr>
                             <th>Order</th>

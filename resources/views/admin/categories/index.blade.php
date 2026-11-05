@@ -28,7 +28,16 @@
                 <a href="{{ route('admin.categories.index', ['status' => 'inactive']) }}" class="filter-chip {{ request('status') === 'inactive' ? 'is-active' : '' }}">Inactive</a>
                 <a href="{{ route('admin.categories.index', ['featured' => '1']) }}" class="filter-chip {{ request('featured') == '1' ? 'is-active' : '' }}"><i class="ph-fill ph-star"></i> Featured</a>
             </div>
-            <span class="ml-auto text-xs font-semibold text-slate-500">{{ $categories->count() }} {{ \Illuminate\Support\Str::plural('category', $categories->count()) }}</span>
+            <div class="ml-auto flex items-center gap-2.5">
+                <span class="text-xs font-semibold text-slate-500">{{ $categories->count() }} {{ \Illuminate\Support\Str::plural('category', $categories->count()) }}</span>
+                <button type="button" class="btn-col-modal" data-target-table="#categoriesTable" title="Customize columns" aria-label="Customize columns">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                        <line x1="15" y1="3" x2="15" y2="21"></line>
+                    </svg>
+                </button>
+            </div>
         </div>
 
         <table id="categoriesTable" class="w-full" data-export-title="Categories">

@@ -265,6 +265,8 @@
     </style>
     <link rel="stylesheet" href="{{ asset('assets/shared/fx-select.css') }}?v=3.1.0">
     <link rel="stylesheet" href="{{ asset('assets/admin/admin.css') }}?v=2.1.0">
+    <link rel="stylesheet" href="{{ asset('assets/admin/dataTables.colReorder.min.css') }}?v=1.2.0">
+    <link rel="stylesheet" href="{{ asset('assets/admin/col-customizer.css') }}?v=1.2.0">
     @stack('styles')
 </head>
 <body class="admin-body">
@@ -1016,6 +1018,7 @@
     {{-- ============================== SCRIPTS ============================== --}}
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="{{ asset('assets/admin/dataTables.colReorder.min.js') }}?v=1.2.0"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
@@ -1045,6 +1048,7 @@
     </script>
     <script src="{{ asset('assets/shared/fx-select.js') }}?v=3.0.0"></script>
     <script src="{{ asset('assets/admin/admin.js') }}?v=2.1.0"></script>
+    <script src="{{ asset('assets/admin/col-customizer.js') }}?v=1.2.0"></script>
     <script>
         // ==================== LIVE CUSTOMIZER CONTROLLER ====================
         (function() {

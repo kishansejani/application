@@ -15,6 +15,21 @@
     </div>
 
     <div class="card table-card">
+        <div class="filter-bar">
+            <span class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                <i class="ph ph-file-text text-base text-slate-400"></i> {{ __('Content Pages Directory') }}
+            </span>
+            <div class="ml-auto flex items-center gap-2.5">
+                <span class="text-xs font-semibold text-slate-500">{{ $pages->count() }} {{ \Illuminate\Support\Str::plural('page', $pages->count()) }}</span>
+                <button type="button" class="btn-col-modal" data-target-table="#pagesTable" title="Customize columns" aria-label="Customize columns">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                        <line x1="15" y1="3" x2="15" y2="21"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
         <table id="pagesTable" class="w-full" data-export-title="Content pages">
             <thead>
                 <tr>

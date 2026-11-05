@@ -75,7 +75,16 @@
                     <a href="{{ route('admin.orders.index') }}" class="btn btn-ghost btn-sm text-rose-600"><i class="ph ph-x-circle"></i> Clear filters</a>
                 @endif
             </form>
-            <span class="ml-auto text-xs font-semibold text-slate-500">{{ $orders->count() }} {{ \Illuminate\Support\Str::plural('order', $orders->count()) }}</span>
+            <div class="ml-auto flex items-center gap-2.5">
+                <span class="text-xs font-semibold text-slate-500">{{ $orders->count() }} {{ \Illuminate\Support\Str::plural('order', $orders->count()) }}</span>
+                <button type="button" class="btn-col-modal" data-target-table="#ordersTable" title="Customize columns" aria-label="Customize columns">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                        <line x1="15" y1="3" x2="15" y2="21"></line>
+                    </svg>
+                </button>
+            </div>
         </div>
 
         <table id="ordersTable" class="w-full" data-export-title="Orders">

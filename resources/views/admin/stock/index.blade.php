@@ -32,7 +32,7 @@ Stock & Inventory
                 <a href="{{ route('admin.stock.index', ['filter' => 'low'] + $catParam) }}" class="filter-chip {{ $filter === 'low' ? 'is-active' : '' }}"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Low ({{ $stats['low_stock_count'] }})</a>
                 <a href="{{ route('admin.stock.index', ['filter' => 'out'] + $catParam) }}" class="filter-chip {{ $filter === 'out' ? 'is-active' : '' }}"><span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Out ({{ $stats['out_of_stock_count'] }})</a>
             </div>
-            <form action="{{ route('admin.stock.index') }}" method="GET" class="flex flex-wrap items-center gap-2.5 sm:ml-auto" data-no-loading>
+            <form action="{{ route('admin.stock.index') }}" method="GET" class="flex flex-wrap items-center gap-2.5" data-no-loading>
                 @if($filter)<input type="hidden" name="filter" value="{{ $filter }}">@endif
                 <select name="category_id" onchange="this.form.submit()" class="form-select w-auto min-w-[11rem]" aria-label="Filter by category" data-search>
                     <option value="">All categories</option>
@@ -44,6 +44,15 @@ Stock & Inventory
                     <a href="{{ route('admin.stock.index') }}" class="btn btn-ghost btn-sm text-rose-600"><i class="ph ph-x-circle"></i> Clear</a>
                 @endif
             </form>
+            <div class="ml-auto flex items-center gap-2.5">
+                <button type="button" class="btn-col-modal" data-target-table="#stockTable" title="Customize columns" aria-label="Customize columns">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                        <line x1="15" y1="3" x2="15" y2="21"></line>
+                    </svg>
+                </button>
+            </div>
         </div>
 
         <table id="stockTable" class="w-full" data-export-title="Stock & inventory">

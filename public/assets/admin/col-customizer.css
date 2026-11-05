@@ -1,0 +1,462 @@
+/* ==========================================================================
+   Table Column Customizer & Reorder Styles (Matches Image 1 & Image 2)
+   ========================================================================== */
+
+/* Trigger Button (Matching Image 1) */
+.btn-col-modal {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    border: 1px solid var(--line-strong, #e2e8f0);
+    background: var(--surface, #ffffff);
+    color: var(--ink, #1e293b);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+}
+.btn-col-modal:hover {
+    border-color: #94a3b8;
+    background: #f8fafc;
+    color: #0f172a;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(16, 24, 40, 0.08);
+}
+.dark .btn-col-modal {
+    background: #1e293b;
+    border-color: #334155;
+    color: #cbd5e1;
+}
+.dark .btn-col-modal:hover {
+    background: #273549;
+    color: #ffffff;
+    border-color: #64748b;
+}
+
+/* Modal Backdrop & Dialog (Matching Image 2) */
+.col-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.2s ease;
+}
+.col-modal-backdrop.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+.col-modal-dialog {
+    width: 100%;
+    max-width: 530px;
+    background: #ffffff;
+    border-radius: 24px;
+    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform: scale(1);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.dark .col-modal-dialog {
+    background: #0f172a;
+    border: 1px solid #1e293b;
+    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+.col-modal-backdrop.is-hidden .col-modal-dialog {
+    transform: scale(0.95);
+}
+
+/* Header */
+.col-modal-header {
+    padding: 24px 26px 14px 26px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+.col-modal-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin: 0;
+}
+.dark .col-modal-title {
+    color: #f8fafc;
+}
+.col-modal-subtitle {
+    font-size: 13px;
+    color: #64748b;
+    margin: 4px 0 0 0;
+    font-weight: 500;
+}
+.dark .col-modal-subtitle {
+    color: #94a3b8;
+}
+.col-modal-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+    transition: all 0.15s ease;
+}
+.col-modal-close:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+.dark .col-modal-close:hover {
+    background: #1e293b;
+    color: #ffffff;
+}
+
+/* Body: 2 Columns */
+.col-modal-body {
+    padding: 8px 26px 20px 26px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+    min-height: 320px;
+}
+@media (max-width: 520px) {
+    .col-modal-body {
+        grid-template-columns: 1fr;
+    }
+}
+.col-modal-left {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+.col-modal-right {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+/* Left Column: Search */
+.col-search-wrap {
+    margin-bottom: 10px;
+}
+.col-search-input {
+    width: 100%;
+    height: 38px;
+    padding: 0 12px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    color: #0f172a;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.col-search-input::placeholder {
+    color: #94a3b8;
+    font-style: italic;
+}
+.col-search-input:focus {
+    border-color: #64748b;
+    box-shadow: 0 0 0 2px rgba(100, 116, 139, 0.15);
+}
+.dark .col-search-input {
+    background: #1e293b;
+    border-color: #334155;
+    color: #f8fafc;
+}
+.dark .col-search-input:focus {
+    border-color: #94a3b8;
+    box-shadow: 0 0 0 2px rgba(148, 163, 184, 0.15);
+}
+
+/* Left Column: Checkbox list */
+.col-checkbox-list {
+    flex: 1;
+    max-height: 290px;
+    overflow-y: auto;
+    padding-right: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+.col-check-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: #1e293b;
+    user-select: none;
+    transition: background 0.12s ease;
+}
+.col-check-row:hover {
+    background: #f8fafc;
+}
+.dark .col-check-row {
+    color: #e2e8f0;
+}
+.dark .col-check-row:hover {
+    background: #1e293b;
+}
+.col-checkbox {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 1.5px solid #0f172a;
+    background-color: #ffffff;
+    cursor: pointer;
+    accent-color: #0f172a;
+    flex-shrink: 0;
+}
+.dark .col-checkbox {
+    accent-color: #38bdf8;
+    border-color: #64748b;
+}
+.col-check-label {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Right Column: Shown Header & Draggable List */
+.col-shown-header {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 10px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+}
+.dark .col-shown-header {
+    color: #cbd5e1;
+}
+.col-draggable-list {
+    flex: 1;
+    max-height: 290px;
+    overflow-y: auto;
+    padding-right: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.col-drag-item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 9px 13px;
+    border-radius: 12px;
+    background: #f2f5fa;
+    color: #1e293b;
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: grab;
+    user-select: none;
+    transition: background 0.15s ease, box-shadow 0.15s ease;
+    border: 1px solid rgba(226, 232, 240, 0.7);
+}
+.dark .col-drag-item {
+    background: #1e293b;
+    color: #f1f5f9;
+    border-color: rgba(51, 65, 85, 0.7);
+}
+.col-drag-item:hover {
+    background: #e9eef6;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+.dark .col-drag-item:hover {
+    background: #273549;
+}
+.col-drag-item.is-dragging {
+    opacity: 0.45;
+    background: #e0e7ff !important;
+    border: 1.5px dashed #3b82f6 !important;
+    cursor: grabbing;
+}
+.dark .col-drag-item.is-dragging {
+    background: #1e3a5f !important;
+    border-color: #60a5fa !important;
+}
+.col-drag-handle {
+    display: flex;
+    align-items: center;
+    color: #94a3b8;
+    cursor: grab;
+    flex-shrink: 0;
+}
+.col-drag-item.is-dragging .col-drag-handle {
+    cursor: grabbing;
+}
+.col-drag-title {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Modal Footer (Image 2) */
+.col-modal-footer {
+    padding: 18px 26px;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fafbfd;
+}
+.dark .col-modal-footer {
+    border-top-color: #1e293b;
+    background: #0c1322;
+}
+.col-btn-reset {
+    border: none;
+    background: transparent;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #0f172a;
+    cursor: pointer;
+    padding: 0;
+}
+.col-btn-reset:hover {
+    text-decoration: underline;
+}
+.dark .col-btn-reset {
+    color: #38bdf8;
+}
+.col-footer-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.col-btn-cancel {
+    padding: 8px 20px;
+    border-radius: 9999px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #0f172a;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+.col-btn-cancel:hover {
+    background: #f1f5f9;
+}
+.dark .col-btn-cancel {
+    background: #1e293b;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+.dark .col-btn-cancel:hover {
+    background: #273549;
+}
+.col-btn-apply {
+    padding: 8px 24px;
+    border-radius: 9999px;
+    border: none;
+    background: #0f172a;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.2);
+    transition: background 0.15s ease, transform 0.1s ease;
+}
+.col-btn-apply:hover {
+    background: #1e293b;
+}
+.dark .col-btn-apply {
+    background: #f8fafc;
+    color: #0f172a;
+}
+.dark .col-btn-apply:hover {
+    background: #e2e8f0;
+}
+
+/* Custom scrollbars for modal lists */
+.col-checkbox-list::-webkit-scrollbar,
+.col-draggable-list::-webkit-scrollbar {
+    width: 5px;
+}
+.col-checkbox-list::-webkit-scrollbar-thumb,
+.col-draggable-list::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 9999px;
+}
+.dark .col-checkbox-list::-webkit-scrollbar-thumb,
+.dark .col-draggable-list::-webkit-scrollbar-thumb {
+    background: #334155;
+}
+
+/* Direct Table Header Drag & Drop Cursor */
+table.dataTable thead th {
+    cursor: grab;
+}
+table.dataTable thead th:active {
+    cursor: grabbing;
+}
+
+/* DataTables ColReorder insertion indicator */
+div.DTCR_pointer {
+    width: 2.5px !important;
+    background-color: #2563eb !important;
+    box-shadow: 0 0 10px rgba(37, 99, 235, 0.7) !important;
+    z-index: 100001 !important;
+    pointer-events: none !important;
+}
+.dark div.DTCR_pointer {
+    background-color: #38bdf8 !important;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.7) !important;
+}
+
+/* Floating Drag Element */
+.DTCR_clonedTable,
+table.DTCR_clonedTable {
+    position: absolute !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    border: 1.5px solid #2563eb !important;
+    border-radius: 10px !important;
+    box-shadow: 0 12px 28px -5px rgba(15, 23, 42, 0.35) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 8px 16px !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.02em !important;
+    white-space: nowrap !important;
+    width: auto !important;
+    max-width: 220px !important;
+    overflow: hidden !important;
+    z-index: 100002 !important;
+    pointer-events: none !important;
+    opacity: 0.96 !important;
+    text-transform: uppercase !important;
+}
+.dark .DTCR_clonedTable,
+.dark table.DTCR_clonedTable {
+    background: #1e293b !important;
+    color: #f8fafc !important;
+    border-color: #38bdf8 !important;
+    box-shadow: 0 12px 28px -5px rgba(0, 0, 0, 0.7) !important;
+}

@@ -33,6 +33,31 @@
         ['User account has been {0} successfully.', 'યુઝર એકાઉન્ટ સફળતાપૂર્વક {0} થયું.'],
         ['{0} items', '{0} વસ્તુઓ'], ['{0} item', '{0} વસ્તુ'], ['{0} orders', '{0} ઓર્ડર'], ['{0} order', '{0} ઓર્ડર'],
         ['{0} products', '{0} પ્રોડક્ટ્સ'], ['{0} product', '{0} પ્રોડક્ટ'], ['{0} users', '{0} યુઝર્સ'], ['{0} units', '{0} યુનિટ'],
+        ['{0} categories', '{0} કેટેગરીઝ'], ['{0} category', '{0} કેટેગરી'],
+        ['{0} subcategories', '{0} સબકેટેગરીઝ'], ['{0} subcategory', '{0} સબકેટેગરી'],
+        ['{0} coupons', '{0} કૂપન્સ'], ['{0} coupon', '{0} કૂપન'],
+        ['{0} banners', '{0} બેનર્સ'], ['{0} banner', '{0} બેનર'],
+        ['{0} roles', '{0} રોલ્સ'], ['{0} role', '{0} રોલ'],
+        ['{0} pages', '{0} પેજીસ'], ['{0} page', '{0} પેજ'],
+        ['{0} columns', '{0} કૉલમ્સ'],
+        ['Delete “{0}”?', '“{0}” ડિલીટ કરવો છે?'],
+        ['Delete "{0}"?', '"{0}" ડિલીટ કરવો છે?'],
+        ['Delete \'{0}\'?', '\'{0}\' ડિલીટ કરવો છે?'],
+        ['Delete coupon “{0}”?', 'કૂપન “{0}” ડિલીટ કરવી છે?'],
+        ['Delete role “{0}”?', 'રોલ “{0}” ડિલીટ કરવો છે?'],
+        ['Delete this role?', 'આ રોલ ડિલીટ કરવો છે?'],
+        ['Delete this record?', 'આ રેકોર્ડ ડિલીટ કરવો છે?'],
+        ['Are you sure you want to delete “{0}”?', 'શું તમને ખાતરી છે કે તમે “{0}” ડિલીટ કરવા માંગો છો?'],
+        ['Are you sure you want to delete {0}?', 'શું તમને ખાતરી છે કે તમે {0} ડિલીટ કરવા માંગો છો?'],
+        ['Are you sure you want to delete this {0}?', 'શું તમને ખાતરી છે કે તમે આ {0} ડિલીટ કરવા માંગો છો?'],
+        ['This role has {0} assigned {1}. Reassign them first.', 'આ રોલ પર {0} {1} સોંપાયેલ છે. પહેલાં તેમને અન્ય રોલ સોંપો.'],
+        ['Reset all settings to defaults?', 'બધી સેટિંગ્સ મૂળ સ્થિતિમાં રીસેટ કરવી છે?'],
+        ['Reset all colors to system defaults?', 'બધા રંગો સિસ્ટમ ડિફોલ્ટ પર રીસેટ કરવા છે?'],
+        ['Reset all storefront and admin colors to default?', 'સ્ટોરફ્રન્ટ અને એડમિનના બધા રંગો ડિફોલ્ટ પર રીસેટ કરવા છે?'],
+        ['All colours (Admin & Frontend Light/Dark), footer text and the store name will return to their default values.', 'બધા રંગો (એડમિન અને સ્ટોરફ્રન્ટ), ફુટર લખાણ અને સ્ટોર નામ તેમની મૂળ કિંમતો પર પાછા આવી જશે.'],
+        ['Style, shape, font, effects and 360° options return to the defaults.', 'સ્ટાઇલ, આકાર, ફોન્ટ, ઇફેક્ટ્સ અને 360° વિકલ્પો મૂળ કિંમતો પર પાછા આવી જશે.'],
+        ['Only the first {0} frames are used.', 'માત્ર પ્રથમ {0} ફ્રેમ્સ ઉપયોગમાં લેવાશે.'],
+        ['PDF ({0}, {1}) is downloading.', 'PDF ({0}, {1}) ડાઉનલોડ થઈ રહી છે.'],
         ['{0} days ago', '{0} દિવસ પહેલાં'], ['{0} hours ago', '{0} કલાક પહેલાં'], ['{0} min ago', '{0} મિનિટ પહેલાં'], ['{0} mins ago', '{0} મિનિટ પહેલાં'], ['Just now', 'હમણાં જ']
     ].map(function (p) {
         var parts = p[0].split(/\{\d\}/), esc = function (x) { return x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); };
@@ -40,11 +65,15 @@
     }).sort(function (a, b) { return b.w - a.w; });
     var plain = function (str) { return (I18N && I18N[str]) || ''; };
     var t = function (str) {
-        if (!I18N || typeof str !== 'string') return str;
+        if (!I18N || cfg.locale !== 'gu' || typeof str !== 'string') return str;
         if (I18N[str]) return I18N[str];
         var key = str.replace(/\s+/g, ' ').trim();
         if (!key) return str;
         if (I18N[key]) return I18N[key];
+        var keyEllipsis = key.replace(/\.{3}$/, '…');
+        if (I18N[keyEllipsis]) return I18N[keyEllipsis];
+        var keyDots = key.replace(/…$/, '...');
+        if (I18N[keyDots]) return I18N[keyDots];
         for (var i = 0; i < PATTERNS.length; i++) {
             var m = PATTERNS[i].re.exec(key);
             if (m) return PATTERNS[i].to.replace(/\{(\d)\}/g, function (_, n) { var g = m[+n + 1]; return g === undefined ? '' : (plain(g) || plain(g.toLowerCase()) || g); });
@@ -765,12 +794,14 @@
                         { extend: 'copyHtml5', text: '<i class="ph ph-copy"></i> ' + t('Copy to clipboard'), init: setNames, exportOptions: exportOpts(plainBody) }
                     ]
                 },
-                { extend: 'colvis', className: 'btn-colvis', text: '<i class="ph ph-columns"></i><span class="btn-text">' + t('Columns') + '</span>', titleAttr: 'Show / hide columns', columns: ':not(.no-export)', collectionTitle: 'Visible columns' },
                 { text: '<i class="ph ph-corners-out"></i>', className: 'btn-icon-only btn-fs', titleAttr: 'Expand table', action: function (e, dt) { toggleCardFullscreen(dt.table().container()); } }
             ];
         };
 
         $.extend(true, DT.defaults, {
+            colReorder: {
+                realtime: false
+            },
             responsive: true,
             pageLength: 10,
             lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, 'All']],
