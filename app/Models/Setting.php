@@ -131,6 +131,8 @@ class Setting extends Model
             // Admin Panel colors
             'theme_primary_color' => '#0f172a',
             'theme_hover_color' => '#334155',
+            'admin_icon_color' => '#0f172a',
+            'admin_icon_hover_color' => '#334155',
             'btn_primary_bg' => '#0f172a',
             'btn_primary_text' => '#ffffff',
             'btn_primary_hover' => '#1e293b',

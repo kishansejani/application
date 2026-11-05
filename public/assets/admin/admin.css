@@ -563,11 +563,19 @@ table.dataTable thead th, .table-modern thead th {
 }
 table.dataTable thead th.sorting, table.dataTable thead th.sorting_asc, table.dataTable thead th.sorting_desc { cursor: pointer; padding-right: 1.9rem !important; }
 table.dataTable thead th.sorting::after, table.dataTable thead th.sorting_asc::after, table.dataTable thead th.sorting_desc::after {
-    position: absolute; right: .7rem; top: 50%; transform: translateY(-50%); font-family: "Phosphor"; font-size: 12px; opacity: .35;
+    position: absolute; right: .7rem; top: 50%; transform: translateY(-50%); font-family: "Phosphor"; font-size: 12px; opacity: .45;
+    color: var(--icon);
     content: "\e140"; /* caret-up-down */
+    transition: color .2s ease, opacity .2s ease;
 }
-table.dataTable thead th.sorting_asc::after { content: "\e13c"; opacity: .9; color: var(--ink); }
-table.dataTable thead th.sorting_desc::after { content: "\e136"; opacity: .9; color: var(--ink); }
+table.dataTable thead th.sorting_asc::after { content: "\e13c"; opacity: 1; color: var(--icon) !important; }
+table.dataTable thead th.sorting_desc::after { content: "\e136"; opacity: 1; color: var(--icon) !important; }
+table.dataTable thead th.sorting:hover::after,
+table.dataTable thead th.sorting_asc:hover::after,
+table.dataTable thead th.sorting_desc:hover::after {
+    color: var(--icon-hover) !important;
+    opacity: 1;
+}
 table.dataTable thead th::before { display: none !important; }
 table.dataTable tbody td, .table-modern tbody td {
     padding: .75rem .9rem !important; vertical-align: middle; border-top: 0 !important;
@@ -825,14 +833,22 @@ a.stat-card:hover, .stat-card:hover { transform: translateY(-3px); border-color:
 }
 
 /* ==========================================================================
-   v2.1 — Premium icon system: one colour at rest, accent colour on hover
+   v2.1 — Configurable Icon Color System (Rest & Hover from Admin Settings)
    ========================================================================== */
-   v2.1 — Premium icon system: one colour at rest, accent colour on hover
-   ========================================================================== */
-:root { --icon: #64748b; --icon-hover: var(--btn-accent-bg, #10b981); --icon-ease: cubic-bezier(.34, 1.56, .64, 1); }
-.dark { --icon: #94a3b8; }
+:root { --icon: var(--admin-icon, var(--theme-primary, #0f172a)); --icon-hover: var(--admin-icon-hover, var(--theme-hover, var(--btn-accent-bg, #10b981))); --icon-ease: cubic-bezier(.34, 1.56, .64, 1); }
+.dark { --icon: var(--admin-icon, #94a3b8); --icon-hover: var(--admin-icon-hover, #38bdf8); }
 
-.app-topbar i, .app-content i[class*="ph"], .sb-icon, .act-btn i, .btn i, div.dt-buttons .dt-button i, .tb-menu-item > i:first-child, .notif-icon i {
+.filter-bar i, .filter-bar svg { color: var(--icon); }
+.btn-col-modal { color: var(--icon) !important; }
+.btn-col-modal:hover { color: var(--icon-hover) !important; }
+.btn-col-modal svg { stroke: currentColor; color: currentColor; }
+.stat-card:has(.tone-slate), .stat-card:has(.tone-theme) {
+    --stat-c: var(--icon, var(--theme-primary, #0f172a));
+    --stat-c2: var(--icon-hover, var(--theme-hover, #334155));
+    --stat-tint: color-mix(in srgb, var(--stat-c) 12%, transparent);
+}
+
+.app-topbar i, .app-content i[class*="ph"], .app-content svg, .sb-icon, .act-btn i, .act-btn svg, .btn i, div.dt-buttons .dt-button i, .tb-menu-item > i:first-child, .notif-icon i {
     transition: color .22s ease, transform .3s var(--icon-ease), opacity .2s;
 }
 
@@ -860,28 +876,47 @@ a.stat-card:hover, .stat-card:hover { transform: translateY(-3px); border-color:
 .card-title i { color: var(--icon); }
 .card:hover .card-title i { color: var(--icon-hover); transform: scale(1.1); }
 
-/* Row action buttons: neutral at rest, coloured on hover */
-.act-btn { color: var(--icon); }
-.act-btn:hover { color: var(--icon-hover); border-color: color-mix(in srgb, var(--icon-hover) 40%, var(--line)); background: color-mix(in srgb, var(--icon-hover) 8%, var(--surface)); }
-.act-btn:hover i { transform: scale(1.15); }
+/* Row action buttons: strictly use configured icon colors at rest and on hover */
+.act-btn { color: var(--icon) !important; }
+.act-btn i, .act-btn svg,
+.act-btn.is-edit i, .act-btn.is-edit svg,
+.act-btn.is-danger i, .act-btn.is-danger svg,
+.act-btn.is-info i, .act-btn.is-info svg {
+    color: var(--icon) !important;
+}
+.act-btn:hover { color: var(--icon-hover) !important; border-color: color-mix(in srgb, var(--icon-hover) 40%, var(--line)); background: color-mix(in srgb, var(--icon-hover) 8%, var(--surface)); }
+.act-btn:hover i, .act-btn:hover svg,
+.act-btn.is-edit:hover i, .act-btn.is-edit:hover svg,
+.act-btn.is-danger:hover i, .act-btn.is-danger:hover svg,
+.act-btn.is-info:hover i, .act-btn.is-info:hover svg {
+    color: var(--icon-hover) !important;
+    transform: scale(1.15);
+}
 .act-btn.is-edit:hover i { transform: rotate(-12deg) scale(1.15); }
 .act-btn.is-danger:hover i { animation: icon-wiggle .45s ease; }
 @keyframes icon-wiggle { 0%,100% { transform: scale(1.15) rotate(0); } 30% { transform: scale(1.15) rotate(-10deg); } 60% { transform: scale(1.15) rotate(8deg); } }
 
-/* Buttons */
+/* Buttons & Inputs */
 .btn-outline i, .btn-ghost i, .btn-light i { color: var(--icon); }
 .btn-outline:hover i, .btn-ghost:hover i, .btn-light:hover i { color: var(--icon-hover); }
 .btn:hover i { transform: scale(1.1); }
 .btn:hover .ph-arrow-right, .btn:hover .ph-caret-right { transform: translateX(3px); }
 .btn:hover .ph-plus { transform: rotate(90deg); }
 
-/* DataTables toolbar: neutral icons, brand colour on hover */
-div.dt-buttons .dt-button i { color: var(--icon); }
-div.dt-buttons .dt-button:hover i { transform: scale(1.14); color: var(--icon-hover); }
-div.dt-buttons .dt-button.btn-excel:hover i { color: #16a34a; }
-div.dt-buttons .dt-button.btn-pdf:hover i { color: #e11d48; }
-div.dt-buttons .dt-button.btn-print:hover i { color: #2563eb; }
-div.dt-buttons .dt-button.btn-colvis:hover i { color: #7c3aed; }
+/* DataTables toolbar: all export/action icons strictly follow settings icon colors (no hardcoded green/red/blue) */
+div.dt-buttons .dt-button i,
+div.dt-buttons .dt-button svg,
+.dataTables_paginate .paginate_button i,
+.dataTables_filter i {
+    color: var(--icon) !important;
+}
+div.dt-buttons .dt-button:hover i,
+div.dt-buttons .dt-button:hover svg,
+.dataTables_paginate .paginate_button:hover i,
+.dataTables_filter:focus-within i {
+    transform: scale(1.14);
+    color: var(--icon-hover) !important;
+}
 
 /* Inline icon links inside the content area */
 .app-content a:hover > i[class*="ph-arrow"], .app-content a:hover > i.ph-caret-right { transform: translateX(3px); }

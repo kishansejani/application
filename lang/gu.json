@@ -1110,5 +1110,11 @@
     "Could not remove the frames.": "ફ્રેમ્સ દૂર થઈ શકી નહીં.",
     "You are offline. Changes will not be saved until the connection is back.": "તમે ઑફલાઇન છો. ઇન્ટરનેટ કનેક્શન પાછું ન આવે ત્યાં સુધી ફેરફારો સેવ થશે નહીં.",
     "Reset All": "બધું રીસેટ કરો",
-    "Delete this role?": "આ રોલ ડિલીટ કરવો છે?"
+    "Delete this role?": "આ રોલ ડિલીટ કરવો છે?",
+    "Icon colour": "આઇકોન રંગ",
+    "Icon hover colour": "આઇકોન હોવર રંગ",
+    "Admin icon colour": "એડમિન આઇકોન રંગ",
+    "Admin icon hover colour": "એડમિન આઇકોન હોવર રંગ",
+    "Icons across headers, topbar, cards, and table actions.": "હેડર્સ, ટોપબાર, કાર્ડ્સ અને ટેબલ એક્શનમાં આઇકોન્સ.",
+    "Icons interactive highlight on hover.": "હોવર કરવા પર આઇકોનનો ઇન્ટરેક્ટિવ હાઇલાઇટ રંગ."
 }

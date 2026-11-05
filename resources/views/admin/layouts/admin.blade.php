@@ -25,6 +25,8 @@
     $sidebarBg     = $sysSettings['sidebar_bg_color'] ?? '#0b1120';
     $sidebarActive = $sysSettings['sidebar_active_color'] ?? '#add8e6';
     $sidebarText   = $sysSettings['sidebar_text_color'] ?? $contrast($sidebarBg);
+    $adminIconColor = $sysSettings['admin_icon_color'] ?? $primary;
+    $adminIconHover = $sysSettings['admin_icon_hover_color'] ?? ($sysSettings['theme_hover_color'] ?? '#334155');
 
     // ---- Live counters for badges & notifications ---------------------------------------
     $pendingCnt  = Order::where('order_status', 'pending')->count();
@@ -257,6 +259,16 @@
             --sidebar-text: {{ $sidebarText }};
             --sidebar-active: {{ $sidebarActive }};
             --sidebar-active-text: {{ $contrast($sidebarActive) }};
+            --admin-icon: {{ $adminIconColor }};
+            --admin-icon-hover: {{ $adminIconHover }};
+            --icon: var(--admin-icon, var(--theme-primary, #0f172a));
+            --icon-hover: var(--admin-icon-hover, var(--theme-hover, #334155));
+        }
+        .dark {
+            --admin-icon: {{ !empty($sysSettings['admin_icon_color']) && $sysSettings['admin_icon_color'] !== '#0f172a' ? $sysSettings['admin_icon_color'] : 'color-mix(in srgb, ' . $primary . ' 40%, #cbd5e1)' }};
+            --admin-icon-hover: {{ $adminIconHover !== '#334155' ? $adminIconHover : '#38bdf8' }};
+            --icon: var(--admin-icon);
+            --icon-hover: var(--admin-icon-hover);
         }
         @if($btnPrimaryIsDark)
         /* A very dark primary button would vanish on dark surfaces: use a light variant in dark mode */
@@ -579,7 +591,7 @@
             <!-- Header -->
             <div class="customizer-header">
                 <div class="flex items-center gap-2.5 font-black text-slate-800 dark:text-white text-base">
-                    <i class="ph-duotone ph-gear-six text-2xl text-emerald-600 dark:text-emerald-400"></i>
+                    <i class="ph-duotone ph-gear-six text-2xl" style="color: var(--icon);"></i>
                     <span class="text-base font-extrabold tracking-tight">Customizer</span>
                 </div>
                 <button type="button" id="customizerClose" onclick="window.closeCustomizerDrawer && window.closeCustomizerDrawer()" class="customizer-close-btn" aria-label="Close Customizer">

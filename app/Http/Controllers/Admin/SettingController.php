@@ -24,6 +24,8 @@ class SettingController extends Controller
         $rules = [
             'theme_primary_color' => 'required|string|max:20',
             'theme_hover_color' => 'required|string|max:20',
+            'admin_icon_color' => 'nullable|string|max:20',
+            'admin_icon_hover_color' => 'nullable|string|max:20',
             'btn_primary_bg' => 'required|string|max:20',
             'btn_primary_text' => 'required|string|max:20',
             'btn_primary_hover' => 'required|string|max:20',
@@ -79,6 +81,8 @@ class SettingController extends Controller
         // Save Admin Settings
         Setting::set('theme_primary_color', $request->theme_primary_color, 'theme');
         Setting::set('theme_hover_color', $request->theme_hover_color, 'theme');
+        Setting::set('admin_icon_color', $request->admin_icon_color ?: $request->theme_primary_color, 'theme');
+        Setting::set('admin_icon_hover_color', $request->admin_icon_hover_color ?: $request->theme_hover_color, 'theme');
         Setting::set('btn_primary_bg', $request->btn_primary_bg, 'theme');
         Setting::set('btn_primary_text', $request->btn_primary_text, 'theme');
         Setting::set('btn_primary_hover', $request->btn_primary_hover, 'theme');
@@ -157,6 +161,8 @@ class SettingController extends Controller
         if (in_array($scope, ['all', 'admin'])) {
             Setting::set('theme_primary_color', '#0f172a', 'theme');
             Setting::set('theme_hover_color', '#334155', 'theme');
+            Setting::set('admin_icon_color', '#0f172a', 'theme');
+            Setting::set('admin_icon_hover_color', '#334155', 'theme');
             Setting::set('btn_primary_bg', '#0f172a', 'theme');
             Setting::set('btn_primary_text', '#ffffff', 'theme');
             Setting::set('btn_primary_hover', '#1e293b', 'theme');

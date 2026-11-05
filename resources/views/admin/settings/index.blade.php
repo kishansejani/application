@@ -8,6 +8,14 @@
     
     // Admin Panel Color Groups
     $adminColorGroups = [
+        'Icons (System-wide)' => [
+            ['admin_icon_color',       'adminIconPicker',      'adminIconText',      'Icon normal colour', 'Global colour for all icons, arrows, table actions, headers, buttons.', '#0f172a'],
+            ['admin_icon_hover_color', 'adminIconHoverPicker', 'adminIconHoverText', 'Icon hover colour',  'Interactive colour when hovering icons, sort arrows, buttons.', '#334155'],
+        ],
+        'Brand' => [
+            ['theme_primary_color', 'primaryColorPicker', 'primaryColorText', 'Brand colour',        'Focus rings and brand highlights across the panel.', '#0f172a'],
+            ['theme_hover_color',   'hoverColorPicker',   'hoverColorText',   'Hover / link colour', 'Links and subtle interactive states.', '#334155'],
+        ],
         'Buttons' => [
             ['btn_primary_bg',    'btnPrimaryBgPicker',    'btnPrimaryBgText',    'Primary button background', 'Save, submit and other primary actions.', '#0f172a'],
             ['btn_primary_text',  'btnPrimaryTextPicker',  'btnPrimaryTextText',  'Primary button text',       'Text and icon colour inside primary buttons.', '#ffffff'],
@@ -19,10 +27,6 @@
             ['sidebar_bg_color',     'sidebarBgPicker',     'sidebarBgText',     'Sidebar background',  'Background of the left navigation.', '#000000'],
             ['sidebar_active_color', 'sidebarActivePicker', 'sidebarActiveText', 'Active menu item',    'Highlight for the current page link.', '#add8e6'],
             ['sidebar_text_color',   'sidebarTextPicker',   'sidebarTextText',   'Sidebar text',        'Menu labels and icons.', '#ffffff'],
-        ],
-        'Brand' => [
-            ['theme_primary_color', 'primaryColorPicker', 'primaryColorText', 'Brand colour',        'Focus rings and brand highlights across the panel.', '#0f172a'],
-            ['theme_hover_color',   'hoverColorPicker',   'hoverColorText',   'Hover / link colour', 'Links and subtle interactive states.', '#334155'],
         ],
     ];
 
@@ -890,8 +894,10 @@
         sidebar_bg_color:     (v) => ({ '--pv-sidebar-bg': v, '--sidebar-bg': v }),
         sidebar_active_color: (v) => ({ '--pv-active': v, '--pv-active-text': contrast(v), '--sidebar-active': v, '--sidebar-active-text': contrast(v) }),
         sidebar_text_color:   (v) => ({ '--pv-sidebar-text': v, '--sidebar-text': v, '--c-sidebar-text': rgb(v).join(' ') }),
-        theme_primary_color:  (v) => ({ '--pv-brand': v, '--theme-primary': v, '--c-primary': rgb(v).join(' ') }),
-        theme_hover_color:    (v) => ({ '--pv-hover': v, '--theme-hover': v }),
+        theme_primary_color:  (v) => ({ '--pv-brand': v, '--theme-primary': v, '--c-primary': rgb(v).join(' '), '--admin-icon': v, '--icon': v }),
+        theme_hover_color:    (v) => ({ '--pv-hover': v, '--theme-hover': v, '--admin-icon-hover': v, '--icon-hover': v }),
+        admin_icon_color:     (v) => ({ '--admin-icon': v, '--icon': v }),
+        admin_icon_hover_color: (v) => ({ '--admin-icon-hover': v, '--icon-hover': v }),
     };
 
     // Frontend live preview variables
@@ -956,6 +962,8 @@
         setFieldVal('sidebar_active_color', sidebarActive);
         setFieldVal('theme_primary_color', themePrimary);
         setFieldVal('theme_hover_color', themeHover);
+        setFieldVal('admin_icon_color', themePrimary);
+        setFieldVal('admin_icon_hover_color', themeHover);
         setFieldVal('btn_primary_text', '#FFFFFF');
         setFieldVal('btn_accent_text', '#FFFFFF');
         setFieldVal('sidebar_text_color', contrast(sidebarBg).toUpperCase());
