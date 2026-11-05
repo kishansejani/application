@@ -1116,5 +1116,22 @@
     "Admin icon colour": "એડમિન આઇકોન રંગ",
     "Admin icon hover colour": "એડમિન આઇકોન હોવર રંગ",
     "Icons across headers, topbar, cards, and table actions.": "હેડર્સ, ટોપબાર, કાર્ડ્સ અને ટેબલ એક્શનમાં આઇકોન્સ.",
-    "Icons interactive highlight on hover.": "હોવર કરવા પર આઇકોનનો ઇન્ટરેક્ટિવ હાઇલાઇટ રંગ."
+    "Icons interactive highlight on hover.": "હોવર કરવા પર આઇકોનનો ઇન્ટરેક્ટિવ હાઇલાઇટ રંગ.",
+    "Action Icons (View, Edit, Delete, Redirect)": "ઍક્શન આઇકન્સ (View, Edit, Delete, Redirect)",
+    "View / Details icon colour": "વ્યુ / વિગતો આઇકન કલર",
+    "View / Details hover colour": "વ્યુ / વિગતો હોવર કલર",
+    "Edit action icon colour": "એડિટ ઍક્શન આઇકન કલર",
+    "Edit action hover colour": "એડિટ ઍક્શન હોવર કલર",
+    "Delete action icon colour": "ડિલીટ ઍક્શન આઇકન કલર",
+    "Delete action hover colour": "ડિલીટ ઍક્શન હોવર કલર",
+    "Redirect / Link icon colour": "રિડાયરેક્ટ / લિંક આઇકન કલર",
+    "Redirect / Link hover colour": "રિડાયરેક્ટ / લિંક હોવર કલર",
+    "Colour for view & details action buttons.": "વ્યુ અને વિગતો જોવા માટેના ઍક્શન બટનનો કલર.",
+    "Hover colour for view action buttons.": "વ્યુ ઍક્શન બટન પર કર્સર લઈ જતાં દેખાતો કલર.",
+    "Colour for edit action buttons.": "એડિટ ઍક્શન બટનનો મૂળ કલર.",
+    "Hover colour for edit action buttons.": "એડિટ ઍક્શન બટન પર કર્સર લઈ જતાં દેખાતો કલર.",
+    "Colour for delete & trash action buttons.": "ડિલીટ (કચરાપેટી) ઍક્શન બટનનો મૂળ કલર.",
+    "Hover colour for delete action buttons.": "ડિલીટ ઍક્શન બટન પર કર્સર લઈ જતાં દેખાતો કલર.",
+    "Colour for storefront external link & redirect buttons.": "સ્ટોરફ્રન્ટ પર જોવા કે બહારની લિંક ખોલવાના બટનનો કલર.",
+    "Hover colour for redirect buttons.": "રિડાયરેક્ટ બટન પર કર્સર લઈ જતાં દેખાતો કલર."
 }

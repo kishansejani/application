@@ -377,33 +377,94 @@ a.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); b
 .btn.is-loading::before { content: ""; width: 14px; height: 14px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: spin .7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Icon action buttons in tables (Ultra-premium tinted badges) */
+/* Icon action buttons in tables (Configurable per action: view, edit, delete, redirect) */
 .act { display: inline-flex; align-items: center; gap: .45rem; }
 .act-btn {
     width: 34px; height: 34px; border-radius: 10px; display: inline-grid; place-items: center; font-size: 15px;
-    color: #0284c7; background: #f0f9ff; border: 1px solid #bae6fd; cursor: pointer; text-decoration: none;
+    cursor: pointer; text-decoration: none;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
     transition: all .2s cubic-bezier(0.16, 1, 0.3, 1);
+    color: var(--icon);
+    background: var(--surface);
+    border: 1px solid var(--line);
 }
-.act-btn:hover { background: #0284c7; color: #ffffff; border-color: #0284c7; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3); }
+.act-btn i, .act-btn svg { color: inherit; transition: color .2s ease, transform .2s var(--icon-ease); }
+.act-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); }
+.act-btn:hover i, .act-btn:hover svg { transform: scale(1.15); }
 
-.act-btn.is-edit { color: #059669; background: #ecfdf5; border-color: #a7f3d0; }
-.act-btn.is-edit:hover { background: #059669; color: #ffffff; border-color: #059669; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(5, 150, 105, 0.3); }
+/* 1. Redirect / Storefront external link */
+.act-btn.is-redirect, a.act-btn[target="_blank"], .act-btn:has(.ph-arrow-square-out) {
+    color: var(--act-redir, #0284c7);
+    background: color-mix(in srgb, var(--act-redir, #0284c7) 8%, var(--surface));
+    border-color: color-mix(in srgb, var(--act-redir, #0284c7) 25%, var(--line));
+}
+.act-btn.is-redirect i, a.act-btn[target="_blank"] i, .act-btn:has(.ph-arrow-square-out) i, .act-btn .ph-arrow-square-out {
+    color: var(--act-redir, #0284c7) !important;
+}
+.act-btn.is-redirect:hover, a.act-btn[target="_blank"]:hover, .act-btn:hover:has(.ph-arrow-square-out) {
+    color: var(--act-redir-hover, #0369a1);
+    background: color-mix(in srgb, var(--act-redir-hover, #0369a1) 16%, var(--surface));
+    border-color: var(--act-redir-hover, #0369a1);
+}
+.act-btn.is-redirect:hover i, a.act-btn[target="_blank"]:hover i, .act-btn:hover:has(.ph-arrow-square-out) i, .act-btn:hover .ph-arrow-square-out {
+    color: var(--act-redir-hover, #0369a1) !important;
+}
 
-.act-btn.is-danger { color: #e11d48; background: #fff1f2; border-color: #fecdd3; }
-.act-btn.is-danger:hover { background: #e11d48; color: #ffffff; border-color: #e11d48; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(225, 29, 72, 0.3); }
+/* 2. View / Details */
+.act-btn.is-view, .act-btn.is-info, .act-btn:has(.ph-eye) {
+    color: var(--act-view, #4f46e5);
+    background: color-mix(in srgb, var(--act-view, #4f46e5) 8%, var(--surface));
+    border-color: color-mix(in srgb, var(--act-view, #4f46e5) 25%, var(--line));
+}
+.act-btn.is-view i, .act-btn.is-info i, .act-btn:has(.ph-eye) i, .act-btn .ph-eye {
+    color: var(--act-view, #4f46e5) !important;
+}
+.act-btn.is-view:hover, .act-btn.is-info:hover, .act-btn:hover:has(.ph-eye) {
+    color: var(--act-view-hover, #3730a3);
+    background: color-mix(in srgb, var(--act-view-hover, #3730a3) 16%, var(--surface));
+    border-color: var(--act-view-hover, #3730a3);
+}
+.act-btn.is-view:hover i, .act-btn.is-info:hover i, .act-btn:hover:has(.ph-eye) i, .act-btn:hover .ph-eye {
+    color: var(--act-view-hover, #3730a3) !important;
+}
 
-.act-btn.is-info { color: #4f46e5; background: #eef2ff; border-color: #c7d2fe; }
-.act-btn.is-info:hover { background: #4f46e5; color: #ffffff; border-color: #4f46e5; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3); }
+/* 3. Edit */
+.act-btn.is-edit, .act-btn:has(.ph-pencil-simple-line), .act-btn:has(.ph-pencil) {
+    color: var(--act-edit, #059669);
+    background: color-mix(in srgb, var(--act-edit, #059669) 8%, var(--surface));
+    border-color: color-mix(in srgb, var(--act-edit, #059669) 25%, var(--line));
+}
+.act-btn.is-edit i, .act-btn:has(.ph-pencil-simple-line) i, .act-btn:has(.ph-pencil) i, .act-btn .ph-pencil-simple-line, .act-btn .ph-pencil {
+    color: var(--act-edit, #059669) !important;
+}
+.act-btn.is-edit:hover, .act-btn:hover:has(.ph-pencil-simple-line), .act-btn:hover:has(.ph-pencil) {
+    color: var(--act-edit-hover, #047857);
+    background: color-mix(in srgb, var(--act-edit-hover, #047857) 16%, var(--surface));
+    border-color: var(--act-edit-hover, #047857);
+}
+.act-btn.is-edit:hover i, .act-btn:hover:has(.ph-pencil-simple-line) i, .act-btn:hover:has(.ph-pencil) i, .act-btn:hover .ph-pencil-simple-line, .act-btn:hover .ph-pencil {
+    color: var(--act-edit-hover, #047857) !important;
+    transform: rotate(-12deg) scale(1.15);
+}
 
-.dark .act-btn { background: rgba(14, 165, 233, 0.12); color: #38bdf8; border-color: rgba(14, 165, 233, 0.28); }
-.dark .act-btn:hover { background: #0284c7; color: #ffffff; border-color: #0284c7; }
-.dark .act-btn.is-edit { background: rgba(16, 185, 129, 0.12); color: #34d399; border-color: rgba(16, 185, 129, 0.28); }
-.dark .act-btn.is-edit:hover { background: #059669; color: #ffffff; border-color: #059669; }
-.dark .act-btn.is-danger { background: rgba(244, 63, 94, 0.12); color: #fb7185; border-color: rgba(244, 63, 94, 0.28); }
-.dark .act-btn.is-danger:hover { background: #e11d48; color: #ffffff; border-color: #e11d48; }
-.dark .act-btn.is-info { background: rgba(99, 102, 241, 0.12); color: #a5b4fc; border-color: rgba(99, 102, 241, 0.28); }
-.dark .act-btn.is-info:hover { background: #4f46e5; color: #ffffff; border-color: #4f46e5; }
+/* 4. Delete */
+.act-btn.is-danger, .act-btn:has(.ph-trash) {
+    color: var(--act-del, #e11d48);
+    background: color-mix(in srgb, var(--act-del, #e11d48) 8%, var(--surface));
+    border-color: color-mix(in srgb, var(--act-del, #e11d48) 25%, var(--line));
+}
+.act-btn.is-danger i, .act-btn:has(.ph-trash) i, .act-btn .ph-trash {
+    color: var(--act-del, #e11d48) !important;
+}
+.act-btn.is-danger:hover, .act-btn:hover:has(.ph-trash) {
+    color: var(--act-del-hover, #be123c);
+    background: color-mix(in srgb, var(--act-del-hover, #be123c) 16%, var(--surface));
+    border-color: var(--act-del-hover, #be123c);
+}
+.act-btn.is-danger:hover i, .act-btn:hover:has(.ph-trash) i, .act-btn:hover .ph-trash {
+    color: var(--act-del-hover, #be123c) !important;
+    animation: icon-wiggle .45s ease;
+}
 
 /* Badges / pills */
 .badge { display: inline-flex; align-items: center; gap: .3rem; height: 22px; padding: 0 .55rem; border-radius: 999px; font-size: 11px; font-weight: 700; white-space: nowrap; }
@@ -835,8 +896,23 @@ a.stat-card:hover, .stat-card:hover { transform: translateY(-3px); border-color:
 /* ==========================================================================
    v2.1 — Configurable Icon Color System (Rest & Hover from Admin Settings)
    ========================================================================== */
-:root { --icon: var(--admin-icon, var(--theme-primary, #0f172a)); --icon-hover: var(--admin-icon-hover, var(--theme-hover, var(--btn-accent-bg, #10b981))); --icon-ease: cubic-bezier(.34, 1.56, .64, 1); }
-.dark { --icon: var(--admin-icon, #94a3b8); --icon-hover: var(--admin-icon-hover, #38bdf8); }
+:root {
+    --icon: var(--admin-icon, var(--theme-primary, #0f172a));
+    --icon-hover: var(--admin-icon-hover, var(--theme-hover, var(--btn-accent-bg, #10b981)));
+    --icon-ease: cubic-bezier(.34, 1.56, .64, 1);
+    --act-view: #4f46e5;
+    --act-view-hover: #3730a3;
+    --act-edit: #059669;
+    --act-edit-hover: #047857;
+    --act-del: #e11d48;
+    --act-del-hover: #be123c;
+    --act-redir: #0284c7;
+    --act-redir-hover: #0369a1;
+}
+.dark {
+    --icon: var(--admin-icon, #94a3b8);
+    --icon-hover: var(--admin-icon-hover, #38bdf8);
+}
 
 .filter-bar i, .filter-bar svg { color: var(--icon); }
 .btn-col-modal { color: var(--icon) !important; }
@@ -876,25 +952,15 @@ a.stat-card:hover, .stat-card:hover { transform: translateY(-3px); border-color:
 .card-title i { color: var(--icon); }
 .card:hover .card-title i { color: var(--icon-hover); transform: scale(1.1); }
 
-/* Row action buttons: strictly use configured icon colors at rest and on hover */
-.act-btn { color: var(--icon) !important; }
-.act-btn i, .act-btn svg,
-.act-btn.is-edit i, .act-btn.is-edit svg,
-.act-btn.is-danger i, .act-btn.is-danger svg,
-.act-btn.is-info i, .act-btn.is-info svg {
-    color: var(--icon) !important;
+/* Generic fallback row action buttons */
+.act-btn:not(.is-edit):not(.is-danger):not(.is-info):not(.is-view):not(.is-redirect):not([target="_blank"]) {
+    color: var(--icon);
 }
-.act-btn:hover { color: var(--icon-hover) !important; border-color: color-mix(in srgb, var(--icon-hover) 40%, var(--line)); background: color-mix(in srgb, var(--icon-hover) 8%, var(--surface)); }
-.act-btn:hover i, .act-btn:hover svg,
-.act-btn.is-edit:hover i, .act-btn.is-edit:hover svg,
-.act-btn.is-danger:hover i, .act-btn.is-danger:hover svg,
-.act-btn.is-info:hover i, .act-btn.is-info:hover svg {
-    color: var(--icon-hover) !important;
-    transform: scale(1.15);
+.act-btn:not(.is-edit):not(.is-danger):not(.is-info):not(.is-view):not(.is-redirect):not([target="_blank"]):hover {
+    color: var(--icon-hover);
+    border-color: color-mix(in srgb, var(--icon-hover) 40%, var(--line));
+    background: color-mix(in srgb, var(--icon-hover) 8%, var(--surface));
 }
-.act-btn.is-edit:hover i { transform: rotate(-12deg) scale(1.15); }
-.act-btn.is-danger:hover i { animation: icon-wiggle .45s ease; }
-@keyframes icon-wiggle { 0%,100% { transform: scale(1.15) rotate(0); } 30% { transform: scale(1.15) rotate(-10deg); } 60% { transform: scale(1.15) rotate(8deg); } }
 
 /* Buttons & Inputs */
 .btn-outline i, .btn-ghost i, .btn-light i { color: var(--icon); }

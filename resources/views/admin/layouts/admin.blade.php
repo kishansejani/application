@@ -27,6 +27,14 @@
     $sidebarText   = $sysSettings['sidebar_text_color'] ?? $contrast($sidebarBg);
     $adminIconColor = $sysSettings['admin_icon_color'] ?? $primary;
     $adminIconHover = $sysSettings['admin_icon_hover_color'] ?? ($sysSettings['theme_hover_color'] ?? '#334155');
+    $adminActView     = $sysSettings['admin_action_view_color'] ?? '#4f46e5';
+    $adminActViewHov  = $sysSettings['admin_action_view_hover'] ?? '#3730a3';
+    $adminActEdit     = $sysSettings['admin_action_edit_color'] ?? '#059669';
+    $adminActEditHov  = $sysSettings['admin_action_edit_hover'] ?? '#047857';
+    $adminActDel      = $sysSettings['admin_action_delete_color'] ?? '#e11d48';
+    $adminActDelHov   = $sysSettings['admin_action_delete_hover'] ?? '#be123c';
+    $adminActRedir    = $sysSettings['admin_action_redirect_color'] ?? '#0284c7';
+    $adminActRedirHov = $sysSettings['admin_action_redirect_hover'] ?? '#0369a1';
 
     // ---- Live counters for badges & notifications ---------------------------------------
     $pendingCnt  = Order::where('order_status', 'pending')->count();
@@ -263,12 +271,28 @@
             --admin-icon-hover: {{ $adminIconHover }};
             --icon: var(--admin-icon, var(--theme-primary, #0f172a));
             --icon-hover: var(--admin-icon-hover, var(--theme-hover, #334155));
+            --act-view: {{ $adminActView }};
+            --act-view-hover: {{ $adminActViewHov }};
+            --act-edit: {{ $adminActEdit }};
+            --act-edit-hover: {{ $adminActEditHov }};
+            --act-del: {{ $adminActDel }};
+            --act-del-hover: {{ $adminActDelHov }};
+            --act-redir: {{ $adminActRedir }};
+            --act-redir-hover: {{ $adminActRedirHov }};
         }
         .dark {
             --admin-icon: {{ !empty($sysSettings['admin_icon_color']) && $sysSettings['admin_icon_color'] !== '#0f172a' ? $sysSettings['admin_icon_color'] : 'color-mix(in srgb, ' . $primary . ' 40%, #cbd5e1)' }};
             --admin-icon-hover: {{ $adminIconHover !== '#334155' ? $adminIconHover : '#38bdf8' }};
             --icon: var(--admin-icon);
             --icon-hover: var(--admin-icon-hover);
+            --act-view: {{ $adminActView }};
+            --act-view-hover: {{ $adminActViewHov }};
+            --act-edit: {{ $adminActEdit }};
+            --act-edit-hover: {{ $adminActEditHov }};
+            --act-del: {{ $adminActDel }};
+            --act-del-hover: {{ $adminActDelHov }};
+            --act-redir: {{ $adminActRedir }};
+            --act-redir-hover: {{ $adminActRedirHov }};
         }
         @if($btnPrimaryIsDark)
         /* A very dark primary button would vanish on dark surfaces: use a light variant in dark mode */
