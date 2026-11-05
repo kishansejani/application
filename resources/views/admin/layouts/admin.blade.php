@@ -27,14 +27,18 @@
     $sidebarText   = $sysSettings['sidebar_text_color'] ?? $contrast($sidebarBg);
     $adminIconColor = $sysSettings['admin_icon_color'] ?? $primary;
     $adminIconHover = $sysSettings['admin_icon_hover_color'] ?? ($sysSettings['theme_hover_color'] ?? '#334155');
-    $adminActView     = $sysSettings['admin_action_view_color'] ?? '#4f46e5';
-    $adminActViewHov  = $sysSettings['admin_action_view_hover'] ?? '#3730a3';
-    $adminActEdit     = $sysSettings['admin_action_edit_color'] ?? '#059669';
-    $adminActEditHov  = $sysSettings['admin_action_edit_hover'] ?? '#047857';
-    $adminActDel      = $sysSettings['admin_action_delete_color'] ?? '#e11d48';
-    $adminActDelHov   = $sysSettings['admin_action_delete_hover'] ?? '#be123c';
-    $adminActRedir    = $sysSettings['admin_action_redirect_color'] ?? '#0284c7';
-    $adminActRedirHov = $sysSettings['admin_action_redirect_hover'] ?? '#0369a1';
+    $adminActView       = $sysSettings['admin_action_view_color'] ?? '#4f46e5';
+    $adminActViewHovBg  = $sysSettings['admin_action_view_hover_bg'] ?? ($sysSettings['admin_action_view_hover'] ?? '#4f46e5');
+    $adminActViewHovTxt = $sysSettings['admin_action_view_hover_text'] ?? '#ffffff';
+    $adminActEdit       = $sysSettings['admin_action_edit_color'] ?? '#059669';
+    $adminActEditHovBg  = $sysSettings['admin_action_edit_hover_bg'] ?? ($sysSettings['admin_action_edit_hover'] ?? '#059669');
+    $adminActEditHovTxt = $sysSettings['admin_action_edit_hover_text'] ?? '#ffffff';
+    $adminActDel        = $sysSettings['admin_action_delete_color'] ?? '#e11d48';
+    $adminActDelHovBg   = $sysSettings['admin_action_delete_hover_bg'] ?? ($sysSettings['admin_action_delete_hover'] ?? '#e11d48');
+    $adminActDelHovTxt  = $sysSettings['admin_action_delete_hover_text'] ?? '#ffffff';
+    $adminActRedir      = $sysSettings['admin_action_redirect_color'] ?? '#0284c7';
+    $adminActRedirHovBg = $sysSettings['admin_action_redirect_hover_bg'] ?? ($sysSettings['admin_action_redirect_hover'] ?? '#0284c7');
+    $adminActRedirHovTxt= $sysSettings['admin_action_redirect_hover_text'] ?? '#ffffff';
 
     // ---- Live counters for badges & notifications ---------------------------------------
     $pendingCnt  = Order::where('order_status', 'pending')->count();
@@ -272,13 +276,17 @@
             --icon: var(--admin-icon, var(--theme-primary, #0f172a));
             --icon-hover: var(--admin-icon-hover, var(--theme-hover, #334155));
             --act-view: {{ $adminActView }};
-            --act-view-hover: {{ $adminActViewHov }};
+            --act-view-hover-bg: {{ $adminActViewHovBg }};
+            --act-view-hover-text: {{ $adminActViewHovTxt }};
             --act-edit: {{ $adminActEdit }};
-            --act-edit-hover: {{ $adminActEditHov }};
+            --act-edit-hover-bg: {{ $adminActEditHovBg }};
+            --act-edit-hover-text: {{ $adminActEditHovTxt }};
             --act-del: {{ $adminActDel }};
-            --act-del-hover: {{ $adminActDelHov }};
+            --act-del-hover-bg: {{ $adminActDelHovBg }};
+            --act-del-hover-text: {{ $adminActDelHovTxt }};
             --act-redir: {{ $adminActRedir }};
-            --act-redir-hover: {{ $adminActRedirHov }};
+            --act-redir-hover-bg: {{ $adminActRedirHovBg }};
+            --act-redir-hover-text: {{ $adminActRedirHovTxt }};
         }
         .dark {
             --admin-icon: {{ !empty($sysSettings['admin_icon_color']) && $sysSettings['admin_icon_color'] !== '#0f172a' ? $sysSettings['admin_icon_color'] : 'color-mix(in srgb, ' . $primary . ' 40%, #cbd5e1)' }};
@@ -286,13 +294,17 @@
             --icon: var(--admin-icon);
             --icon-hover: var(--admin-icon-hover);
             --act-view: {{ $adminActView }};
-            --act-view-hover: {{ $adminActViewHov }};
+            --act-view-hover-bg: {{ $adminActViewHovBg }};
+            --act-view-hover-text: {{ $adminActViewHovTxt }};
             --act-edit: {{ $adminActEdit }};
-            --act-edit-hover: {{ $adminActEditHov }};
+            --act-edit-hover-bg: {{ $adminActEditHovBg }};
+            --act-edit-hover-text: {{ $adminActEditHovTxt }};
             --act-del: {{ $adminActDel }};
-            --act-del-hover: {{ $adminActDelHov }};
+            --act-del-hover-bg: {{ $adminActDelHovBg }};
+            --act-del-hover-text: {{ $adminActDelHovTxt }};
             --act-redir: {{ $adminActRedir }};
-            --act-redir-hover: {{ $adminActRedirHov }};
+            --act-redir-hover-bg: {{ $adminActRedirHovBg }};
+            --act-redir-hover-text: {{ $adminActRedirHovTxt }};
         }
         @if($btnPrimaryIsDark)
         /* A very dark primary button would vanish on dark surfaces: use a light variant in dark mode */
@@ -300,7 +312,7 @@
         @endif
     </style>
     <link rel="stylesheet" href="{{ asset('assets/shared/fx-select.css') }}?v=3.1.0">
-    <link rel="stylesheet" href="{{ asset('assets/admin/admin.css') }}?v=2.1.0">
+    <link rel="stylesheet" href="{{ asset('assets/admin/admin.css') }}?v={{ filemtime(public_path('assets/admin/admin.css')) }}">
     <link rel="stylesheet" href="{{ asset('assets/admin/dataTables.colReorder.min.css') }}?v=1.2.0">
     <link rel="stylesheet" href="{{ asset('assets/admin/col-customizer.css') }}?v=1.2.0">
     @stack('styles')

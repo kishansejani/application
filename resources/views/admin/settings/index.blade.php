@@ -12,15 +12,23 @@
             ['admin_icon_color',       'adminIconPicker',      'adminIconText',      'Icon normal colour', 'Global colour for all icons, arrows, table actions, headers, buttons.', '#0f172a'],
             ['admin_icon_hover_color', 'adminIconHoverPicker', 'adminIconHoverText', 'Icon hover colour',  'Interactive colour when hovering icons, sort arrows, buttons.', '#334155'],
         ],
-        'Action Icons (View, Edit, Delete, Redirect)' => [
-            ['admin_action_view_color',      'actViewPicker',      'actViewText',      'View / Details icon colour',     'Colour for view & details action buttons.', '#4f46e5'],
-            ['admin_action_view_hover',      'actViewHovPicker',   'actViewHovText',   'View / Details hover colour',    'Hover colour for view action buttons.', '#3730a3'],
-            ['admin_action_edit_color',      'actEditPicker',      'actEditText',      'Edit action icon colour',        'Colour for edit action buttons.', '#059669'],
-            ['admin_action_edit_hover',      'actEditHovPicker',   'actEditHovText',   'Edit action hover colour',       'Hover colour for edit action buttons.', '#047857'],
-            ['admin_action_delete_color',    'actDelPicker',       'actDelText',       'Delete action icon colour',      'Colour for delete & trash action buttons.', '#e11d48'],
-            ['admin_action_delete_hover',    'actDelHovPicker',    'actDelHovText',    'Delete action hover colour',     'Hover colour for delete action buttons.', '#be123c'],
-            ['admin_action_redirect_color',  'actRedirPicker',     'actRedirText',     'Redirect / Link icon colour',    'Colour for storefront external link & redirect buttons.', '#0284c7'],
-            ['admin_action_redirect_hover',  'actRedirHovPicker',  'actRedirHovText',  'Redirect / Link hover colour',   'Hover colour for redirect buttons.', '#0369a1'],
+        'Action Buttons & Icons (View, Edit, Delete, Redirect)' => [
+            // View / Details
+            ['admin_action_view_color',        'actViewPicker',       'actViewText',       'View icon colour',         'Normal colour for view & details action buttons.', '#4f46e5'],
+            ['admin_action_view_hover_bg',     'actViewHovBgPicker',  'actViewHovBgText',  'View hover background',    'Background colour when hovering the view button.', '#4f46e5'],
+            ['admin_action_view_hover_text',   'actViewHovTxtPicker', 'actViewHovTxtText', 'View hover icon colour',   'Icon colour inside view button on hover (contrast).', '#ffffff'],
+            // Edit
+            ['admin_action_edit_color',        'actEditPicker',       'actEditText',       'Edit icon colour',         'Normal colour for edit action buttons.', '#059669'],
+            ['admin_action_edit_hover_bg',     'actEditHovBgPicker',  'actEditHovBgText',  'Edit hover background',    'Background colour when hovering the edit button.', '#059669'],
+            ['admin_action_edit_hover_text',   'actEditHovTxtPicker', 'actEditHovTxtText', 'Edit hover icon colour',   'Icon colour inside edit button on hover (contrast).', '#ffffff'],
+            // Delete
+            ['admin_action_delete_color',      'actDelPicker',        'actDelText',        'Delete icon colour',       'Normal colour for delete & trash action buttons.', '#e11d48'],
+            ['admin_action_delete_hover_bg',   'actDelHovBgPicker',   'actDelHovBgText',   'Delete hover background',  'Background colour when hovering the delete button.', '#e11d48'],
+            ['admin_action_delete_hover_text', 'actDelHovTxtPicker',  'actDelHovTxtText',  'Delete hover icon colour', 'Icon colour inside delete button on hover (contrast).', '#ffffff'],
+            // Redirect
+            ['admin_action_redirect_color',      'actRedirPicker',       'actRedirText',       'Redirect icon colour',       'Normal colour for storefront link & redirect buttons.', '#0284c7'],
+            ['admin_action_redirect_hover_bg',   'actRedirHovBgPicker',  'actRedirHovBgText',  'Redirect hover background',  'Background colour when hovering the redirect button.', '#0284c7'],
+            ['admin_action_redirect_hover_text', 'actRedirHovTxtPicker', 'actRedirHovTxtText', 'Redirect hover icon colour', 'Icon colour inside redirect button on hover (contrast).', '#ffffff'],
         ],
         'Brand' => [
             ['theme_primary_color', 'primaryColorPicker', 'primaryColorText', 'Brand colour',        'Focus rings and brand highlights across the panel.', '#0f172a'],
@@ -908,14 +916,18 @@
         theme_hover_color:    (v) => ({ '--pv-hover': v, '--theme-hover': v, '--admin-icon-hover': v, '--icon-hover': v }),
         admin_icon_color:     (v) => ({ '--admin-icon': v, '--icon': v }),
         admin_icon_hover_color: (v) => ({ '--admin-icon-hover': v, '--icon-hover': v }),
-        admin_action_view_color:      (v) => ({ '--act-view': v }),
-        admin_action_view_hover:      (v) => ({ '--act-view-hover': v }),
-        admin_action_edit_color:      (v) => ({ '--act-edit': v }),
-        admin_action_edit_hover:      (v) => ({ '--act-edit-hover': v }),
-        admin_action_delete_color:    (v) => ({ '--act-del': v }),
-        admin_action_delete_hover:    (v) => ({ '--act-del-hover': v }),
-        admin_action_redirect_color:  (v) => ({ '--act-redir': v }),
-        admin_action_redirect_hover:  (v) => ({ '--act-redir-hover': v }),
+        admin_action_view_color:        (v) => ({ '--act-view': v }),
+        admin_action_view_hover_bg:     (v) => ({ '--act-view-hover-bg': v }),
+        admin_action_view_hover_text:   (v) => ({ '--act-view-hover-text': v }),
+        admin_action_edit_color:        (v) => ({ '--act-edit': v }),
+        admin_action_edit_hover_bg:     (v) => ({ '--act-edit-hover-bg': v }),
+        admin_action_edit_hover_text:   (v) => ({ '--act-edit-hover-text': v }),
+        admin_action_delete_color:      (v) => ({ '--act-del': v }),
+        admin_action_delete_hover_bg:   (v) => ({ '--act-del-hover-bg': v }),
+        admin_action_delete_hover_text: (v) => ({ '--act-del-hover-text': v }),
+        admin_action_redirect_color:    (v) => ({ '--act-redir': v }),
+        admin_action_redirect_hover_bg: (v) => ({ '--act-redir-hover-bg': v }),
+        admin_action_redirect_hover_text:(v)=> ({ '--act-redir-hover-text': v }),
     };
 
     // Frontend live preview variables

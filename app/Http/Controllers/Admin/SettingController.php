@@ -27,13 +27,17 @@ class SettingController extends Controller
             'admin_icon_color' => 'nullable|string|max:20',
             'admin_icon_hover_color' => 'nullable|string|max:20',
             'admin_action_view_color' => 'nullable|string|max:20',
-            'admin_action_view_hover' => 'nullable|string|max:20',
+            'admin_action_view_hover_bg' => 'nullable|string|max:20',
+            'admin_action_view_hover_text' => 'nullable|string|max:20',
             'admin_action_edit_color' => 'nullable|string|max:20',
-            'admin_action_edit_hover' => 'nullable|string|max:20',
+            'admin_action_edit_hover_bg' => 'nullable|string|max:20',
+            'admin_action_edit_hover_text' => 'nullable|string|max:20',
             'admin_action_delete_color' => 'nullable|string|max:20',
-            'admin_action_delete_hover' => 'nullable|string|max:20',
+            'admin_action_delete_hover_bg' => 'nullable|string|max:20',
+            'admin_action_delete_hover_text' => 'nullable|string|max:20',
             'admin_action_redirect_color' => 'nullable|string|max:20',
-            'admin_action_redirect_hover' => 'nullable|string|max:20',
+            'admin_action_redirect_hover_bg' => 'nullable|string|max:20',
+            'admin_action_redirect_hover_text' => 'nullable|string|max:20',
             'btn_primary_bg' => 'required|string|max:20',
             'btn_primary_text' => 'required|string|max:20',
             'btn_primary_hover' => 'required|string|max:20',
@@ -92,13 +96,17 @@ class SettingController extends Controller
         Setting::set('admin_icon_color', $request->admin_icon_color ?: $request->theme_primary_color, 'theme');
         Setting::set('admin_icon_hover_color', $request->admin_icon_hover_color ?: $request->theme_hover_color, 'theme');
         Setting::set('admin_action_view_color', $request->admin_action_view_color ?: '#4f46e5', 'theme');
-        Setting::set('admin_action_view_hover', $request->admin_action_view_hover ?: '#3730a3', 'theme');
+        Setting::set('admin_action_view_hover_bg', $request->admin_action_view_hover_bg ?: ($request->admin_action_view_hover ?: '#4f46e5'), 'theme');
+        Setting::set('admin_action_view_hover_text', $request->admin_action_view_hover_text ?: '#ffffff', 'theme');
         Setting::set('admin_action_edit_color', $request->admin_action_edit_color ?: '#059669', 'theme');
-        Setting::set('admin_action_edit_hover', $request->admin_action_edit_hover ?: '#047857', 'theme');
+        Setting::set('admin_action_edit_hover_bg', $request->admin_action_edit_hover_bg ?: ($request->admin_action_edit_hover ?: '#059669'), 'theme');
+        Setting::set('admin_action_edit_hover_text', $request->admin_action_edit_hover_text ?: '#ffffff', 'theme');
         Setting::set('admin_action_delete_color', $request->admin_action_delete_color ?: '#e11d48', 'theme');
-        Setting::set('admin_action_delete_hover', $request->admin_action_delete_hover ?: '#be123c', 'theme');
+        Setting::set('admin_action_delete_hover_bg', $request->admin_action_delete_hover_bg ?: ($request->admin_action_delete_hover ?: '#e11d48'), 'theme');
+        Setting::set('admin_action_delete_hover_text', $request->admin_action_delete_hover_text ?: '#ffffff', 'theme');
         Setting::set('admin_action_redirect_color', $request->admin_action_redirect_color ?: '#0284c7', 'theme');
-        Setting::set('admin_action_redirect_hover', $request->admin_action_redirect_hover ?: '#0369a1', 'theme');
+        Setting::set('admin_action_redirect_hover_bg', $request->admin_action_redirect_hover_bg ?: ($request->admin_action_redirect_hover ?: '#0284c7'), 'theme');
+        Setting::set('admin_action_redirect_hover_text', $request->admin_action_redirect_hover_text ?: '#ffffff', 'theme');
         Setting::set('btn_primary_bg', $request->btn_primary_bg, 'theme');
         Setting::set('btn_primary_text', $request->btn_primary_text, 'theme');
         Setting::set('btn_primary_hover', $request->btn_primary_hover, 'theme');
@@ -180,13 +188,17 @@ class SettingController extends Controller
             Setting::set('admin_icon_color', '#0f172a', 'theme');
             Setting::set('admin_icon_hover_color', '#334155', 'theme');
             Setting::set('admin_action_view_color', '#4f46e5', 'theme');
-            Setting::set('admin_action_view_hover', '#3730a3', 'theme');
+            Setting::set('admin_action_view_hover_bg', '#4f46e5', 'theme');
+            Setting::set('admin_action_view_hover_text', '#ffffff', 'theme');
             Setting::set('admin_action_edit_color', '#059669', 'theme');
-            Setting::set('admin_action_edit_hover', '#047857', 'theme');
+            Setting::set('admin_action_edit_hover_bg', '#059669', 'theme');
+            Setting::set('admin_action_edit_hover_text', '#ffffff', 'theme');
             Setting::set('admin_action_delete_color', '#e11d48', 'theme');
-            Setting::set('admin_action_delete_hover', '#be123c', 'theme');
+            Setting::set('admin_action_delete_hover_bg', '#e11d48', 'theme');
+            Setting::set('admin_action_delete_hover_text', '#ffffff', 'theme');
             Setting::set('admin_action_redirect_color', '#0284c7', 'theme');
-            Setting::set('admin_action_redirect_hover', '#0369a1', 'theme');
+            Setting::set('admin_action_redirect_hover_bg', '#0284c7', 'theme');
+            Setting::set('admin_action_redirect_hover_text', '#ffffff', 'theme');
             Setting::set('btn_primary_bg', '#0f172a', 'theme');
             Setting::set('btn_primary_text', '#ffffff', 'theme');
             Setting::set('btn_primary_hover', '#1e293b', 'theme');

@@ -402,12 +402,13 @@ a.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); b
     color: var(--act-redir, #0284c7) !important;
 }
 .act-btn.is-redirect:hover, a.act-btn[target="_blank"]:hover, .act-btn:hover:has(.ph-arrow-square-out) {
-    color: var(--act-redir-hover, #0369a1);
-    background: color-mix(in srgb, var(--act-redir-hover, #0369a1) 16%, var(--surface));
-    border-color: var(--act-redir-hover, #0369a1);
+    color: var(--act-redir-hover-text, #ffffff) !important;
+    background: var(--act-redir-hover-bg, #0284c7) !important;
+    border-color: var(--act-redir-hover-bg, #0284c7) !important;
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--act-redir-hover-bg, #0284c7) 35%, transparent);
 }
 .act-btn.is-redirect:hover i, a.act-btn[target="_blank"]:hover i, .act-btn:hover:has(.ph-arrow-square-out) i, .act-btn:hover .ph-arrow-square-out {
-    color: var(--act-redir-hover, #0369a1) !important;
+    color: var(--act-redir-hover-text, #ffffff) !important;
 }
 
 /* 2. View / Details */
@@ -420,12 +421,13 @@ a.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); b
     color: var(--act-view, #4f46e5) !important;
 }
 .act-btn.is-view:hover, .act-btn.is-info:hover, .act-btn:hover:has(.ph-eye) {
-    color: var(--act-view-hover, #3730a3);
-    background: color-mix(in srgb, var(--act-view-hover, #3730a3) 16%, var(--surface));
-    border-color: var(--act-view-hover, #3730a3);
+    color: var(--act-view-hover-text, #ffffff) !important;
+    background: var(--act-view-hover-bg, #4f46e5) !important;
+    border-color: var(--act-view-hover-bg, #4f46e5) !important;
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--act-view-hover-bg, #4f46e5) 35%, transparent);
 }
 .act-btn.is-view:hover i, .act-btn.is-info:hover i, .act-btn:hover:has(.ph-eye) i, .act-btn:hover .ph-eye {
-    color: var(--act-view-hover, #3730a3) !important;
+    color: var(--act-view-hover-text, #ffffff) !important;
 }
 
 /* 3. Edit */
@@ -438,12 +440,13 @@ a.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); b
     color: var(--act-edit, #059669) !important;
 }
 .act-btn.is-edit:hover, .act-btn:hover:has(.ph-pencil-simple-line), .act-btn:hover:has(.ph-pencil) {
-    color: var(--act-edit-hover, #047857);
-    background: color-mix(in srgb, var(--act-edit-hover, #047857) 16%, var(--surface));
-    border-color: var(--act-edit-hover, #047857);
+    color: var(--act-edit-hover-text, #ffffff) !important;
+    background: var(--act-edit-hover-bg, #059669) !important;
+    border-color: var(--act-edit-hover-bg, #059669) !important;
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--act-edit-hover-bg, #059669) 35%, transparent);
 }
 .act-btn.is-edit:hover i, .act-btn:hover:has(.ph-pencil-simple-line) i, .act-btn:hover:has(.ph-pencil) i, .act-btn:hover .ph-pencil-simple-line, .act-btn:hover .ph-pencil {
-    color: var(--act-edit-hover, #047857) !important;
+    color: var(--act-edit-hover-text, #ffffff) !important;
     transform: rotate(-12deg) scale(1.15);
 }
 
@@ -457,12 +460,13 @@ a.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); b
     color: var(--act-del, #e11d48) !important;
 }
 .act-btn.is-danger:hover, .act-btn:hover:has(.ph-trash) {
-    color: var(--act-del-hover, #be123c);
-    background: color-mix(in srgb, var(--act-del-hover, #be123c) 16%, var(--surface));
-    border-color: var(--act-del-hover, #be123c);
+    color: var(--act-del-hover-text, #ffffff) !important;
+    background: var(--act-del-hover-bg, #e11d48) !important;
+    border-color: var(--act-del-hover-bg, #e11d48) !important;
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--act-del-hover-bg, #e11d48) 35%, transparent);
 }
 .act-btn.is-danger:hover i, .act-btn:hover:has(.ph-trash) i, .act-btn:hover .ph-trash {
-    color: var(--act-del-hover, #be123c) !important;
+    color: var(--act-del-hover-text, #ffffff) !important;
     animation: icon-wiggle .45s ease;
 }
 
@@ -901,13 +905,17 @@ a.stat-card:hover, .stat-card:hover { transform: translateY(-3px); border-color:
     --icon-hover: var(--admin-icon-hover, var(--theme-hover, var(--btn-accent-bg, #10b981)));
     --icon-ease: cubic-bezier(.34, 1.56, .64, 1);
     --act-view: #4f46e5;
-    --act-view-hover: #3730a3;
+    --act-view-hover-bg: #4f46e5;
+    --act-view-hover-text: #ffffff;
     --act-edit: #059669;
-    --act-edit-hover: #047857;
+    --act-edit-hover-bg: #059669;
+    --act-edit-hover-text: #ffffff;
     --act-del: #e11d48;
-    --act-del-hover: #be123c;
+    --act-del-hover-bg: #e11d48;
+    --act-del-hover-text: #ffffff;
     --act-redir: #0284c7;
-    --act-redir-hover: #0369a1;
+    --act-redir-hover-bg: #0284c7;
+    --act-redir-hover-text: #ffffff;
 }
 .dark {
     --icon: var(--admin-icon, #94a3b8);
