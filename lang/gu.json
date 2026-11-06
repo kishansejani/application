@@ -1158,5 +1158,17 @@
     "Icon colour inside delete button on hover (contrast).": "હોવર કરવા પર ડિલીટ બટનની અંદર આઇકનનો કલર (કોન્ટ્રાસ્ટ).",
     "Normal colour for storefront link & redirect buttons.": "સ્ટોરફ્રન્ટ પર જોવા કે બહારની લિંક ખોલવાના બટનનો મૂળ કલર.",
     "Background colour when hovering the redirect button.": "રિડાયરેક્ટ બટન પર હોવર કરવા પર દેખાતો બેકગ્રાઉન્ડ કલર.",
-    "Icon colour inside redirect button on hover (contrast).": "હોવર કરવા પર રિડાયરેક્ટ બટનની અંદર આઇકનનો કલર (કોન્ટ્રાસ્ટ)."
+    "Icon colour inside redirect button on hover (contrast).": "હોવર કરવા પર રિડાયરેક્ટ બટનની અંદર આઇકનનો કલર (કોન્ટ્રાસ્ટ).",
+    "Customize menu": "મેનૂ કસ્ટમાઇઝ કરો",
+    "Customize Sidebar Menu": "સાઇડબાર મેનૂ કસ્ટમાઇઝ કરો",
+    "NAVIGATION": "નેવિગેશન",
+    "Drag or use arrows to reorder.": "ક્રમ બદલવા ડ્રેગ કરો અથવા એરો વાપરો.",
+    "Use the eye to hide a menu.": "મેનૂ છુપાવવા માટે આંખના આઇકન પર ક્લિક કરો.",
+    "Dashboard and Settings are always shown.": "ડેશબોર્ડ અને સેટિંગ્સ હંમેશા દેખાશે.",
+    "Sidebar menu customized successfully.": "સાઇડબાર મેનૂ સફળતાપૂર્વક કસ્ટમાઇઝ થઈ ગયું.",
+    "Sidebar menu reset to default.": "સાઇડબાર મેનૂ ડિફૉલ્ટ પર રીસેટ થઈ ગયું.",
+    "Always shown": "હંમેશા દર્શાવો",
+    "Toggle visibility": "દેખાવ બદલો",
+    "Move up": "ઉપર ખસેડો",
+    "Move down": "નીચે ખસેડો"
 }

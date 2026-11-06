@@ -1,0 +1,279 @@
+/* ==========================================================================
+   In-Sidebar Navigation Customizer (In-Place Mode)
+   - Matches exactly the sidebar background color & theme
+   - Replaces sidebar navigation in-place when "Customize menu" is clicked
+   - Drag & drop reordering, Up/Down arrows, Eye hide/show (Dashboard & Settings locked)
+   - "Reset to default" and "Done" buttons inside the sidebar
+   ========================================================================== */
+
+/* Customize Menu action button in normal sidebar */
+.sb-custom-action {
+    padding: 0.35rem 0.75rem 0.5rem;
+    flex-shrink: 0;
+}
+.sb-customize-menu-btn {
+    width: 100%;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    text-align: left;
+    color: rgb(var(--c-sidebar-text) / 0.7);
+    transition: all 0.15s ease;
+}
+.sb-customize-menu-btn:hover {
+    background: rgb(var(--c-sidebar-text) / 0.08);
+    color: rgb(var(--c-sidebar-text));
+}
+.sb-customize-menu-btn .sb-icon {
+    color: rgb(var(--c-sidebar-text) / 0.6);
+}
+.sidebar-mini .app-sidebar:not(:hover) .sb-customize-menu-btn {
+    justify-content: center;
+    padding: 0;
+}
+
+/* Sidebar Views: Normal vs Customizer View */
+.sb-view-normal {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+.sb-view-customizer {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    background: transparent;
+    color: rgb(var(--c-sidebar-text));
+    animation: sb-in-place-fade 0.2s ease;
+}
+@keyframes sb-in-place-fade {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Customizer Top Header */
+.sb-cust-top {
+    padding: 0.75rem 0.9rem 0.6rem;
+    flex-shrink: 0;
+    border-bottom: 1px solid rgb(var(--c-sidebar-text) / 0.08);
+}
+.sb-cust-title-main {
+    font-size: 13.5px;
+    font-weight: 800;
+    color: rgb(var(--c-sidebar-text));
+    letter-spacing: -0.01em;
+}
+.sb-cust-close-inline {
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+    border: none;
+    background: rgb(var(--c-sidebar-text) / 0.08);
+    color: rgb(var(--c-sidebar-text) / 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 15px;
+    transition: all 0.15s ease;
+}
+.sb-cust-close-inline:hover {
+    background: rgb(var(--c-sidebar-text) / 0.16);
+    color: rgb(var(--c-sidebar-text));
+}
+.sb-cust-hint-text {
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: rgb(var(--c-sidebar-text) / 0.65);
+    margin: 6px 0 0;
+    font-weight: 500;
+}
+.sb-cust-hint-subtext {
+    color: rgb(var(--c-sidebar-text) / 0.45);
+    font-size: 10.5px;
+}
+
+/* Customizer Scrollable Items List */
+.sb-cust-items-wrap {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0.6rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    scrollbar-color: rgb(var(--c-sidebar-text) / 0.15) transparent;
+}
+.sb-cust-items-wrap::-webkit-scrollbar {
+    width: 4px;
+}
+.sb-cust-items-wrap::-webkit-scrollbar-thumb {
+    background: rgb(var(--c-sidebar-text) / 0.15);
+    border-radius: 9999px;
+}
+
+/* Customizer Item Card (Inherits Sidebar Color) */
+.sb-cust-item {
+    background: rgb(var(--c-sidebar-text) / 0.06);
+    border: 1px solid rgb(var(--c-sidebar-text) / 0.09);
+    border-radius: 12px;
+    padding: 7px 9px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: rgb(var(--c-sidebar-text));
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: grab;
+    user-select: none;
+    transition: background 0.15s ease, opacity 0.15s ease;
+}
+.sb-cust-item:hover {
+    background: rgb(var(--c-sidebar-text) / 0.11);
+}
+.sb-cust-item.is-dragging {
+    opacity: 0.4;
+    background: rgb(var(--c-sidebar-text) / 0.15) !important;
+    border: 1.5px dashed var(--sidebar-active, #38bdf8) !important;
+    cursor: grabbing;
+}
+.sb-cust-item.is-hidden-menu {
+    opacity: 0.4;
+    background: rgb(var(--c-sidebar-text) / 0.02);
+}
+
+.sb-cust-drag-handle {
+    color: rgb(var(--c-sidebar-text) / 0.4);
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+.sb-cust-item.is-dragging .sb-cust-drag-handle {
+    cursor: grabbing;
+}
+.sb-cust-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: rgb(var(--c-sidebar-text) / 0.7);
+    background: rgb(var(--c-sidebar-text) / 0.08);
+    flex-shrink: 0;
+}
+.sb-cust-title {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 12px;
+    font-weight: 600;
+}
+.sb-cust-btn-arrow {
+    width: 20px;
+    height: 20px;
+    border: none;
+    background: transparent;
+    color: rgb(var(--c-sidebar-text) / 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.12s;
+    flex-shrink: 0;
+}
+.sb-cust-btn-arrow:hover:not(:disabled) {
+    background: rgb(var(--c-sidebar-text) / 0.12);
+    color: rgb(var(--c-sidebar-text));
+}
+.sb-cust-btn-arrow:disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
+}
+
+.sb-cust-lock {
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgb(var(--c-sidebar-text) / 0.4);
+    font-size: 13px;
+    flex-shrink: 0;
+}
+.sb-cust-btn-eye {
+    width: 22px;
+    height: 22px;
+    border: none;
+    background: transparent;
+    color: rgb(var(--c-sidebar-text) / 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.12s;
+    flex-shrink: 0;
+}
+.sb-cust-btn-eye:hover {
+    background: rgb(var(--c-sidebar-text) / 0.12);
+    color: rgb(var(--c-sidebar-text));
+}
+.sb-cust-btn-eye.is-hidden-state {
+    color: #f43f5e;
+}
+
+/* Customizer Bottom Action Bar inside Sidebar */
+.sb-cust-bottom-bar {
+    padding: 9px 12px;
+    border-top: 1px solid rgb(var(--c-sidebar-text) / 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgb(var(--c-sidebar-text) / 0.03);
+    flex-shrink: 0;
+}
+.sb-cust-reset-btn {
+    border: none;
+    background: transparent;
+    font-size: 12px;
+    font-weight: 700;
+    color: rgb(var(--c-sidebar-text) / 0.7);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0;
+}
+.sb-cust-reset-btn:hover {
+    color: rgb(var(--c-sidebar-text));
+    text-decoration: underline;
+}
+.sb-cust-done-btn {
+    padding: 5px 16px;
+    border-radius: 9999px;
+    border: none;
+    background: var(--sidebar-active, #38bdf8);
+    color: var(--sidebar-active-text, #0f172a);
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: opacity 0.15s ease, transform 0.1s ease;
+}
+.sb-cust-done-btn:hover {
+    opacity: 0.92;
+    transform: translateY(-1px);
+}

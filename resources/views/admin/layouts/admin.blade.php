@@ -315,6 +315,7 @@
     <link rel="stylesheet" href="{{ asset('assets/admin/admin.css') }}?v={{ filemtime(public_path('assets/admin/admin.css')) }}">
     <link rel="stylesheet" href="{{ asset('assets/admin/dataTables.colReorder.min.css') }}?v=1.2.0">
     <link rel="stylesheet" href="{{ asset('assets/admin/col-customizer.css') }}?v=1.2.0">
+    <link rel="stylesheet" href="{{ asset('assets/admin/sidebar-customizer.css') }}?v=2.0.0">
     @stack('styles')
 </head>
 <body class="admin-body">
@@ -334,36 +335,85 @@
             <button type="button" class="sb-close" data-sidebar-close aria-label="Close menu"><i class="ph ph-x"></i></button>
         </div>
 
-        <div class="sb-search">
-            <i class="ph ph-magnifying-glass"></i>
-            <input type="search" id="sidebarFilter" placeholder="{{ __('Filter menu…') }}" autocomplete="off" aria-label="Filter menu">
+        {{-- Normal Navigation View --}}
+        <div id="sidebarNormalView" class="sb-view-normal">
+            <div class="sb-search">
+                <i class="ph ph-magnifying-glass"></i>
+                <input type="search" id="sidebarFilter" placeholder="{{ __('Filter menu…') }}" autocomplete="off" aria-label="Filter menu">
+            </div>
+
+            <nav class="sb-nav" id="sidebarNav">
+                @foreach($navGroups as $group)
+                    @php $gKey = $group['key']; @endphp
+                    <div class="sb-group" data-group="{{ $gKey }}">
+                        <button type="button" class="sb-group-title" data-group-toggle="{{ $gKey }}">
+                            <span>{{ $group['label'] }}</span>
+                            <i class="ph ph-caret-down"></i>
+                        </button>
+                        <ul class="sb-group-items">
+                            @foreach($group['items'] as $item)
+                                <li>
+                                    <a href="{{ route($item['route']) }}"
+                                       class="sb-item {{ $item['isActive'] ? 'is-active' : '' }}"
+                                       data-sb-link
+                                       data-nav-key="{{ $item['route'] }}"
+                                       data-nav-label="{{ $item['label'] }}"
+                                       data-nav-icon="{{ $item['icon'] }}"
+                                       data-locked="{{ in_array($item['route'], ['admin.dashboard', 'admin.settings.index']) ? '1' : '0' }}"
+                                       data-label="{{ strtolower($item['label']) }}"
+                                       @if($item['isActive']) aria-current="page" @endif>
+                                        <i class="sb-icon {{ $item['isActive'] ? 'ph-fill' : 'ph-duotone' }} ph-{{ $item['icon'] }}"></i>
+                                        <span class="sb-label">{{ $item['label'] }}</span>
+                                        @if(!empty($item['badge']))
+                                            <span class="sb-badge sb-badge-{{ $item['badgeTone'] }}" title="{{ $item['badgeTitle'] ?? '' }}">{{ $item['badge'] > 99 ? '99+' : $item['badge'] }}</span>
+                                        @endif
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endforeach
+                <p class="sb-empty hidden" id="sidebarEmpty">{{ __('No menu items match.') }}</p>
+            </nav>
+
+            {{-- Customize Menu Action Button --}}
+            <div class="sb-custom-action">
+                <button type="button" class="sb-item sb-customize-menu-btn" id="openSidebarCustomizerBtn" title="{{ __('Customize menu') }}">
+                    <span class="sb-icon"><i class="ph ph-faders"></i></span>
+                    <span class="sb-label">{{ __('Customize menu') }}</span>
+                </button>
+            </div>
         </div>
 
-        <nav class="sb-nav" id="sidebarNav">
-            @foreach($navGroups as $group)
-                @php $gKey = $group['key']; @endphp
-                <div class="sb-group" data-group="{{ $gKey }}">
-                    <button type="button" class="sb-group-title" data-group-toggle="{{ $gKey }}">
-                        <span>{{ $group['label'] }}</span>
-                        <i class="ph ph-caret-down"></i>
+        {{-- In-Place Sidebar Customizer View (Replaces menu right inside sidebar with exact sidebar colors) --}}
+        <div id="sidebarCustomizerView" class="sb-view-customizer" style="display: none;">
+            <div class="sb-cust-top">
+                <div class="flex items-center justify-between">
+                    <span class="sb-cust-title-main">{{ __('Customize menu') }}</span>
+                    <button type="button" class="sb-cust-close-inline" id="sbCustCloseInlineBtn" title="{{ __('Close') }}">
+                        <i class="ph ph-x"></i>
                     </button>
-                    <ul class="sb-group-items">
-                        @foreach($group['items'] as $item)
-                            <li>
-                                <a href="{{ route($item['route']) }}" class="sb-item {{ $item['isActive'] ? 'is-active' : '' }}" data-label="{{ strtolower($item['label']) }}" @if($item['isActive']) aria-current="page" @endif>
-                                    <i class="sb-icon {{ $item['isActive'] ? 'ph-fill' : 'ph-duotone' }} ph-{{ $item['icon'] }}"></i>
-                                    <span class="sb-label">{{ $item['label'] }}</span>
-                                    @if(!empty($item['badge']))
-                                        <span class="sb-badge sb-badge-{{ $item['badgeTone'] }}" title="{{ $item['badgeTitle'] ?? '' }}">{{ $item['badge'] > 99 ? '99+' : $item['badge'] }}</span>
-                                    @endif
-                                </a>
-                            </li>
-                        @endforeach
-                    </ul>
                 </div>
-            @endforeach
-            <p class="sb-empty hidden" id="sidebarEmpty">{{ __('No menu items match.') }}</p>
-        </nav>
+                <p class="sb-cust-hint-text">
+                    {{ __('Drag or use arrows to reorder.') }}<br>
+                    {{ __('Use the eye to hide a menu.') }}<br>
+                    <span class="sb-cust-hint-subtext">{{ __('Dashboard and Settings are always shown.') }}</span>
+                </p>
+            </div>
+
+            <div class="sb-cust-items-wrap" id="sbCustList">
+                {{-- Populated dynamically --}}
+            </div>
+
+            <div class="sb-cust-bottom-bar">
+                <button type="button" class="sb-cust-reset-btn" id="sbCustResetBtn">
+                    <i class="ph ph-arrow-counter-clockwise"></i> {{ __('Reset') }}
+                </button>
+                <button type="button" class="sb-cust-done-btn" id="sbCustDoneBtn">
+                    <i class="ph-bold ph-check"></i> {{ __('Done') }}
+                </button>
+            </div>
+        </div>
 
         <div class="sb-footer">
             <div class="sb-user">
@@ -686,6 +736,17 @@
                             @endif
                         </a>
                     </div>
+                </div>
+
+                <!-- 3. NAVIGATION -->
+                <div class="customizer-section">
+                    <label class="customizer-label">
+                        <i class="ph ph-sidebar text-sm"></i> {{ __('NAVIGATION') }}
+                    </label>
+                    <button type="button" onclick="window.closeCustomizerDrawer && window.closeCustomizerDrawer(); window.AdminSidebarCustomizer && window.AdminSidebarCustomizer.open();" class="customizer-full-btn">
+                        <i class="ph ph-faders text-lg"></i>
+                        <span>{{ __('Customize Sidebar Menu') }}</span>
+                    </button>
                 </div>
 
                 <!-- 4. VIEW OPTIONS -->
@@ -1097,6 +1158,7 @@
     <script src="{{ asset('assets/shared/fx-select.js') }}?v=3.0.0"></script>
     <script src="{{ asset('assets/admin/admin.js') }}?v=2.1.0"></script>
     <script src="{{ asset('assets/admin/col-customizer.js') }}?v=1.2.0"></script>
+    <script src="{{ asset('assets/admin/sidebar-customizer.js') }}?v=2.0.0"></script>
     <script>
         // ==================== LIVE CUSTOMIZER CONTROLLER ====================
         (function() {
